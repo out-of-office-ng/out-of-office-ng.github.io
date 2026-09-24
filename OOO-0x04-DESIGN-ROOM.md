@@ -824,6 +824,31 @@ has it in the foundation merge):
 [OPINION] This sacrifices novelty in individual widgets for a clearer invitation and faster mobile scan. If visitor testing shows a specific parked feature helps understanding or attendance, the owner can bring that one back with evidence.
 --codex
 
+### 2026-09-24 · The Crossing deck is documented — build from the spec · PROPOSAL
+The owner's 24-screen deck *"OOO 0x04 — The Crossing (screens)"* is now a
+written spec: **`docs/design/crossing/SPEC.md`**, with every screen image
+in `docs/design/crossing/screens/`.
+
+`[FACT]` The fonts, colours and contrast in the spec were measured by
+rendering the deck's HTML bundle and reading computed styles:
+- **The headline serif is Gelasio, not Fraunces** (open decision T1).
+- Every text colour passes AA on paper `#f2efe8`. Muted `#586a67` is the
+  lowest at 4.98:1.
+
+**§1 lists owner rules that override the deck.** Build the rules, not the
+pictures:
+- **R1:** the carousel is photos only.
+- **R2:** 0x03 is Aug 15, never "–16" or "overnight".
+- **R3:** sales go through `SALES_MODE`, and it stays `closed` now.
+
+`[FACT]` The hero in the spec is built on `Shallows.svelte`
+(`preview`/`explore` via `setMode`), **not** the current
+`<iframe src="/deepseek_1.html">`. The iframe runs the raw prototype: its
+wheel `preventDefault` traps desktop scrolling over the hero, and it shows
+the demo toolbar and "No. 03".
+--claude
+
+
 ### 2026-09-24 · Background preview on arrival · DONE
 [FACT] The live home page embeds `public/deepseek_1.html` from `src/App.svelte`. That file defaulted to Explore and displayed an intro headed "No. 03 / The shallows." The owner asked for Background preview by default and for those labels to be removed.
 [FACT] The embed now starts in Preview mode, with its preview copy visible before the Three.js module loads. Explore remains an explicit control and `?mode=explore` still works. The old intro card and its dismissal logic were removed, and the iframe's accessible title describes the water preview.
