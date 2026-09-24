@@ -1,61 +1,28 @@
 <script>
   import { onMount } from 'svelte';
   import HeaderBar from './lib/HeaderBar.svelte';
-  import BootSequence from './lib/BootSequence.svelte';
-  import PaperHero from './lib/PaperHero.svelte';
-  import Shallows from './lib/Shallows.svelte';
-  import EscapeMetrics from './lib/EscapeMetrics.svelte';
-  import MemoryTimeline from './lib/MemoryTimeline.svelte';
-  import FeaturedShowcase from './lib/FeaturedShowcase.svelte';
+  import Postcard from './lib/Postcard.svelte';
   import Playlist from './lib/Playlist.svelte';
+  import MemoryTimeline from './lib/MemoryTimeline.svelte';
   import Tickets from './lib/Tickets.svelte';
-  import ScrollReveal from './lib/ScrollReveal.svelte';
-  import ChaosLayer from './lib/ChaosLayer.svelte';
+  import ScheduleFAQ from './lib/ScheduleFAQ.svelte';
   import AboutEvent from './lib/AboutEvent.svelte';
   import EventTrail from './lib/EventTrail.svelte';
   import RsvpDrawer from './lib/RsvpDrawer.svelte';
   import OooGeneratorModal from './lib/OooGeneratorModal.svelte';
-  import ScheduleFAQ from './lib/ScheduleFAQ.svelte';
-  import { pageProgress } from './lib/scrollProgress.js';
-  import { forcedCalm, goAway, goOnline } from './lib/calm.js';
+  import ScrollReveal from './lib/ScrollReveal.svelte';
 
-  // Set only when the owner confirms the exact 0x04 date.
-  const EVENT_DATE = null;
   let isDrawerOpen = false;
   let isOooGenOpen = false;
-  let isScrolled = false;
-  let showStickyCta = false;
   let currentRoute = typeof window !== 'undefined' ? window.location.hash || '#/' : '#/';
+  
   const openDrawer = () => isDrawerOpen = true;
   const openOooGen = () => isOooGenOpen = true;
   function onHashChange() { currentRoute = window.location.hash || '#/'; }
-  function handleStatusChange(online) {
-    if (online) goOnline(); else goAway();
-    window.dispatchEvent(new CustomEvent(online ? 'oooStatusOnline' : 'oooStatusAway'));
+  
+  function scrollToContent() {
+    document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' });
   }
-  function onBoard() {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.querySelector('.tickets-section')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth' });
-  }
-  onMount(() => {
-    let frame = 0;
-    function readScroll() {
-      frame = 0;
-      isScrolled = window.scrollY > 80;
-      showStickyCta = window.scrollY > window.innerHeight * .8;
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      pageProgress.set(total <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / total)));
-    }
-    function queueScroll() { if (!frame) frame = requestAnimationFrame(readScroll); }
-    readScroll();
-    window.addEventListener('scroll', queueScroll, { passive: true });
-    window.addEventListener('resize', queueScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', queueScroll);
-      window.removeEventListener('resize', queueScroll);
-    };
-  });
 </script>
 
 <svelte:window on:hashchange={onHashChange} />
@@ -65,18 +32,61 @@
 {:else if currentRoute === '#/trail'}
   <EventTrail />
 {:else}
-  <BootSequence />
-  <HeaderBar scrollState={isScrolled ? 'frosted' : 'transparent'} onOpenDrawer={openDrawer} onStatusChange={handleStatusChange} />
-  <div class="chaos-rain"><ChaosLayer progress={$forcedCalm} /></div>
+  <HeaderBar scrollState="transparent" onOpenDrawer={openDrawer} />
+  
   <main>
-    <iframe src="/deepseek_1.html" title="The shallows" style="width: 100vw; height: 100vh; border: none; display: block; pointer-events: auto;"></iframe>
-    <Tickets showSticky={showStickyCta} onOpenDrawer={openDrawer} />
+    <section class="hero-wrapper">
+      <iframe src="/deepseek_1.html" title="The shallows" class="shallows-frame"></iframe>
+      <button class="scroll-prompt" on:click={scrollToContent} aria-label="Scroll to content">
+        Explore the Party ↓
+      </button>
+    </section>
+
+    <div id="content-start">
+      <ScrollReveal let:visible><Postcard {visible} /></ScrollReveal>
+      <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
+      <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
+      <ScheduleFAQ />
+      <ScrollReveal let:visible><Tickets {visible} showSticky={false} onOpenDrawer={openDrawer} /></ScrollReveal>
+    </div>
   </main>
+
   <RsvpDrawer isOpen={isDrawerOpen} onClose={() => isDrawerOpen = false} />
   <OooGeneratorModal isOpen={isOooGenOpen} onClose={() => isOooGenOpen = false} />
 {/if}
 
 <style>
-  /* Hallmark · macrostructure: crossing · tone: analog · anchor hue: deep water */
-  .chaos-rain { position: fixed; inset: 80px 0 0; pointer-events: none; z-index: 90; }
+  .hero-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+  .shallows-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    pointer-events: auto;
+  }
+  .scroll-prompt {
+    position: absolute;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    right: 24px;
+    z-index: 10;
+    background: var(--ink, #181818);
+    color: var(--bg, #f6f4f1);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-family: var(--sans, system-ui, sans-serif);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .scroll-prompt:hover {
+    transform: translateY(-2px);
+    background: var(--blue, #00bfff);
+  }
 </style>
