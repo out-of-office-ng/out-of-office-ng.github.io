@@ -153,8 +153,8 @@ content gaps.
   - **Build this on that component, not on the current
     `<iframe src="/deepseek_1.html">`.** The iframe runs the raw prototype,
     whose wheel handler calls `preventDefault()` (so desktop scroll is
-    trapped over the hero), which shows its demo toolbar, and which still
-    says "No. 03".
+    trapped over the hero) and shows its demo toolbar. The earlier "No. 03"
+    and "The shallows" intro was removed; the embed now opens in preview mode.
   - The hero text must be real HTML, because it's what paints first, and
     the scene fades in behind it.
 - **Gaps:** none.
