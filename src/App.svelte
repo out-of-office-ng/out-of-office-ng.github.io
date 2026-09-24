@@ -3,6 +3,7 @@
   import HeaderBar from './lib/HeaderBar.svelte';
   import Postcard from './lib/Postcard.svelte';
   import Playlist from './lib/Playlist.svelte';
+  import Community from './lib/Community.svelte';
   import MemoryTimeline from './lib/MemoryTimeline.svelte';
   import Tickets from './lib/Tickets.svelte';
   import ScheduleFAQ from './lib/ScheduleFAQ.svelte';
@@ -45,6 +46,7 @@
     <div id="content-start">
       <ScrollReveal let:visible><Postcard {visible} /></ScrollReveal>
       <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
+      <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
       <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
       <ScheduleFAQ />
       <ScrollReveal let:visible><Tickets {visible} showSticky={false} onOpenDrawer={openDrawer} /></ScrollReveal>
