@@ -3,8 +3,8 @@
   // App's calm-aware progress: scroll, or the AWAY toggle's tween to 1.
   export let progress = 0;
 
-  const STORAGE_KEY = "oooChaosDismissed";
-  let dismissedIds = [];
+  const ALL_POPUP_IDS = ['whatsapp','slack','email','calendar','twitter','instagram','zoom','trello','bank','battery'];
+  let dismissedIds = [...ALL_POPUP_IDS];
   let burstingIds = [];
   // True while AWAY's mass burst plays: hold the layer at full strength so
   // the bursts are actually seen, instead of fading out under them as the
@@ -32,8 +32,6 @@
     }
   }
 
-  const ALL_POPUP_IDS = ['whatsapp','slack','email','calendar','twitter','instagram','zoom','trello','bank','battery'];
-
   function handleAwayEvent() {
     // The mute moment: every popup still on screen bursts at once.
     // dismissedIds is set to ALL up front so storage/restore stay
@@ -41,20 +39,12 @@
     burstingIds = progress < 0.58 ? ALL_POPUP_IDS.filter((id) => !dismissedIds.includes(id)) : [];
     awayBurst = burstingIds.length > 0;
     dismissedIds = [...ALL_POPUP_IDS];
-    try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedIds));
-    } catch {}
     // Stop the battery notification from bouncing
     clearInterval(batteryTimer);
     batteryTimer = null;
   }
 
   onMount(() => {
-    try {
-      dismissedIds = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
-    } catch {
-      dismissedIds = [];
-    }
     if (typeof window !== 'undefined') {
       window.addEventListener('oooStatusOnline', handleOnlineEvent);
       window.addEventListener('oooStatusAway', handleAwayEvent);
@@ -77,9 +67,6 @@
     burstingIds = burstingIds.filter((b) => b !== id);
     if (dismissedIds.includes(id)) return; // AWAY pre-dismisses
     dismissedIds = [...dismissedIds, id];
-    try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedIds));
-    } catch {}
   }
 
   // The System Notification card keeps "re-popping" at a new spot every

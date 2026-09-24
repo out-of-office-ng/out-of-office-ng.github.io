@@ -37,7 +37,7 @@
     {
       stamp: 'OOO 0x04',
       title: '???',
-      meta: 'Up next · Date TBA',
+      meta: 'Up next · November',
       note: 'The next escape is loading. Stay tuned.',
       pending: true,
       color: 'var(--muted-green)',

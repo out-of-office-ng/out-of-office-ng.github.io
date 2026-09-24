@@ -9,10 +9,11 @@
   // AWAY is the site's fast lane to calm (see calm.js). The one-line
   // status note is inline feedback attached to its own control, not a
   // toast system.
-  let isOnline = true;
+  let isOnline = false;
   let statusNote = false;
   let statusMessage = '';
   let noteTimer;
+  let autoMuteTimer;
 
   function toggleStatus() {
     isOnline = !isOnline;
@@ -23,6 +24,20 @@
     statusNote = true;
     clearTimeout(noteTimer);
     noteTimer = setTimeout(() => (statusNote = false), 3200);
+    
+    clearTimeout(autoMuteTimer);
+    if (isOnline) {
+      autoMuteTimer = setTimeout(() => {
+        if (isOnline) {
+          isOnline = false;
+          onStatusChange(false);
+          statusMessage = 'AWAY 🌴 — Auto-reply re-enabled.';
+          statusNote = true;
+          clearTimeout(noteTimer);
+          noteTimer = setTimeout(() => (statusNote = false), 3200);
+        }
+      }, 8000);
+    }
   }
   onDestroy(() => clearTimeout(noteTimer));
 </script>

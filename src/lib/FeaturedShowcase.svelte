@@ -12,18 +12,17 @@
 
   /** @type {Array<{badge?:string,title:string,meta:string,rating?:string,description:string,price?:string,image?:string}>} */
   export let items = [];
-  export let eyebrow = "Featured showcase";
-  export let heading = "Spin through the picks";
+  export let eyebrow = "Previous escapes";
+  export let heading = "Moments from the journey";
 
-  const PLACEHOLDER_ITEMS = Array.from({ length: 6 }, (_, i) => ({
-    badge: "— badge —",
-    title: `— card ${i + 1} title —`,
-    meta: "— location / context —",
-    rating: "—",
-    description: "Placeholder description — swap this copy for the real thing before shipping.",
-    price: "— price —",
-    image: "",
-  }));
+  const PLACEHOLDER_ITEMS = [
+    { title: "OOO 0x01", meta: "The Post-NYSC Hangout", description: "Tarkwa Bay Beach · Apr 11, 2025" },
+    { title: "OOO 0x02", meta: "Open Canvas", description: "Jaekel House Garden · May 30, 2025" },
+    { title: "OOO 0x03", meta: "Release and Unwind", description: "Tarkwa Bay Beach · Aug 15–16, 2026" },
+    { title: "OOO 0x01", meta: "The Post-NYSC Hangout", description: "Tarkwa Bay Beach · Apr 11, 2025" },
+    { title: "OOO 0x02", meta: "Open Canvas", description: "Jaekel House Garden · May 30, 2025" },
+    { title: "OOO 0x03", meta: "Release and Unwind", description: "Tarkwa Bay Beach · Aug 15–16, 2026" },
+  ];
 
   $: cards = items.length ? items : PLACEHOLDER_ITEMS;
   $: count = cards.length;
