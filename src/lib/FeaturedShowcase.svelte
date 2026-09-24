@@ -23,7 +23,7 @@
     {
       title: 'OOO 0x03',
       meta: 'Release and Unwind',
-      description: 'Tarkwa Bay Beach · Aug 15–16, 2026 · overnight camp',
+      description: 'Tarkwa Bay Beach · Aug 15, 2026',
       number: '03',
       tone: 'var(--seafoam)',
     },

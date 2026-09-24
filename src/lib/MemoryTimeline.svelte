@@ -30,7 +30,7 @@
     {
       stamp: 'OOO 0x03',
       title: 'Release and Unwind',
-      meta: 'Tarkwa Bay Beach · Aug 15–16 · overnight beach camp',
+      meta: 'Tarkwa Bay Beach · Aug 15',
       note: 'Took a break from the Lagos palava.',
       color: 'var(--pink-deep)',
     },
