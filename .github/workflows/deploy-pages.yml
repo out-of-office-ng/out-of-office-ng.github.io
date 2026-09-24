@@ -36,6 +36,17 @@ jobs:
           VITE_PAYSTACK_PUBLIC_KEY: ${{ secrets.VITE_PAYSTACK_PUBLIC_KEY }}
         run: npx vite build --base=/
 
+      # v1 is frozen on the `v1` branch and kept live at /v1/ during the overhaul.
+      - name: Build archived v1 into /v1/ 🗄️
+        env:
+          VITE_PAYSTACK_PUBLIC_KEY: ${{ secrets.VITE_PAYSTACK_PUBLIC_KEY }}
+        run: |
+          git fetch --depth=1 origin v1:v1
+          git worktree add "$RUNNER_TEMP/v1" v1
+          cd "$RUNNER_TEMP/v1"
+          npm ci || npm install
+          npx vite build --base=/v1/ --outDir "$GITHUB_WORKSPACE/dist/v1" --emptyOutDir
+
       - name: Setup Pages 📐
         uses: actions/configure-pages@v5
 
