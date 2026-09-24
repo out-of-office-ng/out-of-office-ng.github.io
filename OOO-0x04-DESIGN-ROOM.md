@@ -813,3 +813,13 @@ has it in the foundation merge):
   `ooo-codex-audit` worktree. Your `.dump/` notes were kept under
   `.dump/from-ooo-codex-*` in the main folder.
 --claude
+
+### 2026-09-24 · Shared beach-event skill · CRITIQUE
+[FACT] `.gemini/skills/out-of-office-project/SKILL.md` still instructs agents to use the v1 scroll-pinned cube and phone-card layout, while `src/App.svelte` on this branch renders a shallows HTML experiment and `OOO-0x04-DESIGN-ROOM.md` records the later paper/water direction. The old skill also calls past flyers ground truth without distinguishing them from unannounced 0x04 facts.
+[OPINION] Add a cross-agent beach-event skill for durable brand, event-honesty, mobile and interaction rules, and replace the stale Gemini architecture prescription with a pointer to current code and the new skill. The cost is that agents must inspect the current implementation instead of following a fixed layout recipe; that is appropriate while the design changes.
+--codex
+
+### 2026-09-24 · Shared beach-event skill · DONE
+[FACT] Added `.agents/skills/beach-event-site/SKILL.md` with current OOO event facts and rules for truthful beach imagery, practical event status, manual carousel control, mobile readability, water/audio fallbacks, and verification. Linked it into `.claude/skills/`; the Gemini design router already searches `.agents/skills/`. Replaced `.gemini/skills/out-of-office-project/SKILL.md`'s v1-only cube/card prescription with current repo pointers and a link to the new skill.
+[FACT] The skill-creator `quick_validate.py` reports "Skill is valid!"; the Claude symlink resolves and `git diff --check` passes. This docs-only change does not alter or deploy the site.
+--codex

@@ -1,122 +1,25 @@
 ---
 name: out-of-office-project
-description: >
-  Context, rules, and conventions for working on the Out of Office Lagos
-  brand site (Svelte 5 + Vite + Three.js). Activate whenever opening,
-  editing, or discussing this repository.
+description: Project context and repository workflow for the Out of Office Lagos Svelte site. Use when editing or discussing this repository; load the beach-event-site skill for its event experience and content rules.
 ---
 
-# Out of Office — Project Skill
+# Out of Office — project context
 
-## ALWAYS do this first (multi-agent repo rule)
+This is a Svelte 5 + Vite + Three.js site for a Lagos gathering series. Its live page is served from `main` at `https://out-of-office-ng.github.io/`; the frozen older site is on `v1` and at `/v1/`. Pushing `main` also syncs the owner's portfolio, so treat a deployment request as a separate action from an ordinary edit.
 
-```bash
-git branch --show-current   # confirm which branch you're actually on
-git fetch origin
-git status   # if behind/diverged: stash -> pull -> pop -> resolve -> verify
-```
+## Start from the checkout you actually have
 
-If you have local edits and discover new remote commits:
-1. `git stash -u -m "<description>"`
-2. `git pull origin <branch>`
-3. `git stash pop`
-4. Resolve conflicts explicitly after reviewing both sides; preserve upstream and local intent without automatically favoring or discarding either side. Read what each side actually changed and reconcile intentionally.
-5. Confirm your active branch dynamically (`git branch --show-current`); do not hardcode or assume a fixed branch name.
-6. Verify app still runs before committing.
-7. Re-fetch immediately before every push.
+- Check `git branch --show-current`, `git status`, and the current remote state before editing. This is a shared workspace: another agent may move a branch or edit a file while you work. Preserve uncommitted work; use a separate worktree when needed.
+- Read `OOO-0x04-DESIGN-ROOM.md` for the current brief and decision log. Inspect `src/App.svelte` and the affected components before describing the active layout. Earlier versions used a scroll-pinned cube and phone-shaped card; those are **v1 history, not a standing rule for the current site**.
+- Use [the shared beach-event skill](../../.agents/skills/beach-event-site/SKILL.md) for event facts, copy, beach imagery, tickets, mobile behaviour, motion, sound, and review checks. It applies across the current design experiments without fixing one layout in advance.
 
----
+## Repository facts that remain useful
 
-## Project Structure
+- Hash routes use `#/`, `#/about`, and `#/trail`. The current sales switch is `src/lib/sales.js`; read it before changing any pass or checkout entry point.
+- Brand tokens are in `tokens.css` and `src/app.css`. Fonts are served from `public/fonts/`; do not add a font CDN to recreate the existing typography.
+- `docs/brand-reference/` contains flyers for **past** events. They are not evidence for OOO 0x04's venue, date, tiers, or prices.
+- `.github/workflows/deploy-pages.yml` builds the root site and the `v1` archive. `.github/workflows/deploy-to-portfolio.yml` syncs a `main` build to the portfolio. Keep the archive intact.
 
-```text
-src/
-  App.svelte              # Page shell: scroll-pin hero, scroll progress, section list
-  app.css                 # Brand CSS vars + self-hosted @font-face rules
-  lib/
-    HeaderBar.svelte      # 3-block top strip (STATUS/AWAY | ESCAPE | ooo logo)
-    FooterBar.svelte      # Footer (AUTO REPLY | LAGOS | fine print)
-    BootSequence.svelte   # Animated boot/auto-reply loading screen
-    RotatingCube.svelte   # Three.js 27-cubie Rubik cube (scroll-driven)
-    DanfoBus.svelte       # Animated danfo bus hero bg element
-    EscapeMetrics.svelte  # Escape metrics data section
-    Community.svelte      # Community/polaroids section
-    MemoryTimeline.svelte # OOO 001 / 002 / ... memory timeline
-    Playlist.svelte       # Playlist section
-    Tickets.svelte        # Tickets CTA section
-docs/
-  brand-reference/        # Real event flyers — GROUND TRUTH for brand
-public/fonts/             # Self-hosted woff2: fredoka, space-grotesk,
-                          # bungee, fraunces, permanent-marker
-```
+## Finish the scoped work
 
----
-
-## Brand Identity (treat flyers as ground truth)
-
-### Colours
-
-| Role              | Hex                   |
-|-------------------|-----------------------|
-| Wordmark blue     | #00bfff               |
-| Teal vivid        | #08cabd               |
-| Teal mid          | #37999d to #59b7b0    |
-| Paper/cream bg    | #f6f4f1               |
-| Pink accent       | #fc9ce0               |
-| Yellow-green      | #c2c100               |
-| Ink (near-black)  | #181818               |
-
-CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
-
-### Typography
-
-| Role                  | Font               | CSS var      |
-|-----------------------|--------------------|--------------|
-| Wordmark / headline   | Fredoka Bold       | --display    |
-| Sub-event names       | Fraunces Black     | --serif      |
-| Tags / date badges    | Bungee             | --bungee     |
-| Handwritten notes     | Permanent Marker   | --marker     |
-| Body / meta / labels  | Space Grotesk      | --sans       |
-
-### Texture & layout devices
-- Flat cream bg + SVG feTurbulence grain (no image asset needed)
-- Ticket/zine devices: vertical spine text, barcode, QR, care-label icons,
-  + accents, smiley-flower stickers, paint-splat scatter
-- Numbered event stamps: OOO 001, OOO 002, OOO 003 ...
-
----
-
-## Architecture
-
-### Scroll-pin hero
-- .scroll-track -> height: 220vh (scroll room)
-- .pinned -> position: sticky; top: 0; height: 100vh (pins the hero)
-- progress (0->1) from .scroll-track position -> passed to <RotatingCube {progress}/>
-- activated at progress >= 0.995 -> "Out of Office Activated" reveal
-
-### Layout (phone-shaped card, centered)
-- .frame is a portrait card: width min(100%, 480px), aspect-ratio 9/16,
-  max-height 100vh, border-radius 20px, box-shadow
-- .frame goes edge-to-edge (no radius/shadow/aspect-ratio) only under the
-  700px mobile breakpoint
-- Header/footer bars stretch to the card's width, not the viewport's
-
-### RotatingCube
-- progress=0 -> scrambled (Lagos chaos); progress=1 -> solved (OOO activated)
-- Six solid brand-color faces (`#00bfff` blue, `#e0568f` pink, `#08cabd` teal, `#e8c9a0` sand, `#ff7b4d` orange, `#7c9473` green), chaos-tinted checkerboard (`#ffc72c` yellow / `#d92b2b` red) while scrambled, face-spanning decals, `MeshPhysicalMaterial`
-- 27 cubies with ghost-mesh motion blur on layer twists; drag-to-spin + pointer parallax
-
----
-
-## Rules for AI agents working here
-
-1. Always git fetch before starting and before every push
-2. Never overwrite upstream changes — stash, pull, reapply, resolve
-3. Treat docs/brand-reference/ flyers as ground truth
-4. Phone-shaped card layout — .frame is a centered portrait card (see
-   Architecture above), not full-bleed. This was restored per explicit
-   user instruction on 2026-07-13 after an earlier agent's self-authored
-   "full-bleed, no card" rule had silently overridden it.
-5. Fonts are self-hosted in public/fonts/ — do not switch back to CDN links
-6. Commit messages: "scope: what\n\nwhy + merge decisions"
-7. Before any layout change, understand the scroll-pin architecture first
+Run checks appropriate to the change. For UI work, verify the affected flow in a real browser at phone width and desktop width, then report what ran. Re-fetch before a push, review new commits, and reconcile conflicts intentionally; do not automatically stash, pull, or discard another agent's edits. Sign design-room entries and commits with your own agent tag.
