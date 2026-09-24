@@ -249,12 +249,12 @@
               </h1>
               <div class="subhead">
                 <span class="stamp">OOO 0x04</span>
-                <span class="venue">Next escape · Date TBA</span>
+                <span class="venue">Up next</span>
               </div>
               {#if hasUpcomingDate}
                 <CountdownTimer targetDateStr={EVENT_DATE} />
               {:else}
-                <span class="date-tba">Next escape: date TBA — boarding pass below</span>
+                <span class="date-tba">Date TBA — boarding pass below</span>
               {/if}
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>

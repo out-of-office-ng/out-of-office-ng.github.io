@@ -437,6 +437,12 @@
     animation: batteryPop 0.5s var(--ease-out-expo) both,
                floatChaos 4s ease-in-out infinite alternate 0.5s;
   }
+  /* .glass's own animation shorthand outranks .popup-card.bursting on
+     specificity, so the battery card never burst (and animationend never
+     settled it). Re-assert the burst at matching specificity. */
+  .popup-card.glass.bursting {
+    animation: cardBurst 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
   .popup-card.glass .popup-header,
   .popup-card.glass .popup-header .app-name {
     color: #181818;

@@ -1,6 +1,5 @@
 <script>
   import MorphText from './MorphText.svelte';
-  import { muted, toggleMute } from './ambientSound.js';
   import { fade } from 'svelte/transition';
 
   export let visible = false;
@@ -59,16 +58,6 @@
         <div class="route-point">
           <span class="code blue">OOO</span>
           <span class="city">Blue Lagos (Tarkwa Bay)</span>
-          <button
-            type="button"
-            class="sound-toggle"
-            aria-pressed={!$muted}
-            aria-label={$muted ? 'Unmute ambient sound' : 'Mute ambient sound'}
-            on:click={toggleMute}
-          >
-            <span aria-hidden="true">{$muted ? '🔇' : '🔊'}</span>
-            <span class="sound-toggle-label">{$muted ? 'Sound off' : 'Sound on'}</span>
-          </button>
         </div>
       </div>
 
@@ -271,27 +260,6 @@
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
-  }
-
-  .sound-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin-top: 0.4rem;
-    padding: 0.3rem 0.6rem;
-    border: 1.5px solid var(--blue, #00bfff);
-    border-radius: 999px;
-    background: rgba(0, 191, 255, 0.06);
-    color: var(--blue, #00bfff);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
-  }
-  .sound-toggle:hover {
-    background: rgba(0, 191, 255, 0.14);
-    transform: translateY(-1px);
   }
 
   .route-arrow {
