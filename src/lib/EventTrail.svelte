@@ -46,12 +46,12 @@
       stamp: 'OOO 0x03',
       hex: '0x03',
       title: 'Release and Unwind',
-      venue: 'TBA',
-      date:  'TBA',
-      time:  'TBA',
+      venue: 'Tarkwa Bay Beach',
+      date:  'Aug 15–16, 2026',
+      time:  'Overnight beach camp',
       color: 'var(--pink-deep)',
       textColor: '#fff',
-      active: true,
+      done: true,
       tagline: 'Take a break from the Lagos palava.',
       image: saveTheDate,
     },
@@ -59,13 +59,13 @@
       stamp: 'OOO 0x04',
       hex: '0x04',
       title: '???',
-      venue: 'Coming soon',
+      venue: 'TBA',
       date:  'TBA',
       time:  'TBA',
       color: 'var(--muted-green)',
       textColor: 'var(--ink)',
-      pending: true,
-      tagline: 'Stay tuned.',
+      active: true,
+      tagline: 'The next escape is loading. Stay tuned.',
     },
   ];
 
@@ -210,7 +210,7 @@
           {#if ev.done}
             <a href="#/about" class="card-cta done-cta">View recap ↗</a>
           {:else if ev.active}
-            <a href="#open-canvas-event" class="card-cta active-cta">RSVP now ↗</a>
+            <a href="#/" class="card-cta active-cta">Get on the list ↗</a>
           {:else}
             <span class="card-cta pending-cta">Reveal TBA</span>
           {/if}

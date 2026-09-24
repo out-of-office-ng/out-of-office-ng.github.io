@@ -1,10 +1,8 @@
 <script>
   import { onMount } from 'svelte';
-  import { isDark, toggleTheme } from './theme.js';
   import { muted, toggleMute } from './ambientSound.js';
 
   export let onOpenDrawer = () => {};
-  export let onOpenOooGen = () => {};
   export let onStatusChange = (onlineState) => {};
   export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
 
@@ -57,10 +55,6 @@
         OOO PASS
       </button>
 
-      <button type="button" class="action-pill" on:click={onOpenOooGen}>
-        AUTO-REPLY
-      </button>
-
       <button
         type="button"
         class="action-pill"
@@ -68,15 +62,6 @@
         title="Toggle Sound"
       >
         {#if $muted} UNMUTE {:else} MUTE {/if}
-      </button>
-
-      <button
-        type="button"
-        class="action-pill theme-pill"
-        on:click={toggleTheme}
-        title="Toggle Theme"
-      >
-        {#if $isDark} DAY {:else} NIGHT {/if}
       </button>
     </nav>
   </div>

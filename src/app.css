@@ -83,22 +83,6 @@
   --dur-slow: 0.8s;
 }
 
-:root[data-theme="dark"] {
-  /* Pitch obsidian warm dark — matches About page palette */
-  --bg: #0a0b0c;
-  --ink: #e6e6dc;
-  --cream: #141513;
-  --muted: #c6c7bd;
-  --card-surface: #1a1b18;
-  --border-soft: #2a2b27;
-  --border-soft-deep: #34352f;
-  --border-dashed: #3e3f38;
-  --island-divider: rgba(255, 255, 255, 0.14);
-  --blue: oklch(70% 0.15 245);
-  --pink-deep: oklch(72% 0.22 340);
-  --chaos-yellow: oklch(82% 0.19 85);
-}
-
 * {
   box-sizing: border-box;
 }

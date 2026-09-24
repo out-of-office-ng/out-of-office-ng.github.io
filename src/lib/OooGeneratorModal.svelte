@@ -1,5 +1,4 @@
 <script>
-  import { addToast } from './toastStore.js';
   import { fade, scale } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
@@ -48,13 +47,18 @@
     }
   }
 
-  function copyToClipboard() {
-    navigator.clipboard.writeText(generatedText);
-    addToast({
-      title: 'OOO Message Copied! 📋',
-      description: 'Paste it into your Outlook / Gmail auto-responder and go touch grass!',
-      type: 'success'
-    });
+  // Inline confirmation on the button itself — no toasts.
+  let copied = false;
+  let copiedTimer;
+  async function copyToClipboard() {
+    try {
+      await navigator.clipboard.writeText(generatedText);
+    } catch {
+      return;
+    }
+    copied = true;
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => (copied = false), 1800);
   }
 </script>
 
@@ -126,7 +130,7 @@
         <div class="output-card">
           <div class="card-header">
             <span class="card-title">Generated Auto-Responder</span>
-            <button class="copy-btn" on:click={copyToClipboard}>📋 Copy Auto-Reply</button>
+            <button class="copy-btn" on:click={copyToClipboard}>{copied ? 'Copied ✓ Now go touch grass' : '📋 Copy Auto-Reply'}</button>
           </div>
           <pre class="preview-box">{generatedText}</pre>
         </div>

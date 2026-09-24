@@ -1,5 +1,4 @@
 <script>
-  import { addToast } from './toastStore.js';
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
@@ -16,6 +15,10 @@
   let selectedBadge = 'Offline Legend';
   let confirmedPass = null;
   let paying = false;
+  // Inline feedback, shown in the step that owns the action (no toasts).
+  let formNote = '';
+  let copied = false;
+  let copiedTimer;
 
   const TIERS = [
     {
@@ -60,21 +63,14 @@
   ];
 
   function handleConfirm() {
+    formNote = '';
     if (!attendeeName.trim()) {
-      addToast({
-        title: 'Name Required',
-        description: 'Please enter your name or alias to issue your pass.',
-        type: 'warning'
-      });
+      formNote = 'Add your name or alias so we can issue your pass.';
       return;
     }
 
     if (!attendeeEmail.trim()) {
-      addToast({
-        title: 'Email Required',
-        description: 'Please enter your email address for your ticket confirmation.',
-        type: 'warning'
-      });
+      formNote = 'Add your email so your pass receipt has somewhere to land.';
       return;
     }
 
@@ -95,11 +91,7 @@
         },
         onCancel: () => {
           paying = false;
-          addToast({
-            title: 'Payment Cancelled',
-            description: 'You can try again anytime when ready.',
-            type: 'info'
-          });
+          formNote = 'Payment cancelled. Try again whenever you are ready.';
         }
       });
     } else {
@@ -123,28 +115,23 @@
     };
 
     step = 3;
-    addToast({
-      title: 'Pass Issued! 🎉',
-      description: `Your ${tierObj.name} pass has been confirmed for ${attendeeName}.`,
-      type: 'success'
-    });
   }
 
   function copyPassInfo() {
     if (!confirmedPass) return;
     const text = `Out of Office Pass #${confirmedPass.code}\nRef: ${confirmedPass.ref}\nHolder: ${confirmedPass.name}\nTier: ${confirmedPass.tier}\nPrice: ${confirmedPass.price}\nBadge: ${confirmedPass.badge}`;
-    navigator.clipboard.writeText(text);
-    addToast({
-      title: 'Pass Copied',
-      description: 'Pass details copied to clipboard.',
-      type: 'info'
-    });
+    navigator.clipboard?.writeText(text);
+    copied = true;
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => (copied = false), 1800);
   }
 
   function resetAndClose() {
     step = 1;
     confirmedPass = null;
     paying = false;
+    formNote = '';
+    copied = false;
     onClose();
   }
 </script>
@@ -170,7 +157,7 @@
     >
       <div class="sheet-header">
         <div>
-          <span class="badge">RELEASE & UNWIND RETREAT</span>
+          <span class="badge">OOO 0x04 · DATE TBA</span>
           <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
@@ -244,6 +231,10 @@
               </select>
             </div>
 
+            {#if formNote}
+              <p class="form-note" role="alert">{formNote}</p>
+            {/if}
+
             <div class="btn-row">
               <button class="sec-btn" on:click={() => (step = 1)}>&larr; Back</button>
               <button class="primary-btn" on:click={handleConfirm} disabled={paying}>
@@ -268,7 +259,7 @@
             </div>
 
             <div class="btn-row">
-              <button class="sec-btn" on:click={copyPassInfo}>Copy Pass Data</button>
+              <button class="sec-btn" on:click={copyPassInfo}>{copied ? 'Copied ✓' : 'Copy Pass Data'}</button>
               <button class="primary-btn" on:click={resetAndClose}>Done</button>
             </div>
           </div>
@@ -426,6 +417,16 @@
     flex-direction: column;
     gap: 0.35rem;
     font-size: 0.82rem;
+  }
+
+  .form-note {
+    margin: 0 0 1rem;
+    padding: 0.6rem 0.8rem;
+    border-left: 3px solid var(--pink-deep, #fc9ce0);
+    background: color-mix(in srgb, var(--pink-deep, #fc9ce0) 10%, transparent);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--ink);
   }
 
   .form-group {

@@ -32,7 +32,7 @@
     <p class="eyebrow"><MorphText text="Boarding pass" boost={1.3} /></p>
     <h2 class="heading">Your ticket out of yellow Lagos.</h2>
     <p class="subheading">
-      Escape Lagos noise with Release and Unwind Beach Retreat—reconnect with yourself, nature,
+      Escape Lagos noise with the next Out of Office—reconnect with yourself, nature,
       and community through yoga, painting, beach games, picnics, bonfires, and meaningful
       conversations by the ocean. Come for the experience. Leave with the memories.
     </p>
@@ -79,7 +79,7 @@
         </div>
         <div class="detail-item">
           <span class="label">DATE</span>
-          <span class="value">SUN, AUG 16, 2026</span>
+          <span class="value">TBA</span>
         </div>
         <div class="detail-item">
           <span class="label">GATE</span>
@@ -136,7 +136,7 @@
       <button type="button" class="cta-btn" on:click={onOpenDrawer}>
         Claim {selectedTier.name} →
       </button>
-      <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
+      <span class="fine-print">Secured by Paystack · OOO 0x04 · Date TBA</span>
     </div>
   </div>
 

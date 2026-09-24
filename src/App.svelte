@@ -20,28 +20,25 @@
   import StressMeter from "./lib/StressMeter.svelte";
   import AmbientSound from "./lib/AmbientSound.svelte";
   import AboutEvent from "./lib/AboutEvent.svelte";
-  import ToastSystem from "./lib/ToastSystem.svelte";
   import RsvpDrawer from "./lib/RsvpDrawer.svelte";
-  import CommandPalette from "./lib/CommandPalette.svelte";
   import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
   import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
   import EventTrail from "./lib/EventTrail.svelte";
   import CountdownTimer from "./lib/CountdownTimer.svelte";
-  import ScrollToTop from "./lib/ScrollToTop.svelte";
-  import { clearAllToasts } from "./lib/toastStore.js";
   import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
   import dropletPink from "../docs/brand-reference/paint-droplet-pink.png";
   import { pageProgress } from "./lib/scrollProgress.js";
 
+  // TODO(owner): set the real OOO 0x04 date, e.g. "December 12, 2026 12:00:00".
+  // null (or a past date) renders the "Date TBA" chip instead of a countdown.
+  const EVENT_DATE = null;
+  const hasUpcomingDate = EVENT_DATE !== null && new Date(EVENT_DATE) > new Date();
+
   let isDrawerOpen = false;
-  let isCmdKOpen = false;
   let isOooGenOpen = false;
 
   function openDrawer() { isDrawerOpen = true; }
   function closeDrawer() { isDrawerOpen = false; }
-
-  function openCmdK() { isCmdKOpen = true; }
-  function closeCmdK() { isCmdKOpen = false; }
 
   function openOooGen() { isOooGenOpen = true; }
   function closeOooGen() { isOooGenOpen = false; }
@@ -57,26 +54,6 @@
   let ticking = false;
   let smoothRafId;
   let prefersReducedMotion = false;
-
-  // Two-key Easter Egg (type 'oo')
-  const KONAMI_CODE = ['o', 'o'];
-  let konamiIndex = 0;
-  let showStats = false;
-  let statsTimer;
-
-  function onKeyDown(e) {
-    if (e.key === KONAMI_CODE[konamiIndex]) {
-      konamiIndex++;
-      if (konamiIndex === KONAMI_CODE.length) {
-        showStats = true;
-        konamiIndex = 0;
-        clearTimeout(statsTimer);
-        statsTimer = setTimeout(() => showStats = false, 6000);
-      }
-    } else {
-      konamiIndex = 0;
-    }
-  }
 
   let lastSmoothTime = 0;
   function smoothTick(now) {
@@ -94,13 +71,10 @@
   }
 
   let isScrolledPast80 = false;
-  let isScrolledPast500 = false;
   let showStickyCta = false;
-  let ticketsEl;
 
   function readProgress() {
     isScrolledPast80 = typeof window !== 'undefined' && window.scrollY > 80;
-    isScrolledPast500 = typeof window !== 'undefined' && window.scrollY > 500;
     showStickyCta = typeof window !== 'undefined' && window.scrollY > window.innerHeight * 0.8;
 
     if (!scrollTrack) return;
@@ -136,7 +110,6 @@
     updateProgress();
     window.addEventListener("scroll", updateProgress, { passive: true });
     window.addEventListener("resize", updateProgress);
-    window.addEventListener("keydown", onKeyDown);
     if (!prefersReducedMotion) {
       smoothRafId = requestAnimationFrame(smoothTick);
     }
@@ -144,9 +117,6 @@
   onDestroy(() => {
     window.removeEventListener("scroll", updateProgress);
     window.removeEventListener("resize", updateProgress);
-    window.removeEventListener("keydown", onKeyDown);
-    clearTimeout(statsTimer);
-    clearTimeout(shareToastTimer);
     if (smoothRafId) cancelAnimationFrame(smoothRafId);
   });
 
@@ -186,26 +156,6 @@
     }
   }
 
-  let shareConfirmed = false;
-  let shareToastTimer;
-  async function handleShare() {
-    const shareData = {
-      title: "Out of Office",
-      text: "Auto-reply for real life. Leaving yellow Lagos, entering blue Lagos.",
-      url: window.location.href,
-    };
-    if (navigator.share) {
-      try { await navigator.share(shareData); } catch { /* user cancelled */ }
-      return;
-    }
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(shareData.url);
-      shareConfirmed = true;
-      clearTimeout(shareToastTimer);
-      shareToastTimer = setTimeout(() => { shareConfirmed = false; }, 2000);
-    }
-  }
-
   let isOnline = true;
 
   function handleStatusChange(onlineState) {
@@ -214,20 +164,16 @@
       try {
         sessionStorage.removeItem("oooChaosDismissed");
       } catch {}
-      // Restore all chaos popups + toasts
+      // Restore all chaos popups
       window.dispatchEvent(new CustomEvent('oooStatusOnline'));
     } else {
-      // Going AWAY — kill every popup and toast immediately
-      clearAllToasts();
+      // Going AWAY — kill every popup immediately
       window.dispatchEvent(new CustomEvent('oooStatusAway'));
     }
   }
 
   function handleArrowClick() {
-    const el = document.getElementById('open-canvas-event');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    document.querySelector(".tickets-section")?.scrollIntoView({ behavior: "smooth" });
   }
 
   $: activated = progress >= 0.995;
@@ -244,7 +190,7 @@
   $: notifStage = notificationCount === 0 ? "zero" : (smoothedProgress < 0.25 || isOnline) ? "high" : "mid";
 </script>
 
-<svelte:window on:hashchange={onHashChange} on:keydown={onKeyDown} />
+<svelte:window on:hashchange={onHashChange} />
 
 {#if currentRoute === '#/about'}
   <AboutEvent />
@@ -257,7 +203,6 @@
 <HeaderBar
   scrollState={isScrolledPast80 ? 'frosted' : 'transparent'}
   onOpenDrawer={openDrawer}
-  onOpenOooGen={openOooGen}
   onStatusChange={handleStatusChange}
 />
 
@@ -273,7 +218,7 @@
         <div class="hero">
           <DanfoBus progress={smoothedProgress} />
 
-          <button class="icon-btn icon-share" aria-label="Scroll to Open Canvas event" on:click={handleArrowClick} title="Scroll to Open Canvas event (May 30)">
+          <button class="icon-btn icon-share" aria-label="Scroll to boarding pass" on:click={handleArrowClick} title="Scroll to boarding pass">
             <svg viewBox="0 0 24 24"
               ><path
                 fill="none"
@@ -285,9 +230,6 @@
               /></svg
             >
           </button>
-          {#if shareConfirmed}
-            <span class="share-toast" role="status">Link copied</span>
-          {/if}
 
           <div class="hero-row">
             <div class="headline">
@@ -307,10 +249,14 @@
                 <span class="word">OFFICE</span>
               </h1>
               <div class="subhead">
-                <span class="stamp">OOO 0x03</span>
-                <span class="venue">Tarkwa Bay · Aug 15</span>
+                <span class="stamp">OOO 0x04</span>
+                <span class="venue">Next escape · Date TBA</span>
               </div>
-              <CountdownTimer targetDateStr="August 15, 2026 12:00:00" />
+              {#if hasUpcomingDate}
+                <CountdownTimer targetDateStr={EVENT_DATE} />
+              {:else}
+                <span class="date-tba">Next escape: date TBA — boarding pass below</span>
+              {/if}
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>
                 <span class="sub">Auto replies enabled. Stress disabled.</span>
@@ -322,7 +268,7 @@
               </div>
             </div>
             <div class="cube-slot">
-              <RotatingCube {progress} />
+              <RotatingCube {progress} onOpenOooGen={openOooGen} />
             </div>
           </div>
           <Boat progress={smoothedProgress} />
@@ -336,7 +282,7 @@
 
 {#if activated}
   <div class="cube-companion" in:scale={{ duration: 550, start: 0.4, opacity: 0, easing: cubicOut }}>
-    <RotatingCube progress={1} randomSolve={true} />
+    <RotatingCube progress={1} randomSolve={true} onOpenOooGen={openOooGen} />
   </div>
 {/if}
 
@@ -363,20 +309,7 @@
 <ScheduleFAQ />
 
 <RsvpDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
-<CommandPalette isOpen={isCmdKOpen} onClose={closeCmdK} onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
 <OooGeneratorModal isOpen={isOooGenOpen} onClose={closeOooGen} />
-<ScrollToTop />
-<ToastSystem />
-
-<div class="stats-toast" class:visible={showStats} role="status">
-  <p class="stats-title">Lagos Survival Stats</p>
-  <ul>
-    <li>Traffic avoided: <strong>3 hours</strong></li>
-    <li>Emails ignored: <strong>17</strong></li>
-    <li>Stress reduced: <strong>68%</strong></li>
-  </ul>
-</div>
-
 {/if}
 
 <style>
@@ -494,19 +427,6 @@
     outline: 2px solid var(--blue);
     outline-offset: 4px;
   }
-  .share-toast {
-    position: absolute;
-    top: clamp(3.2rem, 6.5vh, 4rem);
-    right: clamp(0.75rem, 4vw, 1.5rem);
-    background: var(--ink);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.35rem 0.7rem;
-    border-radius: 999px;
-    z-index: 3;
-  }
-
   .headline {
     display: flex;
     flex-direction: column;
@@ -593,6 +513,16 @@
     font-weight: 700;
     font-size: clamp(1rem, 4vw, 1.4rem);
     color: var(--ink);
+  }
+  .date-tba {
+    width: fit-content;
+    font-size: clamp(0.65rem, 1.8vw, 0.75rem);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.35rem 0.75rem;
+    border: 1px dashed var(--border-dashed);
+    border-radius: 999px;
+    color: var(--muted);
   }
   .subhead .venue {
     font-weight: 500;
@@ -834,48 +764,5 @@
     line-height: 1.4;
     color: var(--pink-deep);
     transform: rotate(-1deg);
-  }
-
-  .stats-toast {
-    position: fixed;
-    top: 2rem;
-    left: 50%;
-    transform: translate(-50%, -20px);
-    background: var(--card-surface);
-    backdrop-filter: blur(8px);
-    border: 2px solid var(--blue);
-    padding: 1.25rem 1.75rem;
-    border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
-  }
-  .stats-toast.visible {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  .stats-title {
-    margin: 0 0 0.75rem;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--blue);
-  }
-  .stats-toast ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--ink);
-  }
-  .stats-toast li {
-    margin-bottom: 0.4rem;
-    display: flex;
-    justify-content: space-between;
-    gap: 1.5rem;
-  }
-  .stats-toast li strong {
-    color: var(--accent);
   }
 </style>

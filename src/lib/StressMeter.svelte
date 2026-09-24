@@ -6,6 +6,8 @@
   // same hero `progress` App.svelte already drives the cube and notification
   // counter with, so all three read as one consistent taper rather than
   // three separately-invented timelines.
+  import { onDestroy } from 'svelte';
+
   export let progress = 0; // 0..1, hero scroll progress (App.svelte's smoothedProgress)
   export let activated = false;
 
@@ -13,15 +15,29 @@
   $: stressPct = Math.round((1 - progress) * 100);
   $: filledSegments = Math.round((1 - progress) * SEGMENTS);
   $: stage = stressPct === 0 ? "zero" : progress < 0.25 ? "high" : "mid";
+
+  // The old `oo` keyboard egg, relocated: click the meter for Lagos
+  // Survival Stats. Inline reveal — no toast.
+  let showStats = false;
+  let statsTimer;
+  function toggleStats() {
+    showStats = !showStats;
+    clearTimeout(statsTimer);
+    if (showStats) statsTimer = setTimeout(() => (showStats = false), 6000);
+  }
+  onDestroy(() => clearTimeout(statsTimer));
 </script>
 
-<div
+<button
+  type="button"
   class="stress-meter"
   data-stage={stage}
-  role="img"
+  on:click={toggleStats}
+  aria-expanded={showStats}
+  title="Lagos Survival Stats"
   aria-label={activated
-    ? "Mental state: Out of Office"
-    : `Stress level: ${stressPct} percent`}
+    ? "Mental state: Out of Office. Show Lagos survival stats."
+    : `Stress level: ${stressPct} percent. Show Lagos survival stats.`}
 >
   {#if activated}
     <p class="meter-label state">Mental State: Out of Office</p>
@@ -34,7 +50,18 @@
     </div>
     <p class="meter-pct" aria-hidden="true">{stressPct}%</p>
   {/if}
-</div>
+
+  {#if showStats}
+    <div class="stats-panel" role="status">
+      <p class="stats-title">Lagos Survival Stats</p>
+      <ul>
+        <li>Traffic avoided: <strong>3 hours</strong></li>
+        <li>Emails ignored: <strong>17</strong></li>
+        <li>Stress reduced: <strong>68%</strong></li>
+      </ul>
+    </div>
+  {/if}
+</button>
 
 <style>
   .stress-meter {
@@ -53,6 +80,51 @@
     -webkit-backdrop-filter: blur(14px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+    /* It's a <button> now (click for stats) — reset UA button styling and
+       the global hover-bounce so it still reads as a glass readout. */
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .stress-meter:hover,
+  .stress-meter:active {
+    transform: none;
+  }
+  .stress-meter:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+    outline-offset: 3px;
+  }
+
+  .stats-panel {
+    margin-top: 0.4rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(24, 24, 24, 0.2);
+    min-width: 13rem;
+  }
+  .stats-title {
+    margin: 0 0 0.4rem;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--blue, #00bfff);
+  }
+  .stats-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--ink, #181818);
+  }
+  .stats-panel li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.2rem;
+  }
+  .stats-panel strong {
+    color: var(--accent);
   }
 
   .meter-label {
