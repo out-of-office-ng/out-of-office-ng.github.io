@@ -3,6 +3,9 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
+  import { SALES_MODE, NEXT_EVENT } from './sales.js';
+
+  const salesOpen = SALES_MODE === 'open';
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -60,6 +63,8 @@
   ];
 
   function handleConfirm() {
+    // Belt and braces: never start a payment while sales aren't open.
+    if (!salesOpen) return;
     if (!attendeeName.trim()) {
       addToast({
         title: 'Name Required',
@@ -170,14 +175,31 @@
     >
       <div class="sheet-header">
         <div>
-          <span class="badge">RELEASE & UNWIND RETREAT</span>
-          <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
+          {#if salesOpen}
+            <span class="badge">RELEASE & UNWIND RETREAT</span>
+            <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
+          {:else}
+            <span class="badge">{NEXT_EVENT.code} · {NEXT_EVENT.when.toUpperCase()}</span>
+            <h2 id="sheet-title" class="sheet-title">Tickets open soon</h2>
+          {/if}
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
       </div>
 
       <div class="sheet-body">
-        {#if step === 1}
+        {#if !salesOpen}
+          <div class="step-pane">
+            <p class="closed-lede">
+              The next Out of Office is in <strong>{NEXT_EVENT.when}</strong>.
+              {NEXT_EVENT.detail}
+            </p>
+            <p class="closed-note">
+              Tickets aren't on sale yet, so there's nothing to pay today.
+              Release &amp; Unwind (0x03) has already happened.
+            </p>
+            <button class="primary-btn" on:click={resetAndClose}>Got it</button>
+          </div>
+        {:else if step === 1}
           <div class="step-pane">
             <h3 class="pane-subtitle">1. Select Pass Tier & Inclusions Breakdown</h3>
             <div class="tier-grid">
@@ -331,6 +353,18 @@
     font-size: 1.8rem;
     color: var(--muted);
     cursor: pointer;
+  }
+
+  .closed-lede {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .closed-note {
+    margin: 0 0 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.8;
   }
 
   .sheet-body {
