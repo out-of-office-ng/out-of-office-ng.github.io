@@ -60,7 +60,7 @@
       hex: '0x04',
       title: '???',
       venue: 'TBA',
-      date:  'TBA',
+      date:  'November 2026',
       time:  'TBA',
       color: 'var(--muted-green)',
       textColor: 'var(--ink)',

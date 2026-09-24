@@ -16,19 +16,25 @@
       ? 0
       : Math.min(1, t / FADE, (1 - t) / FADE);
 
+  export let onOpenOooGen = () => {};
+  
   let isRinging = false;
-  function ringBell() {
-    if (isRinging) return;
-    isRinging = true;
-    setTimeout(() => {
-      isRinging = false;
-    }, 800);
+  let clickCount = 0;
+  function handleBoatClick() {
+    if (!isRinging) {
+      isRinging = true;
+      setTimeout(() => {
+        isRinging = false;
+      }, 800);
+    }
+    clickCount = (clickCount + 1) % 11;
+    if (clickCount === 10) onOpenOooGen();
   }
 </script>
 
 <div class="boat-track" aria-hidden="true">
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-  <div class="boat-travel" style="transform: translateX({left}vw); opacity: {opacity};" on:click={ringBell}>
+  <div class="boat-travel" style="transform: translateX({left}vw); opacity: {opacity}; cursor: pointer;" on:click={handleBoatClick}>
     {#if isRinging}
       <div class="ring-bubble">⚓ TOOT TOOT!</div>
     {/if}

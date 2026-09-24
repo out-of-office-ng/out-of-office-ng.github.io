@@ -154,7 +154,7 @@
     >
       <div class="sheet-header">
         <div>
-          <span class="badge">OOO 0x04 · DATE TBA</span>
+          <span class="badge">OOO 0x04 · NOVEMBER</span>
           <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>

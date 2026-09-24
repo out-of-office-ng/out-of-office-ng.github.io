@@ -16,7 +16,7 @@ const reduceMotion =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export const forcedCalm = tweened(0, {
+export const forcedCalm = tweened(1, {
   duration: reduceMotion ? 0 : 1800,
   easing: cubicInOut,
 });

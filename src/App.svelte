@@ -255,7 +255,7 @@
               {#if hasUpcomingDate}
                 <CountdownTimer targetDateStr={EVENT_DATE} />
               {:else}
-                <span class="date-tba">Date TBA — boarding pass below</span>
+                <span class="date-tba">November — boarding pass below</span>
               {/if}
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>
@@ -271,7 +271,7 @@
               <RotatingCube progress={cubeProgress} onOpenOooGen={openOooGen} />
             </div>
           </div>
-          <Boat progress={smoothedProgress} />
+          <Boat progress={smoothedProgress} onOpenOooGen={openOooGen} />
         </div>
 
         <FooterBar />

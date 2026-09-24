@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#dce7df" />
+<title>Clear Water — Take a moment</title>
+<style>
+  :root { color-scheme: light; font-family: system-ui, sans-serif; color: #243e3c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; overflow: hidden; background: linear-gradient(165deg, #dce7df, #7aaea8 58%, #376a65); }
+  canvas { display: block; width: 100%; height: 100%; position: fixed; inset: 0; outline-offset: -5px; }
+  button, select, a { -webkit-tap-highlight-color: transparent; }
+  button, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid #17534e; outline-offset: 4px; }
+  [hidden] { display: none !important; }
+  #intro { position: fixed; z-index: 1; inset: 0 0 auto; padding: clamp(24px, 4vw, 60px); pointer-events: none; background: linear-gradient(#eaf0e6b3, #eaf0e600); }
+  .eyebrow { margin: 0 0 14px; font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
+  h1 { margin: 0; font: normal clamp(36px, 4.5vw, 64px)/1.08 Georgia, serif; letter-spacing: -.045em; }
+  #intro .caption { margin: 14px 0 0; font-size: 12px; line-height: 1.7; opacity: .8; }
+  #toolbar { position: fixed; z-index: 2; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 5px; padding: 7px; max-width: calc(100% - 32px); border-radius: 18px; background: #f5f6ecf2; border: 1px solid #ffffff9c; box-shadow: 0 8px 35px #153b3220; font-size: 11px; white-space: nowrap; }
+  #toolbar button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 11px; background: transparent; }
+  #toolbar button[aria-pressed="true"] { background: #294d47; color: #f6f5e9; }
+  #toolbar button:hover { background: #294d4714; }
+  #toolbar button[aria-pressed="true"]:hover { background: #355e57; }
+  .divider { height: 22px; width: 1px; background: #294d4724; margin: 0 3px; }
+  .quality { display: flex; align-items: center; gap: 4px; padding: 0 8px; }
+  .quality span { opacity: .65; }
+  .volume { display: flex; align-items: center; gap: 8px; width: 142px; padding: 0 8px; min-height: 40px; }
+  .volume input { width: 90px; min-width: 0; accent-color: #294d47; cursor: pointer; }
+  .volume output { min-width: 29px; font-variant-numeric: tabular-nums; opacity: .7; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  select { min-height: 40px; border: 0; background: transparent; cursor: pointer; font-size: 11px; }
+  #preview-copy { position: fixed; z-index: 1; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: clamp(32px, 8vw, 120px); pointer-events: none; background: linear-gradient(90deg, #e7efe0d9, #e7efe052 55%, transparent); }
+  #preview-copy h2 { font: normal clamp(52px, 8vw, 112px)/.95 Georgia, serif; letter-spacing: -.055em; margin: 6px 0 22px; }
+  #preview-copy p:last-child { font-size: 14px; line-height: 1.8; max-width: 260px; }
+  #notice { position: fixed; z-index: 3; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: min(420px, calc(100% - 48px)); padding: 24px; border-radius: 16px; background: #f5f6eceb; font-size: 13px; line-height: 1.7; }
+  #notice a { color: inherit; text-underline-offset: 4px; }
+  body[data-mode="background"] #intro, body[data-mode="background"] #toolbar { display: none; }
+  body[data-mode="background"] canvas, body[data-mode="preview"] canvas { pointer-events: none; touch-action: auto; }
+  body[data-mode="preview"] #intro { display: none; }
+  @media (max-width: 600px) {
+    #toolbar { display: grid; grid-template-columns: repeat(3, 1fr); width: 358px; gap: 2px; padding: 6px; }
+    #toolbar button { padding: 0 10px; min-height: 44px; }
+    #preview { grid-column: 2 / 4; }
+    .quality { padding: 0 6px; justify-content: center; }
+    .quality span, .divider { display: none; }
+    .volume { grid-column: 2 / 4; width: auto; min-height: 44px; }
+    .volume input { flex: 1; }
+    #intro .caption { max-width: 220px; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header id="intro">
+  <p class="eyebrow">Clear water / a small escape</p>
+  <h1>Take a moment.</h1>
+  <p class="caption" id="hint">Drag to look around. Scroll or pinch to get closer.</p>
+</header>
+<section id="preview-copy" aria-label="Website background preview" hidden>
+  <p class="eyebrow">Out of office</p>
+  <h2>Away from<br>the everyday.</h2>
+  <p>A little space to slow down.<br>Leave the rush on the other side.</p>
+</section>
+<nav id="toolbar" aria-label="Water scene controls">
+  <button id="explore" type="button" aria-pressed="true">Explore</button>
+  <button id="preview" type="button" aria-pressed="false">Background preview</button>
+  <span class="divider" aria-hidden="true"></span>
+  <button id="pause" type="button" aria-pressed="false">Pause</button>
+  <button id="reset" type="button">Reset view</button>
+  <label class="quality"><span>Quality</span><select id="quality" aria-label="Rendering quality">
+    <option value="auto">Auto</option><option value="high">High</option><option value="low">Low</option>
+  </select></label>
+  <button id="sound" type="button" aria-label="Ocean sound" aria-pressed="false">Sound off</button>
+  <label class="volume"><span class="sr-only">Ocean volume</span>
+    <input id="volume" type="range" min="0" max="100" step="1" value="40" aria-label="Ocean volume" />
+    <output id="volume-value" for="volume" aria-hidden="true">40%</output>
+  </label>
+</nav>
+<span id="sound-status" class="sr-only" role="status" aria-live="polite"></span>
+<div id="notice" role="status"><span id="notice-text">Finding a little quiet…</span> <a id="retry" href="" hidden>Try again</a></div>
+<noscript><style>#toolbar, #notice { display: none; }</style><p>Enable JavaScript to explore the water.</p></noscript>
+<script type="module">
+const notice = document.querySelector('#notice');
+const noticeText = document.querySelector('#notice-text');
+const retryLink = document.querySelector('#retry');
+function showNotice(message, retry = false) {
+  noticeText.textContent = message;
+  retryLink.hidden = !retry;
+  notice.hidden = false;
+}
+function hideNotice() { notice.hidden = true; }
+window.addEventListener('error', (e) => {
+  showNotice('Something went wrong: ' + (e.message || 'unknown error'), true);
+});
+
+let THREE, OrbitControls;
+try {
+  [THREE, { OrbitControls }] = await Promise.all([
+    import('three'),
+    import('three/addons/controls/OrbitControls.js'),
+  ]);
+} catch (error) {
+  console.error('Import failed', error);
+  showNotice('The water could not load. Check your connection and try again.', true);
+  throw error;
+}
+
+try {
+
+const SETTINGS = {
+  waterLevel: 1, seed: 2718, rocks: 60,
+  waveStrength: .65, speed: 1,
+  surf: { interval: 14, separation: 3.6, speed: 3.4, height: .44, width: 1.25, direction: [.28, .96] },
+  absorption: [0.16, 0.050, 0.035],
+  deepColor: [0.055, 0.22, 0.20],
+  quality: {
+    auto: { dpr: 1.5, pixels: 1600000, refraction: .75, segments: 80 },
+    high: { dpr: 2, pixels: 8300000, refraction: 1, segments: 128 },
+    low: { dpr: 1, pixels: 800000, refraction: .6, segments: 64 },
+  },
+  dynamicScale: { enabled: true, min: .5, max: 1.0, targetMs: 16.6, sampleCount: 45, cooldownMs: 1800 },
+};
+const params = new URLSearchParams(location.search);
+let mode = params.get('mode') === 'background' ? 'background' : 'explore';
+let quality = Object.hasOwn(SETTINGS.quality, params.get('quality')) ? params.get('quality') : 'auto';
+let qualitySettings = SETTINGS.quality[quality];
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+let paused = motionPreference.matches;
+let disposed = false, inView = true, contextLost = false;
+document.body.dataset.mode = mode;
+document.querySelector('#quality').value = quality;
+
+// ---------- renderer / scene / camera ----------
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'default' }); }
+catch (error) {
+  console.error('Renderer creation failed', error);
+  showNotice('This browser could not start the water scene. Try another browser or enable hardware acceleration.', true);
+  throw error;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, qualitySettings.dpr));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.setAttribute('aria-label', 'Clear shallow water with sunlit stones, shells, starfish, drifting fish and a paper toy boat. Drag to orbit; use arrow keys to rotate.');
+renderer.domElement.setAttribute('role', 'img');
+renderer.domElement.tabIndex = 0;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const horizonColor = new THREE.Color(0.63, 0.76, 0.75);
+const skyGain = 1.2;
+scene.fog = new THREE.Fog(horizonColor.clone().multiplyScalar(skyGain), 24, 70);
+renderer.setClearColor(horizonColor, 1);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(6, 4.5, 8);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.6, 0);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.maxPolarAngle = THREE.MathUtils.degToRad(72);
+controls.minPolarAngle = THREE.MathUtils.degToRad(8);
+controls.minDistance = 3.6;
+controls.maxDistance = 22;
+controls.zoomSpeed = .65;
+
+// ---------- lights ----------
+const sunDir = new THREE.Vector3(0.5, 0.8, 0.3).normalize();
+const sun = new THREE.DirectionalLight(0xfff2dd, 2.8);
+sun.position.copy(sunDir).multiplyScalar(20);
+scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xbfd9ff, 0x6b5f4f, 0.7));
+
+// ---------- shared uniforms ----------
+const timeU = { value: 0 };
+const waterLevelU = { value: SETTINGS.waterLevel };
+const waveStrengthU = { value: SETTINGS.waveStrength };
+const surfFrontU = { value: new THREE.Vector2() };
+const surfHeightU = { value: SETTINGS.surf.height };
+const surfDirectionU = { value: new THREE.Vector2(...SETTINGS.surf.direction).normalize() };
+const absorptionU = { value: new THREE.Vector3(...SETTINGS.absorption) };
+// Shared with the water shader for the soft wake patch under the boat.
+const boatPosU = { value: new THREE.Vector3(0, SETTINGS.waterLevel, 0) };
+
+function updateSurf() {
+  const { interval, separation, speed } = SETTINGS.surf;
+  const phase = timeU.value + 5;
+  const center = t => (((t % interval) + interval) % interval) * speed - interval * speed * .5;
+  surfFrontU.value.set(center(phase), center(phase - separation));
+}
+
+// ---------- shared GLSL ----------
+const acesGLSL = /* glsl */`
+  vec3 acesFilm(vec3 color) {
+    color *= 1.1 / 0.6;
+    const mat3 ACESIn = mat3(vec3(0.59719, 0.07600, 0.02840), vec3(0.35458, 0.90834, 0.13383), vec3(0.04823, 0.01566, 0.83777));
+    const mat3 ACESOut = mat3(vec3(1.60475, -0.10208, -0.00327), vec3(-0.53108, 1.10813, -0.07276), vec3(-0.07367, -0.00605, 1.07602));
+    color = ACESIn * color;
+    vec3 a = color * (color + 0.0245786) - 0.000090537;
+    vec3 b = color * (0.983729 * color + 0.4329510) + 0.238081;
+    return clamp(ACESOut * (a / b), 0.0, 1.0);
+  }
+`;
+const skyColorGLSL = /* glsl */`
+  vec3 skyColor(vec3 d) {
+    float t = clamp(d.y, 0.0, 1.0);
+    vec3 col = mix(uHorizonColor, vec3(0.25, 0.49, 0.65), pow(t, 0.75));
+    col += vec3(1.0, 0.95, 0.85) * pow(max(dot(d, uSunDir), 0.0), 1500.0) * 1.0;
+    col += vec3(0.9, 0.85, 0.7) * pow(max(dot(d, uSunDir), 0.0), 8.0) * .1;
+    return col * ${skyGain};
+  }
+`;
+
+// ---------- sky dome ----------
+const skyMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide,
+  depthWrite: false,
+  uniforms: { uSunDir: { value: sunDir }, uHorizonColor: { value: horizonColor } },
+  vertexShader: /* glsl */`
+    varying vec3 vDir;
+    void main() {
+      vDir = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: /* glsl */`
+    uniform vec3 uSunDir;
+    uniform vec3 uHorizonColor;
+    varying vec3 vDir;
+    ${acesGLSL}
+    ${skyColorGLSL}
+    void main() {
+      vec3 d = normalize(vDir);
+      vec3 col = mix(uHorizonColor * ${skyGain}, skyColor(d), smoothstep(-0.06, 0.0, d.y));
+      gl_FragColor = vec4(col, 1.0);
+      gl_FragColor.rgb = acesFilm(gl_FragColor.rgb);
+      #include <colorspace_fragment>
+    }
+  `,
+});
+const sky = new THREE.Mesh(new THREE.SphereGeometry(160, 32, 16), skyMat);
+sky.renderOrder = -1;
+sky.layers.enable(1);
+scene.add(sky);
+
+// ---------- opt-in ocean audio ----------
+let oceanAudio = null, soundEnabled = false, volume = .4;
+let audioRevision = 0, audioSuspendTimer = 0, lastAudioUpdate = -Infinity;
+const soundButton = document.querySelector('#sound');
+const soundStatus = document.querySelector('#sound-status');
+
+function createOceanAudio() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) throw new Error('Ocean sound is not supported by this browser.');
+  const context = new AudioContextClass({ latencyHint: 'playback' });
+  try {
+    const buffer = context.createBuffer(2, 22050 * 8, 22050);
+    let noiseSeed = 1406;
+    for (let channel = 0; channel < 2; channel++) {
+      const data = buffer.getChannelData(channel);
+      for (let i = 0; i < data.length; i++) {
+        noiseSeed = (Math.imul(noiseSeed, 1664525) + 1013904223) >>> 0;
+        data[i] = noiseSeed / 2147483648 - 1;
+      }
+    }
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    const bodyFilter = context.createBiquadFilter();
+    bodyFilter.type = 'lowpass'; bodyFilter.frequency.value = 380; bodyFilter.Q.value = .5;
+    const bodyGain = context.createGain();
+    bodyGain.gain.value = .25;
+    const washHighpass = context.createBiquadFilter();
+    washHighpass.type = 'highpass'; washHighpass.frequency.value = 280; washHighpass.Q.value = .5;
+    const washFilter = context.createBiquadFilter();
+    washFilter.type = 'lowpass'; washFilter.frequency.value = 1100; washFilter.Q.value = .5;
+    const washGain = context.createGain();
+    washGain.gain.value = .05;
+    const master = context.createGain();
+    master.gain.value = 0;
+    const limiter = context.createDynamicsCompressor();
+    limiter.threshold.value = -12; limiter.knee.value = 20; limiter.ratio.value = 8;
+    source.connect(bodyFilter).connect(bodyGain).connect(master);
+    source.connect(washHighpass).connect(washFilter).connect(washGain).connect(master);
+    master.connect(limiter).connect(context.destination);
+    source.start();
+    return { context, source, bodyFilter, bodyGain, washHighpass, washFilter, washGain, master, limiter };
+  } catch (error) {
+    void context.close().catch(() => {});
+    throw error;
+  }
+}
+
+function wantsAudio() { return soundEnabled && volume > 0 && running && !disposed; }
+
+function updateSoundButton() {
+  soundButton.textContent = soundEnabled ? 'Sound on' : 'Sound off';
+  soundButton.setAttribute('aria-pressed', String(soundEnabled));
+  soundButton.title = soundEnabled && paused ? 'Press Play to hear the waves.' : 'Turn ocean sound on or off';
+  soundStatus.textContent = soundEnabled && paused ? 'Ocean sound is on. Press Play to hear the waves.' : `Ocean sound ${soundEnabled ? 'on' : 'off'}.`;
+}
+
+function audioFailed() {
+  if (disposed) return;
+  soundEnabled = false;
+  updateSoundButton();
+  soundButton.textContent = 'Retry sound';
+  soundButton.title = 'Sound could not start. Click to try again.';
+  soundStatus.textContent = soundButton.title;
+  if (oceanAudio) {
+    oceanAudio.master.gain.setValueAtTime(0, oceanAudio.context.currentTime);
+    void oceanAudio.context.suspend().catch(() => {});
+  }
+}
+
+function updateOceanAudio(force = false) {
+  if (!oceanAudio || !wantsAudio() || oceanAudio.context.state !== 'running') return;
+  const { context, bodyFilter, bodyGain, washGain, washFilter } = oceanAudio;
+  const now = context.currentTime;
+  if (!force && now - lastAudioUpdate < .05) return;
+  lastAudioUpdate = now;
+  const wash = distance => Math.exp(-Math.pow(distance / (distance < 0 ? 3.8 : 7.5), 2));
+  const camAlong = camera.position.x * surfDirectionU.value.x + camera.position.z * surfDirectionU.value.y;
+  const surge = Math.min(1, wash(surfFrontU.value.x - camAlong) + .78 * wash(surfFrontU.value.y - camAlong));
+  bodyGain.gain.setTargetAtTime(.25 + surge * .4, now, .18);
+  bodyFilter.frequency.setTargetAtTime(340 + surge * 160, now, .2);
+  washGain.gain.setTargetAtTime(.045 + surge * .75, now, .12);
+  washFilter.frequency.setTargetAtTime(950 + surge * 2300, now, .2);
+}
+
+function syncOceanAudio() {
+  if (!oceanAudio || oceanAudio.context.state === 'closed') return;
+  const revision = ++audioRevision;
+  clearTimeout(audioSuspendTimer);
+  const { context, master } = oceanAudio;
+  if (wantsAudio()) {
+    void context.resume().then(() => {
+      if (revision !== audioRevision || !wantsAudio()) return;
+      updateOceanAudio(true);
+      master.gain.cancelScheduledValues(context.currentTime);
+      master.gain.setTargetAtTime(volume * .7 * (mode === 'explore' ? 1 : .8), context.currentTime, .09);
+    }).catch(() => { if (revision === audioRevision) audioFailed(); });
+  } else {
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setTargetAtTime(0, context.currentTime, .04);
+    audioSuspendTimer = setTimeout(() => {
+      if (revision === audioRevision && !wantsAudio() && context.state !== 'closed') {
+        void context.suspend().catch(() => {});
+      }
+    }, 240);
+  }
+}
+
+function disposeOceanAudio() {
+  ++audioRevision;
+  clearTimeout(audioSuspendTimer);
+  if (!oceanAudio) return;
+  const { context, source } = oceanAudio;
+  try { source.stop(); } catch {}
+  for (const node of Object.values(oceanAudio)) if (node.disconnect) node.disconnect();
+  void context.close().catch(() => {});
+  oceanAudio = null;
+}
+
+function stretchEdges(geometry) {
+  const pos = geometry.attributes.position;
+  const stretch = n => Math.abs(n) <= 16 ? n : Math.sign(n) * (16 + Math.pow((Math.abs(n) - 16) / 4, 2) * 130);
+  for (let i = 0; i < pos.count; i++) { pos.setX(i, stretch(pos.getX(i))); pos.setZ(i, stretch(pos.getZ(i))); }
+}
+
+// ---------- riverbed ----------
+function bedHeight(x, z) {
+  return 0.25 * Math.sin(x * 0.35) * Math.sin(z * 0.3)
+       + 0.10 * Math.sin(x * 1.1 + 1.7) * Math.sin(z * 0.9 + 0.6);
+}
+
+const shadeCanvas = document.createElement('canvas');
+shadeCanvas.width = shadeCanvas.height = 1024;
+const shadeContext = shadeCanvas.getContext('2d');
+shadeContext.fillStyle = '#fff';
+shadeContext.fillRect(0, 0, 1024, 1024);
+const bedShade = new THREE.CanvasTexture(shadeCanvas);
+bedShade.flipY = false;
+
+function paintShade(x, z, radius, strength) {
+  const sx = (x / 40 + .5) * 1024, sy = (z / 40 + .5) * 1024;
+  const size = Math.max(1, radius * 1.35 / 40 * 1024);
+  const shade = shadeContext.createRadialGradient(sx, sy, size * .15, sx, sy, size);
+  shade.addColorStop(0, `rgba(0, 0, 0, ${strength})`);
+  shade.addColorStop(.45, `rgba(0, 0, 0, ${(strength * .53).toFixed(3)})`);
+  shade.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  shadeContext.fillStyle = shade;
+  shadeContext.fillRect(sx - size, sy - size, size * 2, size * 2);
+}
+
+function makeFoamNoise() {
+  const size = 128;
+  const data = new Uint8Array(size * size * 4);
+  const hash = (x, y, cells) => {
+    let n = Math.imul((x % cells) + 37, 374761393) ^ Math.imul((y % cells) + 91, 668265263);
+    n = Math.imul(n ^ (n >>> 13), 1274126177);
+    return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+  };
+  function noise(x, y, cells) {
+    const px = x / size * cells, py = y / size * cells;
+    const ix = Math.floor(px), iy = Math.floor(py);
+    let u = px - ix, v = py - iy;
+    u = u * u * (3 - 2 * u); v = v * v * (3 - 2 * v);
+    const a = hash(ix, iy, cells) * (1 - u) + hash(ix + 1, iy, cells) * u;
+    const b = hash(ix, iy + 1, cells) * (1 - u) + hash(ix + 1, iy + 1, cells) * u;
+    return a * (1 - v) + b * v;
+  }
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const i = (y * size + x) * 4;
+    data[i] = Math.round(noise(x, y, 16) * 255);
+    data[i + 1] = Math.round(noise(x, y, 64) * 255);
+    data[i + 2] = Math.round(noise(x, y, 32) * 255);
+    data[i + 3] = 255;
+  }
+  const texture = new THREE.DataTexture(data, size, size);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps = true;
+  texture.needsUpdate = true;
+  return texture;
+}
+const foamNoise = makeFoamNoise();
+
+function addCaustics(mat, kind = 'rock') {
+  mat.customProgramCacheKey = () => `${kind}-caustics-v5`;
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uTime = timeU;
+    shader.uniforms.uWaterLevel = waterLevelU;
+    shader.uniforms.uAbsorption = absorptionU;
+    if (kind === 'bed') shader.uniforms.tBedShade = { value: bedShade };
+
+    const vertHead = `#include <common>\nvarying vec3 vCausticPos;`;
+    const vertFish = (kind === 'fish') ? '\nuniform float uTime;\nattribute float aPhase;' : '';
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', vertHead + vertFish)
+      .replace('#include <project_vertex>', `
+        vec4 causticPosition = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          causticPosition = instanceMatrix * causticPosition;
+        #endif
+        vCausticPos = (modelMatrix * causticPosition).xyz;
+        #include <project_vertex>`);
+
+    if (kind === 'fish') {
+      shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+      {
+        float tailWeight = 1.0 - smoothstep(-.75, .3, transformed.z);
+        transformed.x += sin(uTime * 7.0 + aPhase + transformed.z * 2.5) * .12 * tailWeight
+                       + sin(uTime * 7.0 + aPhase) * .03;
+      }`);
+    }
+
+    const fragHead = '#include <common>\nuniform float uTime;\nuniform float uWaterLevel;\nuniform vec3 uAbsorption;\nvarying vec3 vCausticPos;\n'
+      + (kind === 'bed' ? 'uniform sampler2D tBedShade;\n' : '');
+    const bedLookup = kind === 'bed' ? 'diffuseColor.rgb *= texture2D(tBedShade, vCausticPos.xz / 40.0 + .5).r;' : '';
+    const wetBandCode = kind === 'rock'
+      ? `float wetBand = 1.0 - smoothstep(uWaterLevel + .02, uWaterLevel + .28, vCausticPos.y);
+         diffuseColor.rgb *= mix(1.0, .55, wetBand);`
+      : '';
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', fragHead)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+      {
+        float under = 1.0 - smoothstep(uWaterLevel - 0.05, uWaterLevel + 0.05, vCausticPos.y);
+        vec2 cp = vCausticPos.xz * 2.0;
+        float t = uTime * .65;
+        float w1 = sin(cp.x * 1.3 + sin(cp.y * 1.6 + t) + t);
+        float w2 = sin(cp.y * 1.5 + sin(cp.x * 1.2 - t * .8) - t);
+        float c = pow(1.0 - abs(w1 * w2), 14.0);
+        float depthBelow = max(uWaterLevel - vCausticPos.y, 0.0);
+        vec3 depthAtten = exp(-uAbsorption * depthBelow * 1.4);
+        diffuseColor.rgb += c * under * vec3(0.16, 0.20, 0.13) * depthAtten;
+        ${bedLookup}
+        ${wetBandCode}
+      }`);
+
+    if (kind === 'rock') {
+      shader.fragmentShader = shader.fragmentShader.replace('#include <roughnessmap_fragment>',
+        `#include <roughnessmap_fragment>
+        {
+          float wetBandR = 1.0 - smoothstep(uWaterLevel + .02, uWaterLevel + .28, vCausticPos.y);
+          roughnessFactor *= mix(1.0, .45, wetBandR);
+        }`);
+    }
+  };
+}
+
+const bedGeo = new THREE.PlaneGeometry(40, 40, 64, 64);
+bedGeo.rotateX(-Math.PI / 2);
+stretchEdges(bedGeo);
+{
+  const pos = bedGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) pos.setY(i, bedHeight(pos.getX(i), pos.getZ(i)));
+  bedGeo.computeVertexNormals();
+}
+const bedMat = new THREE.MeshStandardMaterial({ color: 0xcabd95, roughness: 1.0 });
+addCaustics(bedMat, 'bed');
+scene.add(new THREE.Mesh(bedGeo, bedMat));
+
+// ---------- stones ----------
+function makeRockGeometry(radius) {
+  const geo = new THREE.IcosahedronGeometry(radius, 2);
+  const pos = geo.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const n = .91 + .09 * Math.sin(v.x * 3.1) * Math.sin(v.z * 4.2 + v.y * 2.7);
+    v.multiplyScalar(n);
+    pos.setXYZ(i, v.x, v.y * 0.7, v.z);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+const rockColors = [0x9d998c, 0x958c79, 0xada596, 0x7a8581, 0xb4a68b];
+let seed = SETTINGS.seed;
+function random() {
+  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+  return seed / 4294967296;
+}
+const rockMat = new THREE.MeshStandardMaterial({ roughness: .94, flatShading: true });
+addCaustics(rockMat, 'rock');
+const rocks = new THREE.InstancedMesh(makeRockGeometry(1), rockMat, SETTINGS.rocks + 3);
+rocks.name = 'Stones';
+const rockTransform = new THREE.Object3D();
+const rockColor = new THREE.Color();
+let rockIndex = 0;
+function addRock(x, z, radius) {
+  rockTransform.position.set(x, bedHeight(x, z) + radius * .28, z);
+  rockTransform.rotation.set(random() * .6, random() * Math.PI * 2, random() * .5);
+  rockTransform.scale.set(radius * (.85 + random() * .3), radius, radius * (.8 + random() * .4));
+  rockTransform.updateMatrix();
+  rocks.setMatrixAt(rockIndex, rockTransform.matrix);
+  rocks.setColorAt(rockIndex++, rockColor.setHex(rockColors[Math.floor(random() * rockColors.length)]));
+  paintShade(x, z, radius, .26);
+}
+for (let i = 0; i < SETTINGS.rocks; i++) {
+  addRock((random() - .5) * 20, (random() - .5) * 20, .15 + random() * .55);
+}
+addRock(1.5, -1.0, 1.3);
+addRock(-2.2, 1.4, 1.1);
+addRock(0.4, 2.3, 0.9);
+rocks.instanceMatrix.needsUpdate = true;
+rocks.instanceColor.needsUpdate = true;
+rocks.computeBoundingSphere();
+scene.add(rocks);
+
+// ---------- sea life ----------
+const BOULDERS = [[1.5, -1, 1.3], [-2.2, 1.4, 1.1], [.4, 2.3, .9]];
+function avoidRocks(x, z) {
+  for (const [bx, bz, r] of BOULDERS) {
+    const dx = x - bx, dz = z - bz, rr = r * 1.35, d2 = dx * dx + dz * dz;
+    if (d2 < rr * rr) {
+      const d = Math.sqrt(d2) || .01, push = (rr - d) / rr * .6;
+      x += dx / d * push; z += dz / d * push;
+    }
+  }
+  return [x, z];
+}
+
+const FISH_COUNT = 14;
+function makeFishGeometry() {
+  const parts = [];
+  const body = new THREE.SphereGeometry(.5, 16, 10);
+  body.scale(.42, .3, 1);
+  parts.push(body);
+  const tail = new THREE.ConeGeometry(.22, .35, 8);
+  tail.rotateX(-Math.PI / 2);
+  tail.translate(0, 0, -.6);
+  tail.scale(.25, 1.3, 1);
+  parts.push(tail);
+  const dorsal = new THREE.ConeGeometry(.13, .2, 6);
+  dorsal.translate(0, .24, .05);
+  dorsal.scale(.3, 1, 1.4);
+  parts.push(dorsal);
+
+  const nonIndexed = parts.map(g => g.index ? g.toNonIndexed() : g);
+  let totalVerts = 0;
+  for (const g of nonIndexed) totalVerts += g.attributes.position.count;
+
+  const posArr = new Float32Array(totalVerts * 3);
+  const nrmArr = new Float32Array(totalVerts * 3);
+  const uvArr  = new Float32Array(totalVerts * 2);
+  let offset = 0;
+  for (const g of nonIndexed) {
+    posArr.set(g.attributes.position.array, offset * 3);
+    if (g.attributes.normal) nrmArr.set(g.attributes.normal.array, offset * 3);
+    if (g.attributes.uv) uvArr.set(g.attributes.uv.array, offset * 2);
+    offset += g.attributes.position.count;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+  geo.setAttribute('normal',   new THREE.BufferAttribute(nrmArr, 3));
+  geo.setAttribute('uv',       new THREE.BufferAttribute(uvArr, 2));
+  for (const g of parts) g.dispose();
+  for (const g of nonIndexed) if (!parts.includes(g)) g.dispose();
+
+  const phases = new Float32Array(FISH_COUNT);
+  for (let i = 0; i < FISH_COUNT; i++) phases[i] = random() * Math.PI * 2;
+  geo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phases, 1));
+  return geo;
+}
+
+let fish = null, fishMat = null, fishState = null;
+const fishDummy = new THREE.Object3D();
+try {
+  fishMat = new THREE.MeshStandardMaterial({ roughness: .45, metalness: .1 });
+  addCaustics(fishMat, 'fish');
+  fish = new THREE.InstancedMesh(makeFishGeometry(), fishMat, FISH_COUNT);
+  fish.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  fish.frustumCulled = false;
+  fishState = [];
+  for (let i = 0; i < FISH_COUNT; i++) {
+    fishState.push({
+      orbit: .7 + random() * 1.5, phase: random() * 6.283,
+      speed: .35 + random() * .35, yBase: .42 + random() * .28,
+      bobAmp: .04 + random() * .07, bobSpeed: .5 + random() * .9,
+      scale: .45 + random() * .3,
+    });
+    fish.setColorAt(i, rockColor.setHSL(.52 + random() * .08, .45, .55 + random() * .2));
+  }
+  fish.instanceColor.needsUpdate = true;
+  scene.add(fish);
+} catch (e) {
+  console.warn('Fish creation failed, continuing without fish:', e);
+  fish = null;
+}
+
+function fishPosition(state, t) {
+  const a = state.phase + t * state.speed;
+  let x = Math.cos(t * .11) * 3.2 + Math.cos(a) * state.orbit;
+  let z = Math.sin(t * .14) * 3.2 + Math.sin(a) * state.orbit * .8;
+  let y = state.yBase + Math.sin(t * state.bobSpeed + state.phase) * state.bobAmp;
+  [x, z] = avoidRocks(x, z);
+  y = THREE.MathUtils.clamp(y, bedHeight(x, z) + .3, SETTINGS.waterLevel - .3);
+  return [x, y, z];
+}
+function updateFish() {
+  if (!fish || !fishState) return;
+  for (let i = 0; i < FISH_COUNT; i++) {
+    const state = fishState[i];
+    const [x, y, z] = fishPosition(state, timeU.value);
+    const [nx, ny, nz] = fishPosition(state, timeU.value + .15);
+    fishDummy.position.set(x, y, z);
+    fishDummy.lookAt(nx, ny, nz);
+    fishDummy.scale.setScalar(state.scale);
+    fishDummy.updateMatrix();
+    fish.setMatrixAt(i, fishDummy.matrix);
+  }
+  fish.instanceMatrix.needsUpdate = true;
+}
+
+function placeProp(mesh, index, scale, sink) {
+  const r = 3.2 + random() * 4.5, a = random() * Math.PI * 2;
+  const x = Math.cos(a) * r, z = Math.sin(a) * r;
+  rockTransform.position.set(x, bedHeight(x, z) + sink, z);
+  rockTransform.rotation.set((random() - .5) * .35, random() * Math.PI * 2, (random() - .5) * .35);
+  rockTransform.scale.setScalar(scale);
+  rockTransform.updateMatrix();
+  mesh.setMatrixAt(index, rockTransform.matrix);
+  paintShade(x, z, .5 * scale, .16);
+}
+
+function makeScallopGeometry() {
+  const geo = new THREE.SphereGeometry(.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+  const pos = geo.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const ridge = 1 + .06 * Math.sin(Math.atan2(v.z, v.x) * 9);
+    pos.setXYZ(i, v.x * ridge, v.y * .45, v.z * ridge);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+const scallopMat = new THREE.MeshStandardMaterial({ roughness: .55 });
+addCaustics(scallopMat, 'prop');
+const scallops = new THREE.InstancedMesh(makeScallopGeometry(), scallopMat, 5);
+for (let i = 0; i < 5; i++) {
+  placeProp(scallops, i, .6 + random() * .4, .03);
+  scallops.setColorAt(i, rockColor.setHSL(.02 + random() * .1, .38, .6 + random() * .15));
+}
+scallops.instanceColor.needsUpdate = true;
+scallops.computeBoundingSphere();
+scene.add(scallops);
+
+function makeSpikeShellGeometry() {
+  const geo = new THREE.ConeGeometry(.3, .55, 16, 4);
+  const pos = geo.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const s = (v.y + .275) / .55;
+    pos.setX(i, v.x + s * s * .2);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+const spikeMat = new THREE.MeshStandardMaterial({ roughness: .7 });
+addCaustics(spikeMat, 'prop');
+const spikeShells = new THREE.InstancedMesh(makeSpikeShellGeometry(), spikeMat, 4);
+for (let i = 0; i < 4; i++) {
+  placeProp(spikeShells, i, .6 + random() * .5, .26);
+  spikeShells.setColorAt(i, rockColor.setHSL(.08 + random() * .05, .3, .55 + random() * .2));
+}
+spikeShells.instanceColor.needsUpdate = true;
+spikeShells.computeBoundingSphere();
+scene.add(spikeShells);
+
+function makeStarfishGeometry() {
+  const shape = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? .21 : .5;
+    const a = i / 10 * Math.PI * 2 - Math.PI / 2;
+    const x = Math.cos(a) * r, y = Math.sin(a) * r;
+    i ? shape.lineTo(x, y) : shape.moveTo(x, y);
+  }
+  shape.closePath();
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: .12, bevelEnabled: true, bevelThickness: .06, bevelSize: .06, bevelSegments: 2 });
+  geo.rotateX(-Math.PI / 2);
+  return geo;
+}
+const starMat = new THREE.MeshStandardMaterial({ roughness: .8, flatShading: true });
+addCaustics(starMat, 'prop');
+const starfish = new THREE.InstancedMesh(makeStarfishGeometry(), starMat, 3);
+for (let i = 0; i < 3; i++) {
+  placeProp(starfish, i, .5 + random() * .35, .06);
+  starfish.setColorAt(i, rockColor.setHSL(.03 + random() * .04, .68, .42 + random() * .12));
+}
+starfish.instanceColor.needsUpdate = true;
+starfish.computeBoundingSphere();
+scene.add(starfish);
+bedShade.needsUpdate = true;
+
+// ---------- paper toy boat ----------
+// Classic origami silhouette at a visible scale, riding the actual wave field.
+// The boat samples the same wave function the water vertex shader uses, so it
+// pitches and rolls on real swells rather than a canned animation.
+const PAPER_BOAT = (() => {
+  // ------- Geometry -------
+  // Proportions give a hull about 1.2 m long, 0.56 m wide, and a 0.36 m sail.
+  const L = 0.60;    // half-length (bow to stern = 2L)
+  const W = 0.28;    // half-width
+  const H = 0.13;    // rim height above keel
+  const S = 0.36;    // sail height above rim
+  const BOB_OFFSET = -0.035;  // hull sinks slightly below the surface
+
+  function makeGeometry() {
+    // 9 vertices. The hull is a V with a continuous port and starboard face
+    // meeting at a keel ridge. The sail is a single triangle above the fold.
+    const verts = new Float32Array([
+      // 0 bow rim
+       0,    H,     L,
+      // 1 port rim
+      -W,    H,     0,
+      // 2 stern rim
+       0,    H,    -L,
+      // 3 starboard rim
+       W,    H,     0,
+      // 4 keel near bow (on centreline, below rim)
+       0,    0,     L * 0.55,
+      // 5 keel near stern
+       0,    0,    -L * 0.55,
+      // 6 sail apex (fold ridge peak)
+       0,    H + S, 0,
+      // 7 sail bow anchor on the rim
+       0,    H,     L * 0.42,
+      // 8 sail stern anchor on the rim
+       0,    H,    -L * 0.42,
+    ]);
+
+    // 7 triangles. Winding is chosen so every hull normal points outward.
+    const idx = new Uint16Array([
+      // Port side (outward -x). Three triangles fan from portRim.
+      1, 4, 0,   // port front quarter
+      1, 5, 4,   // port middle
+      1, 2, 5,   // port rear quarter
+      // Starboard side (outward +x), mirrored.
+      3, 0, 4,   // starboard front quarter
+      3, 4, 5,   // starboard middle
+      3, 5, 2,   // starboard rear quarter
+      // Sail (flat, in the centreline plane; DoubleSide renders both faces).
+      7, 6, 8,
+    ]);
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+    geo.setIndex(new THREE.BufferAttribute(idx, 1));
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  const geo = makeGeometry();
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xfaf1d8,          // warm cream paper
+    roughness: 0.78,          // slightly less than fully matte — paper sheen
+    metalness: 0.0,
+    flatShading: true,        // crisp origami panels
+    side: THREE.DoubleSide,   // sail and open hull visible from both sides
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.name = 'PaperBoat';
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+
+  // ------- Water surface sampling (mirrors the vertex shader) -------
+  function smoothstepJS(a, b, x) {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
+
+  // Four base waves, pre-normalized. Matches addWave() in the vertex shader.
+  const WAVES = [
+    [ 1.0,  0.3,  0.8, 0.060, 1.2],
+    [-0.7,  1.0,  1.3, 0.045, 1.6],
+    [ 0.5, -1.0,  2.2, 0.030, 2.2],
+    [-1.0, -0.4,  3.5, 0.015, 2.8],
+  ].map(([dx, dz, freq, amp, spd]) => {
+    const len = Math.hypot(dx, dz);
+    return { dx: dx/len, dz: dz/len, freq, amp, spd };
+  });
+
+  function sampleWaterHeight(x, z) {
+    const t = timeU.value;
+    let h = 0;
+    for (const w of WAVES) {
+      h += w.amp * Math.sin((w.dx * x + w.dz * z) * w.freq + t * w.spd);
+    }
+    const r = Math.hypot(x, z);
+    h *= waveStrengthU.value * (1 - smoothstepJS(18, 65, r));
+
+    const sd = surfDirectionU.value;
+    const crossPos = x * (-sd.y) + z * sd.x;
+    const along = x * sd.x + z * sd.y;
+    const bend = 0.32 * Math.sin(crossPos * 0.48);
+
+    const w2 = SETTINGS.surf.width * SETTINGS.surf.width;
+    const swellVal = (dist, weight) => {
+      const peak = Math.exp(-dist * dist / w2);
+      const td = dist + 2.0;
+      const trough = Math.exp(-td * td / (w2 * 3.0));
+      return weight * (peak - 0.24 * trough);
+    };
+    const sw = swellVal(along + bend - surfFrontU.value.x, 1.0)
+             + swellVal(along + bend - surfFrontU.value.y, 0.78);
+    const shoreFade = 1 - smoothstepJS(13, 23, Math.abs(along));
+    h += sw * surfHeightU.value * shoreFade;
+    return h;
+  }
+
+  // ------- Drift path -------
+  // Lissajous: x period ≈ 48 s, z period ≈ 70 s. Never repeats quickly, and
+  // the boat wanders through the middle of the pond where the camera looks.
+  const PATH = {
+    ax: 3.6, az: 4.2,
+    wx: 0.13, wz: 0.10,
+    zPhase: 0.4,
+  };
+  function pathPosition(t) {
+    const x = PATH.ax * Math.sin(t * PATH.wx);
+    const z = PATH.az * Math.cos(t * PATH.wz + PATH.zPhase);
+    return [x, z];
+  }
+  function pathVelocity(t) {
+    const dx = PATH.ax * PATH.wx * Math.cos(t * PATH.wx);
+    const dz = -PATH.az * PATH.wz * Math.sin(t * PATH.wz + PATH.zPhase);
+    return [dx, dz];
+  }
+
+  // ------- Reused scratch objects (allocation-free per frame) -------
+  const _up    = new THREE.Vector3();
+  const _fwd   = new THREE.Vector3();
+  const _right = new THREE.Vector3();
+  const _m     = new THREE.Matrix4();
+
+  function update() {
+    const t = timeU.value;
+
+    const [x, z] = pathPosition(t);
+    const [dx, dz] = pathVelocity(t);
+
+    const waveH = sampleWaterHeight(x, z);
+
+    // Local water slope via central differences.
+    const d = 0.10;
+    const hL = sampleWaterHeight(x - d, z);
+    const hR = sampleWaterHeight(x + d, z);
+    const hD = sampleWaterHeight(x, z - d);
+    const hU = sampleWaterHeight(x, z + d);
+    const dhdx = (hR - hL) / (2 * d);
+    const dhdz = (hU - hD) / (2 * d);
+
+    // Surface normal with a tilt clamp (≈20°) so a steep swell never rolls the
+    // boat unnaturally.
+    const nx = THREE.MathUtils.clamp(-dhdx, -0.36, 0.36);
+    const nz = THREE.MathUtils.clamp(-dhdz, -0.36, 0.36);
+
+    // Small independent flutter so a "stationary" boat still feels buoyant.
+    const flutter = Math.sin(t * 3.1 + 0.7) * 0.004 + Math.sin(t * 4.3) * 0.002;
+
+    mesh.position.set(x, waveH + BOB_OFFSET + flutter, z);
+
+    // Orthonormal basis: boat's local +y is the water normal (so it rolls and
+    // pitches with the waves), and its local +z is the path tangent,
+    // projected perpendicular to the water normal so the basis is clean.
+    _up.set(nx, 1, nz).normalize();
+    _fwd.set(dx, 0, dz).normalize();
+    // Reject the component of _fwd parallel to _up (Gram-Schmidt).
+    _fwd.addScaledVector(_up, -_up.dot(_fwd)).normalize();
+    // right = up × fwd gives a right-handed basis (verified: up × fwd = right,
+    // fwd × right = up). The boat's bow is local +z, so it faces the tangent.
+    _right.crossVectors(_up, _fwd);
+    _m.makeBasis(_right, _up, _fwd);
+    mesh.quaternion.setFromRotationMatrix(_m);
+
+    // Publish the position for the water shader's wake patch.
+    boatPosU.value.set(x, waveH, z);
+  }
+
+  function dispose() {
+    geo.dispose();
+    mat.dispose();
+  }
+
+  return { mesh, update, dispose };
+})();
+
+// ---------- water ----------
+const vertexShader = /* glsl */`
+  uniform float uTime;
+  uniform float uWaveStrength;
+  uniform vec2 uSurfFront;
+  uniform vec2 uSurfDirection;
+  uniform float uSurfHeight;
+  uniform float uSurfWidth;
+  varying float vCrest;
+  varying vec3 vWorldPos;
+  varying vec4 vClipPos;
+  varying vec3 vNormalW;
+
+  void addWave(vec2 dir, float freq, float amp, float speed, vec2 p, float t,
+               inout float h, inout vec2 grad) {
+    float phase = dot(p, dir) * freq + t * speed;
+    h += amp * sin(phase);
+    grad += dir * (freq * amp * cos(phase));
+  }
+
+  void addSwell(float dist, float weight, vec2 slopeDirection,
+                inout float height, inout vec2 gradient, inout float crest) {
+    float width2 = uSurfWidth * uSurfWidth;
+    float peak = exp(-dist * dist / width2);
+    float tailDistance = dist + 2.0;
+    float trough = exp(-tailDistance * tailDistance / (width2 * 3.0));
+    height += weight * (peak - .24 * trough);
+    float slope = weight * (-2.0 * dist / width2 * peak
+                 + .16 * tailDistance / width2 * trough);
+    gradient += slopeDirection * slope;
+    crest = max(crest, peak * weight);
+  }
+
+  void main() {
+    vec3 pos = position;
+    vec2 p = pos.xz;
+    float h = 0.0;
+    vec2 grad = vec2(0.0);
+    addWave(normalize(vec2( 1.0,  0.3)), 0.8, 0.060, 1.2, p, uTime, h, grad);
+    addWave(normalize(vec2(-0.7,  1.0)), 1.3, 0.045, 1.6, p, uTime, h, grad);
+    addWave(normalize(vec2( 0.5, -1.0)), 2.2, 0.030, 2.2, p, uTime, h, grad);
+    addWave(normalize(vec2(-1.0, -0.4)), 3.5, 0.015, 2.8, p, uTime, h, grad);
+    float amplitude = uWaveStrength * (1.0 - smoothstep(18.0, 65.0, length(p)));
+    h *= amplitude;
+    grad *= amplitude;
+
+    vec2 across = vec2(-uSurfDirection.y, uSurfDirection.x);
+    float crossPosition = dot(p, across);
+    float along = dot(p, uSurfDirection);
+    float bend = .32 * sin(crossPosition * .48);
+    vec2 slopeDirection = uSurfDirection + across * (.1536 * cos(crossPosition * .48));
+    float swell = 0.0;
+    vec2 swellGrad = vec2(0.0);
+    float crest = 0.0;
+    addSwell(along + bend - uSurfFront.x, 1.0, slopeDirection, swell, swellGrad, crest);
+    addSwell(along + bend - uSurfFront.y, .78, slopeDirection, swell, swellGrad, crest);
+    float shoreFade = 1.0 - smoothstep(13.0, 23.0, abs(along));
+    h += swell * uSurfHeight * shoreFade;
+    grad += swellGrad * uSurfHeight * shoreFade;
+    vCrest = crest * shoreFade;
+    pos.y += h;
+    vNormalW = normalize(vec3(-grad.x, 1.0, -grad.y));
+    vec4 wp = modelMatrix * vec4(pos, 1.0);
+    vWorldPos = wp.xyz;
+    vClipPos = projectionMatrix * viewMatrix * wp;
+    gl_Position = vClipPos;
+  }
+`;
+
+const fragmentShader = /* glsl */`
+  uniform float uTime;
+  uniform float uWaveStrength;
+  uniform sampler2D tRefraction;
+  uniform sampler2D tDepth;
+  uniform sampler2D tFoam;
+  uniform float uNear;
+  uniform float uFar;
+  uniform vec3 uSunDir;
+  uniform vec3 uAbsorption;
+  uniform vec3 uDeepColor;
+  uniform vec3 uHorizonColor;
+  uniform vec2 uTexel;
+  uniform float uSurfHeight;
+  uniform vec3 uBoatPos;
+  varying float vCrest;
+  varying vec3 vWorldPos;
+  varying vec4 vClipPos;
+  varying vec3 vNormalW;
+
+  float linearizeDepth(float z) {
+    return (2.0 * uNear * uFar) / (uFar + uNear - (z * 2.0 - 1.0) * (uFar - uNear));
+  }
+  ${acesGLSL}
+  ${skyColorGLSL}
+
+  void main() {
+    vec2 p = vWorldPos.xz;
+    float t = uTime;
+    vec2 ripple = vec2(
+      sin(p.x * 6.0 + t * 2.0) * 0.05 + sin(p.x * 17.0 - t * 3.2) * 0.025,
+      sin(p.y * 7.0 - t * 1.7) * 0.05 + sin((p.x + p.y) * 13.0 + t * 2.5) * 0.025
+    );
+    float rippleFade = 1.0 - smoothstep(.05, .45, length(fwidth(p)));
+    vec3 N = normalize(vNormalW + vec3(ripple.x, 0.0, ripple.y) * uWaveStrength * rippleFade);
+    vec3 V = normalize(cameraPosition - vWorldPos);
+    vec2 screenUV = vClipPos.xy / vClipPos.w * 0.5 + 0.5;
+
+    float rawDepth = texture2D(tDepth, screenUV).x;
+    float sceneZ = linearizeDepth(rawDepth);
+    float waterZ = linearizeDepth(gl_FragCoord.z);
+    if (sceneZ <= waterZ) {
+      gl_FragColor = vec4(texture2D(tRefraction, screenUV).rgb, 1.0);
+      gl_FragColor.rgb = acesFilm(gl_FragColor.rgb);
+      #include <colorspace_fragment>
+      return;
+    }
+    float rayScale = length(cameraPosition - vWorldPos) / max(waterZ, .001);
+    float waterDepth = rawDepth > .9999 ? 12.0 : clamp((sceneZ - waterZ) * rayScale, 0.0, 12.0);
+
+    vec2 viewNormal = (viewMatrix * vec4(N - vec3(0.0, 1.0, 0.0), 0.0)).xy;
+    vec2 edge = min(screenUV, 1.0 - screenUV);
+    float edgeFade = smoothstep(0.0, .07, min(edge.x, edge.y));
+    float eta = 1.0 / 1.333;
+    float cosI = clamp(dot(N, V), 0.0, 1.0);
+    float sinI = sqrt(1.0 - cosI * cosI);
+    float sinT = eta * sinI;
+    float cosT = sqrt(1.0 - sinT * sinT);
+    float shift = waterDepth * abs(sinI / max(cosI, .1) - sinT / max(cosT, .1));
+    float vnLen = length(viewNormal);
+    vec2 vnDir = viewNormal / max(vnLen, 1e-5);
+    float tiltGate = smoothstep(0.0, 0.018, vnLen);
+    float offsetMag = min(shift * .22, .018) * edgeFade
+                    * smoothstep(0.0, .1, waterDepth) * tiltGate;
+    vec2 offset = vnDir * offsetMag;
+
+    vec2 refrUV = clamp(screenUV + offset, uTexel, 1.0 - uTexel);
+    float sampleDepth = texture2D(tDepth, refrUV).x;
+    float sampleZ = linearizeDepth(sampleDepth);
+    float continuity = 1.0 - smoothstep(.08, .4, abs(sampleZ - sceneZ));
+    refrUV = mix(screenUV, refrUV, continuity);
+    if (sampleDepth > .9999 || sampleZ <= waterZ + .03) refrUV = screenUV;
+
+    vec2 ca = (refrUV - screenUV) * .025;
+    vec3 refr = vec3(
+      texture2D(tRefraction, clamp(refrUV + ca, uTexel, 1.0 - uTexel)).r,
+      texture2D(tRefraction, refrUV).g,
+      texture2D(tRefraction, clamp(refrUV - ca, uTexel, 1.0 - uTexel)).b);
+
+    vec2 refrEdge = min(refrUV, 1.0 - refrUV);
+    float refrEdgeFade = smoothstep(0.0, .05, min(refrEdge.x, refrEdge.y));
+    if (refrEdgeFade < 1.0) {
+      vec3 raw = texture2D(tRefraction, screenUV).rgb;
+      refr = mix(raw, refr, refrEdgeFade);
+    }
+
+    vec3 absorb = exp(-uAbsorption * waterDepth);
+    refr = refr * absorb + uDeepColor * (1.0 - absorb);
+
+    float fres = 0.02 + 0.98 * pow(1.0 - max(dot(N, V), 0.0), 5.0);
+    vec3 refl = skyColor(reflect(-V, N));
+    vec3 col = mix(refr, refl, fres);
+
+    vec3 foamTex = texture2D(tFoam, p * .12 + vec2(t * .009, -t * .013)).rgb;
+    vec3 foamFine = texture2D(tFoam, p * .35 + vec2(-t * .015, t * .011)).rgb;
+
+    vec3 H = normalize(uSunDir + V);
+    float spec = pow(max(dot(N, H), 0.0), 1800.0);
+    float sparkle = smoothstep(.55, .95, foamFine.b);
+    col += vec3(1.0, .95, .82) * spec * (fres * 14.0 + .08) * (.25 + 1.5 * sparkle) * (1.0 + vCrest);
+
+    if (vCrest > .18) {
+      float crestFoam = smoothstep(.58, .93, vCrest + (foamTex.r - .5) * .55);
+      float bubbles = .24 + .76 * smoothstep(.22, .7, foamTex.g);
+      float foam = crestFoam * bubbles * smoothstep(0.0, .18, waterDepth);
+      col = mix(col, vec3(.91, .96, .89), foam * min(uSurfHeight * 1.7, .8));
+    }
+
+    float rimOuter = 1.0 - smoothstep(.04, .30, waterDepth);
+    float rimInner = smoothstep(.005, .05, waterDepth);
+    float lap = .5 + .5 * sin(t * 1.4 + dot(p, vec2(1.7, 1.3)));
+    float surge = lap + vCrest * .35;
+    float shoreFoam = rimOuter * rimInner * smoothstep(.42, .85, foamFine.g * .75 + surge * .28);
+    col = mix(col, vec3(.93, .97, .92), shoreFoam * .38);
+
+    // Soft wake patch around the drifting paper boat.
+    float boatDist = length(p - uBoatPos.xz);
+    float boatFoam = exp(-boatDist * boatDist * 3.2) * .55;
+    col = mix(col, vec3(.94, .97, .96), boatFoam);
+
+    float mist = smoothstep(24.0, 70.0, length(vWorldPos - cameraPosition));
+    col = mix(col, uHorizonColor * ${skyGain}, mist);
+
+    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor.rgb = acesFilm(gl_FragColor.rgb);
+    #include <colorspace_fragment>
+  }
+`;
+
+const rt = new THREE.WebGLRenderTarget(1, 1);
+rt.depthTexture = new THREE.DepthTexture(1, 1);
+rt.texture.generateMipmaps = false;
+
+const waterMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: timeU,
+    uWaveStrength: waveStrengthU,
+    uSurfFront: surfFrontU,
+    uSurfDirection: surfDirectionU,
+    uSurfHeight: surfHeightU,
+    uSurfWidth: { value: SETTINGS.surf.width },
+    tRefraction: { value: rt.texture },
+    tDepth: { value: rt.depthTexture },
+    tFoam: { value: foamNoise },
+    uNear: { value: camera.near },
+    uFar: { value: camera.far },
+    uSunDir: { value: sunDir },
+    uAbsorption: absorptionU,
+    uDeepColor: { value: new THREE.Color(...SETTINGS.deepColor) },
+    uHorizonColor: { value: horizonColor },
+    uTexel: { value: new THREE.Vector2(1, 1) },
+    uBoatPos: boatPosU,
+  },
+  vertexShader,
+  fragmentShader,
+});
+
+function makeWaterGeometry(segments) {
+  const geometry = new THREE.PlaneGeometry(40, 40, segments, segments);
+  geometry.rotateX(-Math.PI / 2);
+  stretchEdges(geometry);
+  return geometry;
+}
+const water = new THREE.Mesh(makeWaterGeometry(qualitySettings.segments), waterMat);
+water.position.y = waterLevelU.value;
+water.layers.set(1);
+scene.add(water);
+
+// ---------- resolution ----------
+const bufferSize = new THREE.Vector2();
+let dynamicScaleValue = 1.0;
+let frameIntervals = [];
+let lastAutoAdjustTime = 0;
+
+function baseRefractionScale() {
+  const quiet = mode !== 'explore';
+  return quiet && quality === 'auto' ? .65 : qualitySettings.refraction;
+}
+
+function applyRenderTargetSize() {
+  renderer.getDrawingBufferSize(bufferSize);
+  const scale = baseRefractionScale() * dynamicScaleValue;
+  rt.setSize(Math.max(1, Math.floor(bufferSize.x * scale)), Math.max(1, Math.floor(bufferSize.y * scale)));
+  waterMat.uniforms.uTexel.value.set(1 / rt.width, 1 / rt.height);
+}
+
+function onResize() {
+  if (disposed || contextLost) return;
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  const quiet = mode !== 'explore';
+  const dprCap = quiet && quality === 'auto' ? 1.25 : qualitySettings.dpr;
+  const pixelBudget = qualitySettings.pixels * (quiet && quality === 'auto' ? .8 : 1);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, dprCap, Math.sqrt(pixelBudget / (innerWidth * innerHeight))));
+  renderer.setSize(innerWidth, innerHeight);
+  applyRenderTargetSize();
+  requestRender();
+}
+
+function updateDynamicScale(frameMs) {
+  const cfg = SETTINGS.dynamicScale;
+  if (!cfg.enabled || quality !== 'auto') return;
+  if (frameMs <= 0 || frameMs > 80) return;
+  frameIntervals.push(frameMs);
+  if (frameIntervals.length > cfg.sampleCount) frameIntervals.shift();
+  if (frameIntervals.length < cfg.sampleCount) return;
+  const now = performance.now();
+  if (now - lastAutoAdjustTime < cfg.cooldownMs) return;
+  let sum = 0;
+  for (const v of frameIntervals) sum += v;
+  const avg = sum / frameIntervals.length;
+  let next = dynamicScaleValue;
+  if (avg > cfg.targetMs * 1.35 && dynamicScaleValue > cfg.min) {
+    next = Math.max(cfg.min, dynamicScaleValue - 0.10);
+  } else if (avg < cfg.targetMs * 0.85 && dynamicScaleValue < cfg.max) {
+    next = Math.min(cfg.max, dynamicScaleValue + 0.05);
+  }
+  if (next !== dynamicScaleValue) {
+    dynamicScaleValue = next;
+    applyRenderTargetSize();
+    frameIntervals.length = 0;
+    lastAutoAdjustTime = now;
+  } else {
+    lastAutoAdjustTime = now;
+  }
+}
+
+function resetCamera() {
+  const damping = controls.enableDamping;
+  controls.enableDamping = false;
+  controls.update();
+  controls.target.set(0, .6, 0);
+  camera.position.set(...(mode === 'explore' ? [6, 4.5, 8] : [7, 10, 10]));
+  controls.update();
+  controls.enableDamping = damping;
+  requestRender();
+}
+
+function setMode(nextMode) {
+  mode = nextMode;
+  document.body.dataset.mode = mode;
+  document.querySelector('#preview-copy').hidden = mode !== 'preview';
+  document.querySelector('#explore').setAttribute('aria-pressed', String(mode === 'explore'));
+  document.querySelector('#preview').setAttribute('aria-pressed', String(mode === 'preview'));
+  document.querySelector('#reset').hidden = mode !== 'explore';
+  controls.enabled = mode === 'explore';
+  renderer.domElement.tabIndex = mode === 'explore' ? 0 : -1;
+  renderer.domElement.setAttribute('aria-hidden', String(mode !== 'explore'));
+  waveStrengthU.value = SETTINGS.waveStrength * (mode === 'explore' ? 1 : .55);
+  surfHeightU.value = SETTINGS.surf.height * (mode === 'explore' ? 1 : .75);
+  resetCamera();
+  onResize();
+  syncAnimation();
+}
+
+// ---------- animation ----------
+let lastFrame = 0, renderRequest = 0, running = false;
+function renderFrame() {
+  if (disposed || contextLost) return;
+  if (controls.enabled) controls.update();
+  updateSurf();
+  updateOceanAudio();
+  updateFish();
+  PAPER_BOAT.update();
+  camera.layers.set(0);
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, camera);
+  camera.layers.set(1);
+  renderer.setRenderTarget(null);
+  renderer.render(scene, camera);
+  camera.layers.set(0);
+}
+
+function animate(now) {
+  const elapsed = lastFrame ? Math.min((now - lastFrame) / 1000, .1) : 0;
+  lastFrame = now;
+  timeU.value += elapsed * SETTINGS.speed;
+  updateDynamicScale(elapsed * 1000);
+  renderFrame();
+}
+
+function requestRender() {
+  if (disposed || contextLost || running || renderRequest || document.hidden || !inView) return;
+  renderRequest = requestAnimationFrame(() => {
+    renderRequest = 0;
+    if (!document.hidden && inView) renderFrame();
+  });
+}
+
+function syncAnimation() {
+  if (disposed) return;
+  running = !paused && !document.hidden && inView && !contextLost;
+  controls.enableDamping = !paused;
+  lastFrame = 0;
+  renderer.setAnimationLoop(running ? animate : null);
+  if (running && renderRequest) { cancelAnimationFrame(renderRequest); renderRequest = 0; }
+  document.querySelector('#pause').textContent = paused ? 'Play' : 'Pause';
+  document.querySelector('#pause').setAttribute('aria-pressed', String(paused));
+  updateSoundButton();
+  syncOceanAudio();
+  requestRender();
+}
+
+const listeners = new AbortController();
+function listen(target, event, callback, options = {}) {
+  target.addEventListener(event, callback, { ...options, signal: listeners.signal });
+}
+listen(window, 'resize', onResize);
+listen(document, 'visibilitychange', syncAnimation);
+listen(motionPreference, 'change', () => { paused = motionPreference.matches; syncAnimation(); });
+listen(document.querySelector('#explore'), 'click', () => setMode('explore'));
+listen(document.querySelector('#preview'), 'click', () => setMode('preview'));
+listen(document.querySelector('#pause'), 'click', () => { paused = !paused; syncAnimation(); });
+listen(document.querySelector('#reset'), 'click', resetCamera);
+listen(soundButton, 'click', () => {
+  soundEnabled = !soundEnabled;
+  updateSoundButton();
+  try {
+    if (soundEnabled && !oceanAudio) oceanAudio = createOceanAudio();
+    syncOceanAudio();
+  } catch { audioFailed(); }
+});
+listen(document.querySelector('#volume'), 'input', event => {
+  volume = Number(event.target.value) / 100;
+  document.querySelector('#volume-value').value = `${Math.round(volume * 100)}%`;
+  syncOceanAudio();
+});
+listen(document.querySelector('#quality'), 'change', event => {
+  quality = event.target.value;
+  qualitySettings = SETTINGS.quality[quality];
+  const previousGeometry = water.geometry;
+  water.geometry = makeWaterGeometry(qualitySettings.segments);
+  previousGeometry.dispose();
+  dynamicScaleValue = 1.0;
+  frameIntervals.length = 0;
+  lastAutoAdjustTime = 0;
+  onResize();
+});
+controls.addEventListener('change', requestRender);
+
+listen(renderer.domElement, 'keydown', event => {
+  if (mode !== 'explore' || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+  event.preventDefault();
+  const offset = camera.position.clone().sub(controls.target);
+  const spherical = new THREE.Spherical().setFromVector3(offset);
+  if (event.key === 'ArrowLeft') spherical.theta -= .08;
+  if (event.key === 'ArrowRight') spherical.theta += .08;
+  if (event.key === 'ArrowUp') spherical.phi -= .08;
+  if (event.key === 'ArrowDown') spherical.phi += .08;
+  spherical.phi = THREE.MathUtils.clamp(spherical.phi, controls.minPolarAngle, controls.maxPolarAngle);
+  camera.position.copy(controls.target).add(offset.setFromSpherical(spherical));
+  controls.update();
+  requestRender();
+});
+
+const observer = new IntersectionObserver(entries => {
+  inView = entries[0].isIntersecting;
+  syncAnimation();
+});
+observer.observe(renderer.domElement);
+
+listen(renderer.domElement, 'webglcontextlost', event => {
+  event.preventDefault();
+  contextLost = true;
+  syncAnimation();
+  showNotice('The water is taking a moment. It will return when graphics are available.');
+});
+listen(renderer.domElement, 'webglcontextrestored', () => {
+  contextLost = false;
+  hideNotice();
+  onResize();
+  syncAnimation();
+});
+
+function dispose() {
+  if (disposed) return;
+  disposed = true;
+  disposeOceanAudio();
+  try { PAPER_BOAT.dispose(); } catch {}
+  renderer.setAnimationLoop(null);
+  cancelAnimationFrame(renderRequest);
+  observer.disconnect();
+  listeners.abort();
+  controls.removeEventListener('change', requestRender);
+  controls.dispose();
+  scene.traverse(object => {
+    if (!object.isMesh) return;
+    try { object.geometry.dispose(); } catch {}
+    try { if (object.material) object.material.dispose(); } catch {}
+  });
+  try { rocks.dispose(); } catch {}
+  if (fish) try { fish.dispose(); } catch {}
+  try { scallops.dispose(); } catch {}
+  try { spikeShells.dispose(); } catch {}
+  try { starfish.dispose(); } catch {}
+  try { bedShade.dispose(); } catch {}
+  try { foamNoise.dispose(); } catch {}
+  try { rt.dispose(); } catch {}
+  try { renderer.dispose(); } catch {}
+}
+listen(window, 'pagehide', event => {
+  if (event.persisted) { renderer.setAnimationLoop(null); running = false; syncOceanAudio(); }
+  else dispose();
+});
+listen(window, 'pageshow', event => { if (event.persisted) syncAnimation(); });
+
+setMode(mode);
+renderFrame();
+hideNotice();
+document.documentElement.dataset.ready = 'true';
+
+} catch (error) {
+  console.error('Setup failed:', error);
+  showNotice('Setup failed: ' + (error && error.message ? error.message : String(error)), true);
+}
+</script>
+</body>
+</html>

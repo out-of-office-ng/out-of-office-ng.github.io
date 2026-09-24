@@ -68,7 +68,7 @@
         </div>
         <div class="detail-item">
           <span class="label">DATE</span>
-          <span class="value">TBA</span>
+          <span class="value">November</span>
         </div>
         <div class="detail-item">
           <span class="label">GATE</span>
@@ -125,7 +125,7 @@
       <button type="button" class="cta-btn" on:click={onOpenDrawer}>
         Claim {selectedTier.name} →
       </button>
-      <span class="fine-print">Secured by Paystack · OOO 0x04 · Date TBA</span>
+      <span class="fine-print">Secured by Paystack · OOO 0x04 · November</span>
     </div>
   </div>
 
