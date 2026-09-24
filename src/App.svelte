@@ -69,7 +69,8 @@
   <HeaderBar scrollState={isScrolled ? 'frosted' : 'transparent'} onOpenDrawer={openDrawer} onStatusChange={handleStatusChange} />
   <div class="chaos-rain"><ChaosLayer progress={$forcedCalm} /></div>
   <main>
-    <Shallows onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
+    <iframe src="/deepseek_1.html" title="The shallows" style="width: 100vw; height: 100vh; border: none; display: block; pointer-events: auto;"></iframe>
+    <Tickets showSticky={showStickyCta} onOpenDrawer={openDrawer} />
   </main>
   <RsvpDrawer isOpen={isDrawerOpen} onClose={() => isDrawerOpen = false} />
   <OooGeneratorModal isOpen={isOooGenOpen} onClose={() => isOooGenOpen = false} />
