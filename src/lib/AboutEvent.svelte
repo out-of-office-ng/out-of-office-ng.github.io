@@ -5,26 +5,22 @@
 <div class="about-page">
   <div class="header">
     <button class="back-btn" on:click={() => window.location.hash = '#/'}>
-      &larr; Return to Lagos
+      &larr; Back to the page
     </button>
   </div>
 
   <div class="content">
     <div class="text-col">
-      <h1 class="title">What We Are</h1>
+      <h1 class="title">What we are</h1>
       <p class="manifesto">
-        Out of Office is a temporary rebellion against Lagos life. 
-        It is not just a vacation; it's permission to disconnect from the madness.
+        Out of Office is a temporary rebellion<br>
+        against Lagos life. It is not just a vacation;<br>
+        it’s permission to disconnect from the<br>
+        madness.
       </p>
-      <p class="manifesto">
-        We are a community-driven escape from the traffic, the hustle, the economy, 
-        and the constant pressure to grind. A momentary suspension of stress, lit by a 
-        digital bonfire of ignored emails and paused notifications.
-      </p>
-      <p class="manifesto signature">
+      <p class="signature">
         Gone to touch grass. Back soon.
       </p>
-      <a class="archive-link" href="/v1/">See where it started: Out of Office v1 &rarr;</a>
     </div>
     
     <div class="fire-col">
@@ -38,28 +34,29 @@
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: #0a0b0c; /* AsciiGen Obsidian */
-    color: #e6e6dc; /* AsciiGen Limestone */
+    background: var(--bg, #f6f4f1);
+    color: var(--ink, #181818);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
   }
   .header {
-    padding: 2rem;
+    padding: 2.5rem 3rem;
   }
   .back-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #e6e6dc;
-    padding: 0.6rem 1.2rem;
-    border-radius: 20px;
+    background: none;
+    border: none;
+    color: var(--deep, #376a65);
+    padding: 0;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: background 0.2s ease, transform 0.2s ease;
+    font-family: var(--sans, system-ui, sans-serif);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease;
   }
   .back-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(-4px);
+    color: var(--ink, #181818);
   }
   .content {
     flex: 1;
@@ -68,7 +65,7 @@
     align-items: center;
     justify-content: center;
     gap: 4rem;
-    padding: 2rem;
+    padding: 2rem 3rem;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -77,47 +74,40 @@
     .content {
       flex-direction: row;
       justify-content: space-between;
+      align-items: center;
     }
     .text-col {
       flex: 1;
-      padding-right: 4rem;
+      padding-right: 2rem;
     }
     .fire-col {
-      flex: 1.2;
+      flex: 1;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: flex-end;
     }
   }
   .title {
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    color: var(--chaos-yellow, #d9a441);
+    font-family: var(--serif, Georgia, serif);
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    font-weight: 500;
+    color: #1a332f;
     margin-top: 0;
     margin-bottom: 2rem;
+    letter-spacing: -0.03em;
   }
   .manifesto {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    color: rgba(230, 230, 220, 0.85);
+    font-family: var(--serif, Georgia, serif);
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    line-height: 1.5;
+    margin-bottom: 2.5rem;
+    color: #1a332f;
   }
   .signature {
-    color: var(--pink-deep, #fc9ce0);
-    font-size: 1.5rem;
+    font-family: var(--marker, "Permanent Marker", cursive);
+    color: var(--pink-deep, #e0568f);
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-top: 2rem;
-    transform: rotate(-2deg);
-  }
-  .archive-link {
-    display: inline-block;
-    margin-top: 1.5rem;
-    color: rgba(230, 230, 220, 0.6);
-    font-size: 0.95rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.2s ease;
-  }
-  .archive-link:hover,
-  .archive-link:focus-visible {
-    color: var(--chaos-yellow, #d9a441);
   }
 </style>
