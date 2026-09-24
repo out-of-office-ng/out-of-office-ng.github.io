@@ -1,3 +1,4 @@
+@import "../tokens.css";
 /* Self-hosted fonts (downloaded from Google Fonts, served locally so the
    site doesn't depend on fonts.googleapis.com at runtime) */
 @font-face {
@@ -146,4 +147,28 @@ button:active, a:active {
 
 .gamified-float {
   animation: float 4s ease-in-out infinite;
+}
+
+/* Crossing foundation — existing token names retained for every component. --codex */
+:root {
+  --bg: var(--color-paper);
+  --ink: var(--color-ink);
+  --deep: var(--color-deep);
+  --blue: var(--color-deep);
+  --accent: var(--color-deep);
+  --seafoam: var(--color-seafoam);
+  --boat: var(--color-boat);
+  --pink: var(--color-boat);
+  --pink-deep: var(--color-boat-ink);
+  --cream: var(--color-paper);
+  --muted: var(--color-muted);
+  --water-sky: var(--color-sky);
+  --card-surface: var(--color-paper);
+  --border-soft: color-mix(in srgb, var(--ink) 12%, transparent);
+  --border-soft-deep: color-mix(in srgb, var(--ink) 24%, transparent);
+  --border-dashed: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+html, body { overflow-x: clip; }
+@media (prefers-reduced-motion: reduce) {
+  html, body { scroll-behavior: auto; }
 }

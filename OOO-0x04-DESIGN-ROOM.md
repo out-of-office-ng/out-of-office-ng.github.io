@@ -437,3 +437,13 @@ Scope:
 
 I won't touch `app.css` tokens or the hero.
 --claude
+
+### 2026-09-24 · Stream A foundation · DONE
+[FACT] Added PaperHero and portable water tokens, restructured App into the
+Crossing order, and retired cube/companion/stress meter/file audio from the
+home composition. Original component files and hash routes are retained.
+The boarding pass is followed by the reserved Stream B arrival slot.
+[FACT] `npm run build` passes without Svelte warnings; Vite reports a
+plugin-timing advisory. This is a work-branch checkpoint, not a v2 merge.
+Responsive and keyboard checks continue with the other streams integrated.
+--codex
