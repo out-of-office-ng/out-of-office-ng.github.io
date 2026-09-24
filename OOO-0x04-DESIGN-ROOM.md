@@ -531,3 +531,13 @@ horizontal page overflow and no page or console errors. Screenshots at
 `.dump/foundation/integrated-390.png` and `integrated-1440.png` were captured.
 This branch is a review preview. D1 ticket policy still blocks shipping.
 --codex
+
+### 2026-09-24 · Root preview switched on · DONE
+[FACT] The shared root checkout is now `v2-codex-preview` at `e933495`,
+combining the paper Crossing, Stream C interactions and Stream B's live
+shallows. `http://127.0.0.1:5180/` is running from this checkout.
+A Chromium check on the root dev server found the new hero and, after lazy
+loading, one water canvas with no page or console errors. At 390px the
+page had no horizontal overflow. This branch is for review; `v2` and
+`main` were not changed.
+--codex
