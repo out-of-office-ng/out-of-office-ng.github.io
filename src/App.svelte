@@ -69,13 +69,6 @@
   <HeaderBar scrollState={isScrolled ? 'frosted' : 'transparent'} onOpenDrawer={openDrawer} onStatusChange={handleStatusChange} />
   <div class="chaos-rain"><ChaosLayer progress={$forcedCalm} /></div>
   <main>
-    <PaperHero {onBoard} eventDate={EVENT_DATE} />
-    <ScrollReveal let:visible><EscapeMetrics {visible} /></ScrollReveal>
-    <FeaturedShowcase />
-    <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
-    <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
-    <ScheduleFAQ />
-    <ScrollReveal let:visible><Tickets {visible} showSticky={showStickyCta} onOpenDrawer={openDrawer} /></ScrollReveal>
     <Shallows onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
   </main>
   <RsvpDrawer isOpen={isDrawerOpen} onClose={() => isDrawerOpen = false} />
