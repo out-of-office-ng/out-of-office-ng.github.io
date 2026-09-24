@@ -3,37 +3,31 @@
 
   export let visible = false;
 
-  function joinCommunity() {
-    // TODO(owner): replace with the real community link (WhatsApp/IG/Discord).
-    // Until then, the way to join is to come — send them to the boarding pass.
-    document.querySelector('.tickets-section')?.scrollIntoView({ behavior: 'smooth' });
-  }
-
   const POLAROIDS = [
-    { src: 'https://images.pexels.com/photos/7149181/pexels-photo-7149181.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'no hierarchy, just vibes', rotate: -4 },
-    { src: 'https://images.pexels.com/photos/3483763/pexels-photo-3483763.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'make a mess. make friends.', rotate: 3 },
-    { src: 'https://images.pexels.com/photos/35435219/pexels-photo-35435219.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'play is the plan', rotate: -2 },
+    { word: 'MAKE', caption: 'room for art', rotate: -4 },
+    { word: 'PLAY', caption: 'without a plan', rotate: 3 },
+    { word: 'MEET', caption: 'somebody new', rotate: -2 },
   ];
 </script>
 
 <section class="community">
   <div class="text-content">
     <p class="eyebrow"><MorphText text="Community > calendar invites" /></p>
-    <h2 class="heading">The best memories are slightly blurry.</h2>
+    <h2 class="heading">Good company changes the day.</h2>
 
     <div class="manifesto" class:visible>
       <p>Out of Office is not status-heavy nightlife. It is a small rebellion: music, art, board games, shared snacks and the kind of conversation you remember on Monday.</p>
     </div>
 
     <div class="cta-row" class:visible>
-      <button class="btn-join" on:click={joinCommunity}>Join the community →</button>
+      <a class="btn-join" href="#/trail">See the trail →</a>
     </div>
   </div>
 
   <div class="wall">
     {#each POLAROIDS as p, i}
       <figure class="polaroid" class:visible style="--rotate: {p.rotate}deg; --i: {i};">
-        <img src={p.src} alt={p.caption} width="600" height="400" loading="lazy" />
+        <span class="polaroid-art" aria-hidden="true">{p.word}</span>
         <figcaption>{p.caption}</figcaption>
       </figure>
     {/each}
@@ -119,11 +113,14 @@
     transform: rotate(0deg) scale(1.05);
     z-index: 10;
   }
-  .polaroid img {
-    display: block;
+  .polaroid-art {
+    display: grid;
+    place-items: center;
     width: 100%;
     height: 18rem;
-    object-fit: cover;
+    background: var(--warm-sand);
+    color: var(--deep);
+    font: 700 clamp(2.5rem, 5vw, 5rem)/1 var(--serif);
     border-radius: 2px;
   }
   .polaroid figcaption {
@@ -165,6 +162,8 @@
   }
   
   .btn-join {
+    display: inline-flex;
+    text-decoration: none;
     font-weight: 700;
     font-size: 1rem;
     background: var(--blue);
@@ -181,5 +180,6 @@
     box-shadow: 0 6px 20px rgba(0, 191, 255, 0.4);
     background: #00aceb;
   }
+  .btn-join:focus-visible { outline: 3px solid var(--deep); outline-offset: 3px; }
 
 </style>

@@ -13,5 +13,5 @@ export const SALES_MODE = 'closed';
 export const NEXT_EVENT = {
   code: 'OOO 0x04',
   when: 'November 2026',
-  detail: 'Date and venue drop soon.',
+  detail: 'The exact date and venue are to be announced.',
 };

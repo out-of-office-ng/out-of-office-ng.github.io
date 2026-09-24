@@ -622,3 +622,17 @@ D1 implicitly through invented ticket details.
 were not supplied by the owner. Replace the number-led tiles with the
 actual auto-reply sentence and non-numeric, clearly playful activities.
 --codex
+
+### 2026-09-24 · Site error audit and repair · DONE
+[FACT] `main` was changed concurrently during this audit. Its merged `Tickets.svelte` had an unclosed `{#if salesOpen}` and `npm run build` failed at line 133. I worked in the separate `v2-codex-audit` worktree and brought the closed-sales guard from `main` into that branch. I did not edit or push `main`.
+[FACT] The carousel repair in `FeaturedShowcase.svelte` now shows one archived event per view, with manual previous/next/selector controls, no auto-advance and no hidden focusable cards. Chromium/Playwright at 320, 390 and 1440px cycled 0x01, 0x02 and 0x03 correctly, with no overflow.
+[FACT] `Tickets.svelte` now compiles and marks its pass as a preview. It shows only the confirmed OOO 0x04 month and TBA date, venue, passes and prices. `RsvpDrawer.svelte` opens an informational sheet while sales are closed. The old offline fallback cannot issue a simulated paid pass when payment is unavailable. `ScheduleFAQ.svelte` no longer asserts an unannounced itinerary or transport policy. `EscapeMetrics.svelte` no longer presents unsupported numeric results.
+[FACT] `Community.svelte` no longer displays unrelated stock photography as community memories or a Join button that merely scrolled to tickets. Its trail link works. Redundant Google Fonts requests and the closed-sale Paystack page-load request were removed from `index.html`.
+[FACT] `npm run build` passes with zero Svelte/Vite warnings and `git diff --check` passes. Playwright at 320, 390 and 1440px checked carousel navigation, ticket status, drawer, FAQ, water preview/explore controls, overflow and browser errors. All three runs recorded no page or console errors. Screenshots and script are in `.dump/audit/site-fixed-*.png` and `.dump/audit/site-smoke.mjs` in this worktree.
+[OPINION] The archival carousel and honest event preview are clearer than the rotating card and invented schedule. The cost is a quieter presentation and no live ticket conversion until the owner confirms OOO 0x04 details and checkout integration.
+--codex
+
+### 2026-09-24 · Owner-requested mobile deployment · DECISION
+[FACT] The owner asked to deploy the audited site for mobile review after the `main` Pages and portfolio workflows failed on the malformed `Tickets.svelte` conditional at line 133 (runs 36008644118 and 36008644461). The audit branch built on GitHub (run 36010306942) but the Pages environment rejected deployment from `v2-codex-audit`: only `main` is allowed.
+[FACT] The owner request authorizes this deployment. I merged `v2-codex-audit` into the current `origin/main` in a separate release worktree, retained the audited ticket and sales files when they conflicted with a concurrent fix, and ran `npm run build` and `git diff --check` on the merge result. Both passed. The normal `main` push will trigger Pages and portfolio sync; deployment status must be verified after the push.
+--codex

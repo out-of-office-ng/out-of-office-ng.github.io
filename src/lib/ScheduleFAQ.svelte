@@ -1,42 +1,26 @@
 <script>
-  let activeTab = 'afternoon';
   let openAccordion = 'faq-1';
-
-  const SCHEDULE = {
-    morning: [
-      { time: '11:00 AM', title: 'Arrival & Laptop Lockup', desc: 'Hand over your work laptop (optional, but highly encouraged) & claim your offline badge.' },
-      { time: '11:45 AM', title: 'Ignored Email Ceremony', desc: 'Symbolic mass deletion of unread Slack notifications and out-of-office setup.' }
-    ],
-    afternoon: [
-      { time: '01:30 PM', title: 'Danfo Rally to Tarkwa Bay', desc: 'Scenic bus & boat transport with retro Afrobeats & local Lagos snacks.' },
-      { time: '03:30 PM', title: 'Rubik Cube & Chaos Battle', desc: 'Solve the digital cube live or relax on the sand with zero Wi-Fi.' }
-    ],
-    night: [
-      { time: '06:30 PM', title: 'Sunset Grass Touching', desc: 'Gather around the ocean shore for live ambient soundscapes & acoustic jam.' },
-      { time: '08:00 PM', title: 'Digital Bonfire & Zine Swap', desc: 'ASCII fire illumination, storytelling, and zine sticker distribution.' }
-    ]
-  };
 
   const FAQS = [
     {
       id: 'faq-1',
-      question: 'What if my boss Slack calls me during the event?',
-      answer: 'Our official policy: pretend your phone fell into Tarkwa Bay. Or send them our passive-aggressive OOO email generator output!'
+      question: 'When is OOO 0x04?',
+      answer: 'It is planned for November 2026. The exact date and times have not been announced.'
     },
     {
       id: 'faq-2',
-      question: 'Is Wi-Fi available at the venue?',
-      answer: 'Wi-Fi is intentionally disabled. We offer 100% pure high-speed grass touching and wave listening instead.'
+      question: 'Where will it happen?',
+      answer: 'The venue and travel details are still to be announced.'
     },
     {
       id: 'faq-3',
-      question: 'What should I wear or bring?',
-      answer: 'Wear comfortable beachwear or casual clothes. Bring sunglasses, good vibes, and your phone set strictly to Do Not Disturb.'
+      question: 'Can I buy a pass?',
+      answer: 'Not yet. Pass options, prices and release details have not been announced.'
     },
     {
       id: 'faq-4',
-      question: 'How do I return home after the bonfire?',
-      answer: 'Chartered boat and Danfo shuttles run continuously back to the mainland from 8:30 PM until late.'
+      question: 'What is Out of Office?',
+      answer: 'A Lagos gathering series for time away from the usual routine. Browse the trail to see previous editions.'
     }
   ];
 
@@ -47,59 +31,30 @@
 
 <section id="current-event" class="schedule-wrap">
   <div class="header-center">
-    <span class="pill-tag">PROGRAM TIMELINE</span>
-    <h2 class="title">Event Schedule & Survival FAQ</h2>
-    <p class="subtitle">Plan your escape from the daily grind and master the art of total disconnection.</p>
+    <span class="pill-tag">OOO 0x04 · NOVEMBER 2026</span>
+    <h2 class="title">The next chapter is on its way.</h2>
+    <p class="subtitle">The plan is still being made. Here is what we can say today.</p>
   </div>
 
   <div class="tabs-container">
-    <div class="tabs-list" role="tablist">
-      <button
-        class="tab-btn"
-        class:active={activeTab === 'morning'}
-        on:click={() => (activeTab = 'morning')}
-        role="tab"
-        aria-selected={activeTab === 'morning'}
-      >
-        🌅 Morning Escape
-      </button>
-      <button
-        class="tab-btn"
-        class:active={activeTab === 'afternoon'}
-        on:click={() => (activeTab = 'afternoon')}
-        role="tab"
-        aria-selected={activeTab === 'afternoon'}
-      >
-        🚌 Afternoon Rally
-      </button>
-      <button
-        class="tab-btn"
-        class:active={activeTab === 'night'}
-        on:click={() => (activeTab = 'night')}
-        role="tab"
-        aria-selected={activeTab === 'night'}
-      >
-        🔥 Night Bonfire
-      </button>
-    </div>
-
-    <div class="tab-content">
-      <div class="timeline">
-        {#each SCHEDULE[activeTab] as item}
-          <div class="timeline-item">
-            <span class="item-time">{item.time}</span>
-            <div class="item-body">
-              <h3 class="item-title">{item.title}</h3>
-              <p class="item-desc">{item.desc}</p>
-            </div>
-          </div>
-        {/each}
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="item-time">01</span>
+        <div class="item-body"><h3 class="item-title">November 2026</h3><p class="item-desc">The month for OOO 0x04 is set; the day and time are TBA.</p></div>
+      </div>
+      <div class="timeline-item">
+        <span class="item-time">02</span>
+        <div class="item-body"><h3 class="item-title">Place and programme</h3><p class="item-desc">Venue, activities and travel plans will be shared when confirmed.</p></div>
+      </div>
+      <div class="timeline-item">
+        <span class="item-time">03</span>
+        <div class="item-body"><h3 class="item-title">Pass release</h3><p class="item-desc">Ticket options and prices are not available yet.</p></div>
       </div>
     </div>
   </div>
 
   <div class="faq-container">
-    <h3 class="faq-title">Survival FAQ</h3>
+    <h3 class="faq-title">Good to know</h3>
     <div class="accordion">
       {#each FAQS as faq}
         <div class="accordion-item" class:open={openAccordion === faq.id}>
@@ -174,37 +129,6 @@
     flex-direction: column;
     gap: 1.5rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  }
-
-  .tabs-list {
-    display: flex;
-    gap: 0.6rem;
-    background: var(--bg);
-    padding: 0.4rem;
-    border-radius: 10px;
-    border: 1px solid var(--border-soft-deep);
-    overflow-x: auto;
-  }
-
-  .tab-btn {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: none;
-    background: transparent;
-    color: var(--ink);
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s ease, transform 0.15s ease;
-  }
-
-  .tab-btn.active {
-    background: var(--card-surface);
-    color: var(--blue, #00bfff);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   .timeline {

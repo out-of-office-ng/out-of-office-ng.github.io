@@ -23,6 +23,7 @@
   let nameError = false;
   let emailError = false;
   let cancelNote = false;
+  let checkoutUnavailable = false;
   let copied = false;
   let copiedTimer;
   onDestroy(() => clearTimeout(copiedTimer));
@@ -73,6 +74,7 @@
     nameError = !attendeeName.trim();
     emailError = !attendeeEmail.trim();
     cancelNote = false;
+    checkoutUnavailable = false;
     if (nameError || emailError) return;
 
     const tierObj = TIERS.find((t) => t.id === selectedTierId) || TIERS[0];
@@ -96,9 +98,7 @@
         }
       });
     } else {
-      // Fallback offline simulation if Paystack SDK not loaded
-      const mockRef = 'OFFLINE_' + Math.floor(100000 + Math.random() * 900000);
-      issuePass(tierObj, mockRef);
+      checkoutUnavailable = true;
     }
   }
 
@@ -158,7 +158,7 @@
       <div class="sheet-header">
         <div>
           <span class="badge">OOO 0x04 · NOVEMBER</span>
-          <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
+          <h2 id="sheet-title" class="sheet-title">{salesOpen ? 'Claim Event Pass' : 'Pass update'}</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
       </div>
@@ -251,6 +251,9 @@
 
             {#if cancelNote}
               <p class="field-error muted" role="status">Payment cancelled — try again whenever you're ready.</p>
+            {/if}
+            {#if checkoutUnavailable}
+              <p class="field-error" role="alert">Checkout is unavailable. No pass was issued or payment taken.</p>
             {/if}
 
             <div class="btn-row">

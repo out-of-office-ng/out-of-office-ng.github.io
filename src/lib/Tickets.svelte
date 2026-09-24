@@ -32,11 +32,10 @@
 <section class="tickets-section">
   <div class="header-text" class:visible>
     <p class="eyebrow"><MorphText text="Boarding pass" boost={1.3} /></p>
-    <h2 class="heading">Your ticket out of yellow Lagos.</h2>
+    <h2 class="heading">Your next escape is taking shape.</h2>
     <p class="subheading">
-      Escape Lagos noise with the next Out of Office—reconnect with yourself, nature,
-      and community through yoga, painting, beach games, picnics, bonfires, and meaningful
-      conversations by the ocean. Come for the experience. Leave with the memories.
+      OOO 0x04 is planned for November 2026. The exact date, venue, pass options,
+      and price have yet to be announced.
     </p>
   </div>
 
@@ -44,8 +43,8 @@
     <!-- Main Pass Body -->
     <div class="pass-main">
       <div class="pass-header">
-        <div class="brand-tag">OUT OF OFFICE AIR & MARINE · ONE WAY ESCAPE</div>
-        <div class="flight-num">FLIGHT: <strong>OOO-2026</strong></div>
+        <div class="brand-tag">OUT OF OFFICE · PREVIEW COPY</div>
+        <div class="flight-num">EDITION: <strong>OOO 0x04</strong></div>
       </div>
 
       <div class="route-display">
@@ -54,13 +53,13 @@
           <span class="city">Yellow Lagos</span>
         </div>
         <div class="route-arrow">
-          <span class="travel-icon">⛵</span>
+          <span class="travel-icon">→</span>
           <div class="line"></div>
           <span class="duration">NON-STOP ESCAPE</span>
         </div>
         <div class="route-point">
           <span class="code blue">OOO</span>
-          <span class="city">Blue Lagos (Tarkwa Bay)</span>
+          <span class="city">Destination to be announced</span>
         </div>
       </div>
 
@@ -71,19 +70,19 @@
         </div>
         <div class="detail-item">
           <span class="label">DATE</span>
-          <span class="value">November</span>
+          <span class="value">November 2026 · day TBA</span>
         </div>
         <div class="detail-item">
-          <span class="label">GATE</span>
-          <span class="value">TB-01</span>
+          <span class="label">VENUE</span>
+          <span class="value">To be announced</span>
         </div>
         <div class="detail-item">
-          <span class="label">BOARDING TIME</span>
-          <span class="value">IMMEDIATELY</span>
+          <span class="label">PASSES</span>
+          <span class="value">Not on sale yet</span>
         </div>
         <div class="detail-item col-span">
-          <span class="label">SPECIAL INSTRUCTIONS</span>
-          <span class="value highlight">Mute work Slack · Leave problems at Marina jetty</span>
+          <span class="label">STATUS</span>
+          <span class="value highlight">Details are still being prepared</span>
         </div>
       </div>
     </div>
@@ -98,13 +97,8 @@
     <!-- Stub Section -->
     <div class="pass-stub">
       <div class="stub-header">
-        <span class="stub-title">STUB COPY</span>
-        <span class="seat-badge">SEAT: 1A (SURFSIDE)</span>
-      </div>
-
-      <div class="barcode" aria-hidden="true">
-        <div class="bars"></div>
-        <span class="barcode-num">4 829104 772019 OOO-BNG</span>
+        <span class="stub-title">PREVIEW STUB</span>
+        <span class="seat-badge">NOT A TICKET</span>
       </div>
 
       {#if salesOpen}
@@ -131,14 +125,9 @@
       </button>
       <span class="fine-print">Secured by Paystack · OOO 0x04 · November</span>
       {:else}
-      <p class="tier-description">
-        Tickets aren't on sale yet.
-      </p>
-
-      <button type="button" class="cta-btn" on:click={onOpenDrawer}>
-        Tickets open soon →
-      </button>
-      <span class="fine-print">OOO 0x04 · November</span>
+        <p class="tier-description">A date, place and pass release are still to come. This is a preview, not an issued pass.</p>
+        <button type="button" class="cta-btn" on:click={onOpenDrawer}>Pass details →</button>
+        <span class="fine-print">{NEXT_EVENT.when} · Date, venue and prices TBA</span>
       {/if}
     </div>
   </div>
@@ -416,41 +405,6 @@
     padding: 0.35rem 0.6rem;
     border-radius: 6px;
     letter-spacing: 0.05em;
-  }
-
-  .barcode {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .barcode .bars {
-    width: 100%;
-    height: 44px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--ink) 0px,
-      var(--ink) 3px,
-      transparent 3px,
-      transparent 5px,
-      var(--ink) 5px,
-      var(--ink) 9px,
-      transparent 9px,
-      transparent 11px,
-      var(--ink) 11px,
-      var(--ink) 13px,
-      transparent 13px,
-      transparent 18px,
-      var(--ink) 18px,
-      var(--ink) 20px
-    );
-  }
-  .barcode-num {
-    font-family: monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    color: var(--muted);
   }
 
   .tier-select {
