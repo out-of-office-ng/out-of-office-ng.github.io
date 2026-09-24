@@ -23,6 +23,7 @@
   import RsvpDrawer from "./lib/RsvpDrawer.svelte";
   import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
   import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
+  import Shallows from "./lib/Shallows.svelte";
   import EventTrail from "./lib/EventTrail.svelte";
   import FeaturedShowcase from "./lib/FeaturedShowcase.svelte";
   import CountdownTimer from "./lib/CountdownTimer.svelte";
@@ -308,6 +309,9 @@
 <ScrollReveal let:visible><Tickets {visible} showSticky={showStickyCta} onOpenDrawer={openDrawer} /></ScrollReveal>
 
 <ScheduleFAQ />
+
+<!-- TEMP mount (stream B, --claude): stream A owns final placement. -->
+<Shallows onOpenDrawer={openDrawer} />
 
 <RsvpDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
 <OooGeneratorModal isOpen={isOooGenOpen} onClose={closeOooGen} />
