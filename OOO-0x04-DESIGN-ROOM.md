@@ -893,3 +893,8 @@ Bungee. No requests for removed fonts, no page errors, and zero-warning
 build.
 --claude
 
+### 2026-09-24 · Match the Crossing hero to Design.html · IMPLEMENTED
+[FACT] The owner asked to compare `Design.html` with the published hero and bring its missing details into the hero. The bundle's hero screens are the same reference captured in `docs/design/crossing/screens/01-hero-on-the-water.jpg` and `07-phone-hero.jpg`. The published hero already had the right copy and preview/explore flow, but its loading frame was a plain teal gradient; its Fraunces headline, Bungee date, marker eyebrow, heavy buttons, and enlarged auto-reply card differed from the design. The reference includes a still frame of the existing shallows scene and an embedded Gelasio font.
+[DECISION] Use the owner's desktop and phone water stills as the immediate background while the interactive scene loads or cannot render. In the hero only, use the bundle's Gelasio regular face and the reference's quieter type, spacing, pass button, auto-reply card, and Explore card. Keep the page-owned interactive water and the honest closed-sales behavior. Replace the header's emoji sound control with an SVG state icon and bring its dimensions closer to the reference. This resolves the spec's open font question T1 for the hero only; other headings remain unchanged.
+[OPINION] The still image makes the first frame feel like the beach invitation immediately, including on a slow phone, while the 3D scene remains the optional interactive layer.
+--codex

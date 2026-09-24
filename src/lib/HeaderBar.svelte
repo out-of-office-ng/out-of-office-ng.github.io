@@ -72,7 +72,10 @@
         aria-label={$muted ? 'Unmute ambient sound' : 'Mute ambient sound'}
         title={$muted ? 'Sound off' : 'Sound on'}
       >
-        <span aria-hidden="true">{$muted ? '🔇' : '🔊'}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 5 6 9H3v6h3l5 4z" />
+          {#if $muted}<path d="m16 9 5 6m0-6-5 6" />{:else}<path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13" />{/if}
+        </svg>
       </button>
 
       <button type="button" class="action-pill pass-pill" on:click={onOpenDrawer}>
@@ -93,7 +96,7 @@
     top: calc(1rem + env(safe-area-inset-top));
     z-index: 1000;
     width: calc(100% - 2rem);
-    max-width: 1000px;
+    max-width: 966px;
     margin: 0 auto;
   }
   .bar-container.overlay {
@@ -106,7 +109,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    min-height: 56px;
+    padding: 5px 6px 5px 22px;
     border-radius: 999px;
     transition: background 0.3s ease, 
                 border-color 0.3s ease, 
@@ -153,13 +157,13 @@
 
   .brand-link {
     font-family: var(--sans);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 800;
     line-height: 1;
     letter-spacing: 0.05em;
     color: var(--ink);
     text-decoration: none;
-    padding-left: 0.5rem;
+    padding-left: 0;
     white-space: nowrap;
     border-radius: 999px;
   }
@@ -185,8 +189,8 @@
   }
 
   .live-dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--muted);
     transition: background 0.2s ease;
@@ -198,7 +202,7 @@
 
   .status-label {
     font-family: var(--sans);
-    font-size: 0.6rem;
+    font-size: 0.625rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     color: var(--muted);
@@ -236,11 +240,15 @@
   }
 
   .icon-pill {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.55rem;
+    width: 44px;
+    height: 44px;
+    padding: 0;
   }
 
   .pass-pill {
+    height: 44px;
+    padding: 0 20px;
+    font-size: 0.6875rem;
     background: var(--ink);
     color: var(--bg);
   }
@@ -275,9 +283,15 @@
   }
 
   @media (max-width: 768px) {
-    .action-pill {
-      padding: 0.5rem 0.5rem;
-      font-size: 0.55rem;
-    }
+    .bar { padding-left: 16px; }
+    .pass-pill { padding-inline: 16px; }
+  }
+  @media (max-width: 360px) {
+    .bar { gap: 2px; padding-left: 10px; }
+    .brand-link { font-size: 0.67rem; }
+    .status-pill { padding-inline: 3px; }
+    .status-label { font-size: 0.55rem; }
+    .icon-pill { width: 32px; }
+    .pass-pill { padding-inline: 10px; font-size: 0.6rem; }
   }
 </style>
