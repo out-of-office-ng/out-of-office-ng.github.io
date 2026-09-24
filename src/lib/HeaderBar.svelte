@@ -1,18 +1,30 @@
 <script>
+  import { onDestroy } from 'svelte';
   import { muted, toggleMute } from './ambientSound.js';
 
   export let onOpenDrawer = () => {};
   export let onStatusChange = (onlineState) => {};
   export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
 
-  // AWAY is the site's fast lane to calm (see calm.js) — its payoff is
-  // the whole page exhaling, so the toggle itself needs no toast.
+  // AWAY is the site's fast lane to calm (see calm.js). The one-line
+  // status note is inline feedback attached to its own control, not a
+  // toast system.
   let isOnline = true;
+  let statusNote = false;
+  let statusMessage = '';
+  let noteTimer;
 
   function toggleStatus() {
     isOnline = !isOnline;
     onStatusChange(isOnline);
+    statusMessage = isOnline
+      ? 'ONLINE ⚡ — Reconnected. The noise is back.'
+      : 'AWAY 🌴 — Muted. Gone to touch grass.';
+    statusNote = true;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => (statusNote = false), 3200);
   }
+  onDestroy(() => clearTimeout(noteTimer));
 </script>
 
 <header class="bar-container {scrollState}">
@@ -52,6 +64,10 @@
       </button>
     </nav>
   </div>
+
+  {#if statusNote}
+    <div class="status-note" class:online={isOnline} role="status">{statusMessage}</div>
+  {/if}
 </header>
 
 <style>
@@ -199,11 +215,37 @@
   }
 
   .pass-pill {
-    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
   }
   .pass-pill:hover {
     background: var(--ink);
+    opacity: 0.88;
+  }
+
+  .status-note {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
     color: var(--bg);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    animation: noteIn 0.2s ease-out;
+  }
+  .status-note.online {
+    background: var(--chaos-yellow);
+    color: var(--ink);
+  }
+  @keyframes noteIn {
+    from { opacity: 0; transform: translate(-50%, -6px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
   }
 
   @media (max-width: 768px) {

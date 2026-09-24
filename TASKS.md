@@ -128,3 +128,23 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
     reads as a stack of competing alerts instead of four neatly placed
     widgets.
   - **Consolidated Header & Zine Aesthetic**: Removed the SaaS-style glassmorphic iOS "Dynamic Island" look from `HeaderBar.svelte`. It is now a flat, ink-colored printed ticket header with solid borders and mono typography, completely matching `ZineDecorations`' physical print aesthetic.
+
+## P5 — Strip-down pass (2026-09-24, branch `v2`)
+
+- [x] **Cut SaaS layer** — deleted CommandPalette, ToastSystem+toastStore,
+  AudioControlDeck (dead code), ScrollToTop, theme.js/dark mode; removed
+  cube mini-modal (generator unified behind OooGeneratorModal).
+- [x] **calm store** — `src/lib/calm.js`; one value, two writers
+  (pageProgress scenic / AWAY toggle fast lane, tweened ~1.8s). Cube, pill,
+  ChaosLayer, StressMeter, MorphText, AmbientSound all read it. AWAY toggle
+  now has page-wide payoff (Concept 3's "Tamagotchi" realized).
+- [x] **Inline feedback** — copied ✓ states + field errors replace toasts.
+- [x] **Date honesty** — 0x03 (Release & Unwind, Tarkwa Bay, Aug 15–16
+  2026) marked done on trail/timeline; 0x04 is up next. Expired countdown →
+  "Date TBA" chip (`EVENT_DATE` const in App.svelte; set it when 0x04 is
+  dated). Boarding pass DATE → TBA; hero arrow repointed to boarding pass.
+- [x] **Header strip** — 4 controls (brand, status, mute, OOO PASS).
+- [ ] **0x04 tickets** — Paystack still sells 0x03's tiers/prices under a
+  0x04 · Date TBA label. Decide tiers or switch to a waitlist before v2 ships.
+- [ ] **Real community photos** — still pending from P3.
+- [ ] **Audio files** — still pending from P1 (city-busy.mp3, beach-waves.mp3).

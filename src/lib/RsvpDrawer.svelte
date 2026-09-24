@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
@@ -16,9 +17,12 @@
   let confirmedPass = null;
   let paying = false;
   // Inline feedback, shown in the step that owns the action (no toasts).
-  let formNote = '';
+  let nameError = false;
+  let emailError = false;
+  let cancelNote = false;
   let copied = false;
   let copiedTimer;
+  onDestroy(() => clearTimeout(copiedTimer));
 
   const TIERS = [
     {
@@ -63,16 +67,10 @@
   ];
 
   function handleConfirm() {
-    formNote = '';
-    if (!attendeeName.trim()) {
-      formNote = 'Add your name or alias so we can issue your pass.';
-      return;
-    }
-
-    if (!attendeeEmail.trim()) {
-      formNote = 'Add your email so your pass receipt has somewhere to land.';
-      return;
-    }
+    nameError = !attendeeName.trim();
+    emailError = !attendeeEmail.trim();
+    cancelNote = false;
+    if (nameError || emailError) return;
 
     const tierObj = TIERS.find((t) => t.id === selectedTierId) || TIERS[0];
 
@@ -91,7 +89,7 @@
         },
         onCancel: () => {
           paying = false;
-          formNote = 'Payment cancelled. Try again whenever you are ready.';
+          cancelNote = true;
         }
       });
     } else {
@@ -130,7 +128,7 @@
     step = 1;
     confirmedPass = null;
     paying = false;
-    formNote = '';
+    nameError = emailError = cancelNote = false;
     copied = false;
     onClose();
   }
@@ -208,7 +206,10 @@
                 class="input"
                 placeholder="e.g. Tunde (Offline)"
                 bind:value={attendeeName}
+                on:input={() => (nameError = false)}
+                aria-invalid={nameError}
               />
+              {#if nameError}<p class="field-error" role="alert">Name required to issue your pass.</p>{/if}
             </div>
 
             <div class="form-group">
@@ -219,7 +220,10 @@
                 class="input"
                 placeholder="you@example.com"
                 bind:value={attendeeEmail}
+                on:input={() => (emailError = false)}
+                aria-invalid={emailError}
               />
+              {#if emailError}<p class="field-error" role="alert">Email required for your receipt.</p>{/if}
             </div>
 
             <div class="form-group">
@@ -231,8 +235,8 @@
               </select>
             </div>
 
-            {#if formNote}
-              <p class="form-note" role="alert">{formNote}</p>
+            {#if cancelNote}
+              <p class="field-error muted" role="status">Payment cancelled — try again whenever you're ready.</p>
             {/if}
 
             <div class="btn-row">
@@ -419,14 +423,15 @@
     font-size: 0.82rem;
   }
 
-  .form-note {
-    margin: 0 0 1rem;
-    padding: 0.6rem 0.8rem;
-    border-left: 3px solid var(--pink-deep, #fc9ce0);
-    background: color-mix(in srgb, var(--pink-deep, #fc9ce0) 10%, transparent);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: var(--ink);
+  .field-error {
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--chaos-red, #e5383b);
+  }
+  .field-error.muted {
+    margin-bottom: 0.8rem;
+    color: var(--muted);
   }
 
   .form-group {

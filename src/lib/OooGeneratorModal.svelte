@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from 'svelte';
   import { fade, scale } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
@@ -60,6 +61,7 @@
     clearTimeout(copiedTimer);
     copiedTimer = setTimeout(() => (copied = false), 1800);
   }
+  onDestroy(() => clearTimeout(copiedTimer));
 </script>
 
 {#if isOpen}
@@ -130,7 +132,7 @@
         <div class="output-card">
           <div class="card-header">
             <span class="card-title">Generated Auto-Responder</span>
-            <button class="copy-btn" on:click={copyToClipboard}>{copied ? 'Copied ✓ Now go touch grass' : '📋 Copy Auto-Reply'}</button>
+            <button class="copy-btn" on:click={copyToClipboard}>{copied ? 'Copied ✓' : '📋 Copy Auto-Reply'}</button>
           </div>
           <pre class="preview-box">{generatedText}</pre>
         </div>

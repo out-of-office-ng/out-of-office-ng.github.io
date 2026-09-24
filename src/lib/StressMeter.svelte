@@ -97,33 +97,46 @@
   }
 
   .stats-panel {
-    margin-top: 0.4rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed rgba(24, 24, 24, 0.2);
-    min-width: 13rem;
+    position: absolute;
+    bottom: calc(100% + 0.6rem);
+    left: 0;
+    min-width: 15rem;
+    background: var(--card-surface);
+    border: 2px solid var(--blue, #00bfff);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    animation: statsIn 0.25s var(--ease-out-expo);
+  }
+  @keyframes statsIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
   .stats-title {
     margin: 0 0 0.4rem;
-    font-weight: 700;
     font-size: 0.72rem;
-    letter-spacing: 0.06em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--blue, #00bfff);
+    color: var(--blue);
   }
   .stats-panel ul {
     list-style: none;
-    padding: 0;
     margin: 0;
-    font-size: 0.75rem;
-    color: var(--ink, #181818);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    color: var(--ink);
   }
   .stats-panel li {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 0.2rem;
   }
-  .stats-panel strong {
+  .stats-panel li strong {
     color: var(--accent);
   }
 
