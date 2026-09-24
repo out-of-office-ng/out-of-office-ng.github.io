@@ -326,7 +326,7 @@ welcome.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D1 | 0x04 tickets | real tiers / free waitlist / off | **open: blocks shipping** |
+| D1 | 0x04 tickets | real tiers / free waitlist / off | **DECIDED by owner 2026-09-24: C (off) now → B (waitlist) → A (real tiers)**. C is live on `main` + `/v1/`, see log |
 | D2 | Water placement | end-of-page destination (proposed) / hero / whole page | leaning end, per owner notes |
 | D3 | Palette | site-wide water palette with the contrast fixes above (proposed) / hero only | leaning site-wide |
 | D4 | The cube | retire + boat egg (--claude lean) / docked companion / remove fully | open |
@@ -437,3 +437,44 @@ Scope:
 
 I won't touch `app.css` tokens or the hero.
 --claude
+
+### 2026-09-24 · D1 decided: sales closed now, waitlist next, real tiers later · DONE
+**The owner decided D1:** **C (sales off) now → B (free waitlist) → A (real
+0x04 tiers).**
+
+**C is live now** `[FACT]`. It was pushed to `main` (`77bdd56`, `a72277b`)
+and cherry-picked onto `v1` (`c673ec2`). Deploy run succeeded. The deployed
+JS bundles for `/` and `/v1/` both contain the "Tickets open soon" state.
+The `v1.0` tag still points at the original `e8759a1`. Before this, the live
+root **and** the `/v1/` archive both sold the finished 0x03 event through
+the live Paystack key.
+
+**How it works:**
+- The new `src/lib/sales.js` holds one switch:
+  `SALES_MODE = 'closed' | 'waitlist' | 'open'`, plus `NEXT_EVENT`
+  (`OOO 0x04`, `November 2026`).
+- `RsvpDrawer` is where every "claim a pass" entry point ends up (header
+  OOO PASS, boarding-pass CTA, sticky mobile bar, ⌘K). It shows a "Tickets
+  open soon" pane and `handleConfirm()` returns early unless sales are
+  `'open'`.
+- `Tickets` hides the 0x03 tiers and prices and shows "NOV 2026 · TBA".
+- Verified in a browser: all four entry points show the closed pane, with
+  0 tier cards and 0 Paystack mentions.
+- On the live root only (not `/v1/`), the hero now reads "OOO 0x04 ·
+  November · Date TBA" and the expired countdown is removed.
+
+**For `v2`: whoever owns the ticket flow** (stream C, --agy, unless --codex
+has it in the foundation merge):
+- Port `src/lib/sales.js` from `main` and gate `RsvpDrawer`/`Tickets` the
+  same way. **v2 must not reach `main` with sales open.**
+- Build B as `SALES_MODE = 'waitlist'`: name + email only, no Paystack.
+  It needs a form service the owner hasn't chosen yet, so ask them. Don't
+  invent an endpoint.
+- `[FACT]` `RsvpDrawer`'s no-Paystack fallback issues a fake "OFFLINE_" pass
+  (`handleConfirm` else-branch). That's unreachable while closed, but it
+  must be removed before A, because it would hand out passes nobody paid
+  for.
+- For A, `origin/claude/kind-noether-fd8k8v` already centralises tiers in
+  `tickets.js`. Reuse it rather than writing a third copy.
+--claude
+
