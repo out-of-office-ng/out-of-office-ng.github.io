@@ -26,6 +26,7 @@
   import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
   import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
   import EventTrail from "./lib/EventTrail.svelte";
+  import FeaturedShowcase from "./lib/FeaturedShowcase.svelte";
   import { clearAllToasts } from "./lib/toastStore.js";
   import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
   import dropletPink from "../docs/brand-reference/paint-droplet-pink.png";
@@ -239,22 +240,26 @@
 
 <BootSequence />
 
+<div class="global-header-wrap">
+  <HeaderBar
+    onOpenCmdK={openCmdK}
+    onOpenDrawer={openDrawer}
+    onOpenOooGen={openOooGen}
+    onStatusChange={handleStatusChange}
+  />
+</div>
+
 <div class="scroll-track" bind:this={scrollTrack}>
   <div class="pinned">
     <div class="stage-wrap">
       <div class="grain"></div>
-      <!-- Chaos Layer chat bubbles outside of the main postcard card to frame the digital noise around our escape -->
-      <ChaosLayer progress={smoothedProgress} forceOnline={isOnline} />
+      <!-- Chaos Layer chat bubbles are now inside the hero to prevent them from showing throughout the page -->
       <main class="frame">
-        <HeaderBar
-          onOpenCmdK={openCmdK}
-          onOpenDrawer={openDrawer}
-          onOpenOooGen={openOooGen}
-          onStatusChange={handleStatusChange}
-        />
+
         <ZineDecorations />
 
         <div class="hero">
+          <ChaosLayer progress={smoothedProgress} forceOnline={isOnline} />
           <DanfoBus progress={smoothedProgress} />
 
           <button class="icon-btn icon-share" aria-label="Scroll to Open Canvas event" on:click={handleArrowClick} title="Scroll to Open Canvas event (May 30)">
@@ -340,6 +345,7 @@
 <ScrollReveal let:visible><EscapeMetrics {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
 <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
+<FeaturedShowcase />
 <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Tickets {visible} /></ScrollReveal>
 
@@ -480,13 +486,24 @@
     position: absolute;
     top: clamp(3.2rem, 6.5vh, 4rem);
     right: clamp(0.75rem, 4vw, 1.5rem);
-    background: var(--ink);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.35rem 0.7rem;
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.35rem 0.6rem;
     border-radius: 999px;
-    z-index: 3;
+    background: #ffcc00;
+    border: 1.5px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    transform: rotate(-3deg);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+  }
+  .share-toast:hover {
+    transform: scale(1.1) rotate(-6deg);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .share-toast:active {
+    transform: scale(0.95) rotate(0deg);
+    box-shadow: 0px 0px 0 var(--ink);
   }
 
   .headline {
@@ -507,8 +524,16 @@
   .paint-splat {
     position: absolute;
     z-index: -1;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: grab;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     height: auto;
+  }
+  .paint-splat:active {
+    cursor: grabbing;
+  }
+  .paint-splat:hover {
+    transform: scale(1.1) rotate(5deg) !important;
   }
 
   .paint-splat-blue {
@@ -519,8 +544,9 @@
   }
 
   .paint-splat-pink {
-    top: 1.05em;
-    left: -3.6em;
+    bottom: -150%;
+    right: -20%;
+    transform: rotate(15deg);
     width: clamp(45px, 10.2vw, 60px);
     opacity: 0.92;
   }
@@ -530,19 +556,15 @@
     display: flex;
     flex-direction: column;
     line-height: 0.95;
+    margin: 0;
   }
   .stack .word {
     font-weight: normal;
     font-size: clamp(3.2rem, 14vw, 5.4rem);
     color: var(--blue);
     letter-spacing: 0.02em;
-    /* All-caps display heads need line-height >= 1.0 */
     line-height: 1.04;
   }
-  /* "of" breaks from the wordmark's Back Wild/blue pairing into Permanent
-     Marker on a danfo-yellow highlight — a hand-scrawled connector taped
-     between two big painted words, the way a route detail gets marker'd
-     onto a danfo alongside the painted destination name. */
   .stack .of {
     align-self: flex-start;
     font-weight: normal;
@@ -602,9 +624,6 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    /* Solid glass, not the barely-there tint it used to be: a properly
-       frosted, mostly-opaque panel (unlike the chaos layer's translucent
-       glass popups) so it reads as a fixed piece of the card's UI. */
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -620,9 +639,6 @@
                 transform var(--dur-base) var(--ease-standard);
     pointer-events: none;
   }
-  /* Danfo zone: while the cube is still scrambled (stage "high"), the pill
-     carries a yellow/black hazard-stripe edge instead of a flat red tint —
-     the one moment on the page that's allowed to look like mainland chaos. */
   .notification-pill[data-stage="high"]::before {
     content: "";
     position: absolute;
@@ -647,8 +663,6 @@
   .notif-count {
     font-weight: 700;
     color: var(--chaos-red);
-    /* Digit widths vary per-glyph in Fredoka; without tabular-nums the
-       counter's own width jitters on every tick as it counts 999 -> 0. */
     font-variant-numeric: tabular-nums;
     transition: color var(--dur-base) var(--ease-standard);
   }
@@ -697,11 +711,6 @@
     width: clamp(160px, min(27vw, 30vh), 340px);
     height: clamp(160px, min(27vw, 30vh), 340px);
   }
-  /* Grounding glow — the cube is meant to be the hero object, but its
-     bright/paper-cream seams sat directly on a near-identical cream page
-     background with nothing to separate the two, so it visually thinned
-     out instead of popping. A soft halo gives it an edge regardless of
-     which sticker colors happen to be facing the camera. */
   .cube-slot::before {
     content: "";
     position: absolute;
@@ -712,10 +721,6 @@
     filter: blur(28px);
   }
 
-  /* The hero cube stays put in .cube-slot for the whole scroll-pin —
-     it does not relocate. Once activated, a second, independent cube
-     (.cube-companion below) pops into play instead, docked in the
-     corner for the rest of the scroll. */
   .cube-companion {
     position: fixed;
     bottom: clamp(1.5rem, 5vh, 3rem);
@@ -727,10 +732,6 @@
     animation: floatAssistant 4s ease-in-out infinite;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
   }
-  /* Glassmorphism dock — the moodboard calls for it and the site has none
-     yet; the transparent-canvas cube (renderer alpha: true) sitting over a
-     frosted panel is the one place it reads as a UI affordance rather than
-     decoration. */
   .cube-companion::before {
     content: "";
     position: absolute;
@@ -763,10 +764,6 @@
     opacity: 0;
     transform: translateY(24px);
     transition: opacity 0.6s var(--ease-standard), transform 0.6s var(--ease-standard);
-    /* Sea zone: this is the "you've found calm" moment, so blue gets to read
-       as water here instead of as a flat UI accent — a soft foam wash from
-       the top and a horizon line, not a saturated block, so the existing
-       ink/blue/pink-deep text on top stays readable. */
     background:
       radial-gradient(140% 65% at 50% -10%, rgba(0, 191, 255, 0.16), transparent 60%),
       linear-gradient(180deg, transparent 0%, rgba(0, 191, 255, 0.05) 60%, rgba(0, 191, 255, 0.12) 100%);
@@ -859,5 +856,17 @@
   }
   .stats-toast li strong {
     color: var(--accent);
+  }
+
+  .global-header-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .global-header-wrap > :global(*) {
+    pointer-events: auto;
   }
 </style>

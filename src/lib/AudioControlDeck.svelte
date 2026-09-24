@@ -1,5 +1,5 @@
 <script>
-  import { muted, toggleMute } from './ambientSound.js';
+  import { muted, toggleMute, beachUserVol, cityUserVol } from './ambientSound.js';
   import { addToast } from './toastStore.js';
 
   let isOpen = false;
@@ -8,6 +8,8 @@
   let cityVol = 40;
 
   muted.subscribe((v) => (isMutedVal = v));
+  beachUserVol.subscribe((v) => (beachVol = v));
+  cityUserVol.subscribe((v) => (cityVol = v));
 
   function handleMuteToggle() {
     toggleMute();
@@ -16,6 +18,14 @@
       description: isMutedVal ? 'Soundscape active.' : 'All audio silenced.',
       type: 'info'
     });
+  }
+
+  function handleBeachVol(e) {
+    beachUserVol.set(Number(e.target.value));
+  }
+
+  function handleCityVol(e) {
+    cityUserVol.set(Number(e.target.value));
   }
 </script>
 
@@ -55,7 +65,8 @@
             min="0"
             max="100"
             disabled={isMutedVal}
-            bind:value={beachVol}
+            value={beachVol}
+            on:input={handleBeachVol}
             class="slider"
           />
         </div>
@@ -70,7 +81,8 @@
             min="0"
             max="100"
             disabled={isMutedVal}
-            bind:value={cityVol}
+            value={cityVol}
+            on:input={handleCityVol}
             class="slider"
           />
         </div>
@@ -219,5 +231,18 @@
   @keyframes popIn {
     from { opacity: 0; transform: translateY(-8px) scale(0.95); }
     to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @media (max-width: 768px) {
+    .trigger-label {
+      display: none;
+    }
+    .deck-trigger {
+      padding: 0.4rem;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      justify-content: center;
+    }
   }
 </style>

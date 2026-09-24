@@ -6,6 +6,8 @@ import { writable } from 'svelte/store';
 // control. Default is unmuted (explicit instruction) — most sites default
 // audio off, this one is meant to be heard first.
 export const muted = writable(false);
+export const beachUserVol = writable(80);
+export const cityUserVol = writable(40);
 
 export function toggleMute() {
   muted.update((m) => !m);

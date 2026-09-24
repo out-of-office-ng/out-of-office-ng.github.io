@@ -91,13 +91,16 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 0.75rem;
-    background: color-mix(in srgb, var(--card-surface) 80%, transparent);
+    background: color-mix(in srgb, var(--card-surface) 65%, transparent);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid var(--border-soft);
     border-radius: 999px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  .bar:hover {
+    background: color-mix(in srgb, var(--card-surface) 95%, transparent);
   }
 
   .brand-link {

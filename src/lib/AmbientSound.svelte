@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   import { pageProgress } from "./scrollProgress.js";
-  import { muted } from "./ambientSound.js";
+  import { muted, beachUserVol, cityUserVol } from "./ambientSound.js";
 
   // Concept 5 (concept.txt), reinterpreted per user direction 2026-07-17:
   // "rowdy people in a busy place" at the top, "blue and a beach sound" near
@@ -22,22 +22,26 @@
   let isMuted = false;
   let progress = 0;
   let gestureArmed = false;
+  
+  let userBeachVol = 80;
+  let userCityVol = 40;
 
   const unsubMuted = muted.subscribe((v) => (isMuted = v));
   const unsubProgress = pageProgress.subscribe((v) => (progress = v));
+  const unsubBeachVol = beachUserVol.subscribe((v) => (userBeachVol = v));
+  const unsubCityVol = cityUserVol.subscribe((v) => (userCityVol = v));
 
   function clamp01(v) {
     return Math.max(0, Math.min(1, v));
   }
 
   // City bed: full volume at the top, fully faded by 12% down the page.
-  $: cityVolume = clamp01(1 - progress / 0.12);
+  $: cityScrollMult = clamp01(1 - progress / 0.12);
   // Beach bed: silent until 82% down the page, full by the very bottom
-  // (the Tickets section / "near the ticket line" the user specified).
-  $: beachVolume = clamp01((progress - 0.82) / 0.18);
+  $: beachScrollMult = clamp01((progress - 0.82) / 0.18);
 
-  $: if (cityEl) cityEl.volume = isMuted ? 0 : cityVolume;
-  $: if (beachEl) beachEl.volume = isMuted ? 0 : beachVolume;
+  $: if (cityEl) cityEl.volume = isMuted ? 0 : (userCityVol / 100) * cityScrollMult;
+  $: if (beachEl) beachEl.volume = isMuted ? 0 : (userBeachVol / 100) * beachScrollMult;
 
   // Browsers block audio playback before a real user gesture. Both beds
   // play continuously once armed — volume (above), not play/pause, carries
@@ -58,6 +62,8 @@
   onDestroy(() => {
     unsubMuted();
     unsubProgress();
+    unsubBeachVol();
+    unsubCityVol();
     window.removeEventListener("pointerdown", arm);
     window.removeEventListener("keydown", arm);
     window.removeEventListener("scroll", arm);
@@ -65,4 +71,4 @@
 </script>
 
 <audio bind:this={cityEl} src="/audio/city-busy.mp3" loop preload="none"></audio>
-<audio bind:this={beachEl} src="/audio/beach-waves.mp3" loop preload="none"></audio>
+<audio bind:this={beachEl} src="/audio/beach-waves.m4a" loop preload="none"></audio>

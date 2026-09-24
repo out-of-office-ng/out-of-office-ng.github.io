@@ -14,11 +14,24 @@
     progress <= START || progress >= END
       ? 0
       : Math.min(1, t / FADE, (1 - t) / FADE);
+
+  let isHonking = false;
+  function honk() {
+    if (isHonking) return;
+    isHonking = true;
+    setTimeout(() => {
+      isHonking = false;
+    }, 600);
+  }
 </script>
 
 <div class="bus-track" aria-hidden="true">
-  <div class="bus-travel" style="transform: translateX({left}vw); opacity: {opacity};">
-    <div class="bus-rig">
+  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+  <div class="bus-travel" style="transform: translateX({left}vw); opacity: {opacity};" on:click={honk}>
+    {#if isHonking}
+      <div class="honk-bubble">HONK!</div>
+    {/if}
+    <div class="bus-rig" class:honking={isHonking}>
       <svg viewBox="0 0 150 90" class="bus-svg">
         <!-- danfo: Lagos yellow minibus, VW-van silhouette with roof
              destination sign, ref: dribbble.com/shots/4422413 -->
@@ -70,6 +83,8 @@
     width: 130px;
     height: 100%;
     transition: opacity var(--dur-base) var(--ease-standard);
+    pointer-events: auto;
+    cursor: pointer;
   }
 
   .bus-rig {
@@ -77,11 +92,52 @@
     height: 100%;
     animation: bounce 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
+  .bus-rig.honking {
+    animation: shake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  .honk-bubble {
+    position: absolute;
+    top: -30px;
+    right: 20px;
+    background: white;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    font-family: var(--sans);
+    box-shadow: 2px 2px 0 var(--chaos-yellow);
+    animation: pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    z-index: 10;
+  }
+  .honk-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 10px;
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: var(--ink) transparent transparent transparent;
+  }
 
   .bus-svg {
     width: 100%;
     height: 100%;
     overflow: visible;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-2px, -2px, 0) rotate(-2deg); }
+    20%, 80% { transform: translate3d(2px, 2px, 0) rotate(2deg); }
+    30%, 50%, 70% { transform: translate3d(-3px, -3px, 0) rotate(-3deg); }
+    40%, 60% { transform: translate3d(3px, 3px, 0) rotate(3deg); }
   }
 
   /* horizontal position/opacity now come from the `progress` prop (see
