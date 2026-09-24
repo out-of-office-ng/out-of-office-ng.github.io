@@ -134,18 +134,17 @@
   }
 </script>
 
+<svelte:window on:keydown={(e) => isOpen && e.key === 'Escape' && resetAndClose()} />
+
 {#if isOpen}
   <div
     class="overlay"
-    on:click={resetAndClose}
-    on:keydown={(e) => e.key === 'Escape' && resetAndClose()}
-    tabindex="-1"
-    role="button"
+    on:click={(e) => e.target === e.currentTarget && resetAndClose()}
+    role="presentation"
     transition:fade={{ duration: dialogDuration(180) }}
   >
     <div
       class="sheet"
-      on:click|stopPropagation
       role="dialog"
       aria-modal="true"
       aria-labelledby="sheet-title"

@@ -64,18 +64,17 @@
   onDestroy(() => clearTimeout(copiedTimer));
 </script>
 
+<svelte:window on:keydown={(e) => isOpen && e.key === 'Escape' && onClose()} />
+
 {#if isOpen}
   <div
     class="overlay"
-    on:click={onClose}
-    on:keydown={(e) => e.key === 'Escape' && onClose()}
-    tabindex="-1"
-    role="button"
+    on:click={(e) => e.target === e.currentTarget && onClose()}
+    role="presentation"
     transition:fade={{ duration: dialogDuration(180) }}
   >
     <div
       class="modal"
-      on:click|stopPropagation
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

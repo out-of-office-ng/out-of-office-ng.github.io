@@ -295,12 +295,6 @@
     color: var(--muted);
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
   }
-  .nav-tally {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-  }
 
   /* ─── Page header ────────────────────────────────────── */
   .trail-header {
@@ -624,8 +618,8 @@
 
   /* ─── Reduced motion ─────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
-    .node-row, .connector-fill { transition: none; }
-    .pulse-dot, .active-dot    { animation: none; }
+    .node-row  { transition: none; }
+    .active-dot { animation: none; }
     @keyframes bulletPop { from { transform: scale(1); } to { transform: scale(1); } }
   }
 </style>

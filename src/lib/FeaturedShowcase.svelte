@@ -221,6 +221,9 @@
     <h2 class="heading">{heading}</h2>
   </div>
 
+  <!-- WAI-ARIA carousel pattern: a focusable region that takes arrow keys.
+       Svelte's lint treats region as non-interactive, so it's silenced here. -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex a11y_no_noninteractive_element_interactions -->
   <div
     class="stage"
     class:reduced={prefersReducedMotion}
@@ -240,6 +243,7 @@
       class:transitioning={isTransitioning}
       class:dragging={isDragging}
       style="transform: rotateY({-rotation}deg);"
+      role="presentation"
       on:pointerdown={onPointerDown}
       on:pointermove={onPointerMove}
       on:pointerup={onPointerUp}
