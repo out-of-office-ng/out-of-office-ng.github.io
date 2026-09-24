@@ -3,6 +3,9 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
+  import { SALES_MODE, NEXT_EVENT } from './sales.js';
+
+  const salesOpen = SALES_MODE === 'open';
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -20,6 +23,7 @@
   let nameError = false;
   let emailError = false;
   let cancelNote = false;
+  let checkoutUnavailable = false;
   let copied = false;
   let copiedTimer;
   onDestroy(() => clearTimeout(copiedTimer));
@@ -70,6 +74,7 @@
     nameError = !attendeeName.trim();
     emailError = !attendeeEmail.trim();
     cancelNote = false;
+    checkoutUnavailable = false;
     if (nameError || emailError) return;
 
     const tierObj = TIERS.find((t) => t.id === selectedTierId) || TIERS[0];
@@ -93,9 +98,7 @@
         }
       });
     } else {
-      // Fallback offline simulation if Paystack SDK not loaded
-      const mockRef = 'OFFLINE_' + Math.floor(100000 + Math.random() * 900000);
-      issuePass(tierObj, mockRef);
+      checkoutUnavailable = true;
     }
   }
 
@@ -155,13 +158,25 @@
       <div class="sheet-header">
         <div>
           <span class="badge">OOO 0x04 · NOVEMBER</span>
-          <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
+          <h2 id="sheet-title" class="sheet-title">{salesOpen ? 'Claim Event Pass' : 'Pass update'}</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
       </div>
 
       <div class="sheet-body">
-        {#if step === 1}
+        {#if !salesOpen}
+          <div class="step-pane">
+            <p class="closed-lede">
+              The next Out of Office is in <strong>{NEXT_EVENT.when}</strong>.
+              {NEXT_EVENT.detail}
+            </p>
+            <p class="closed-note">
+              Tickets aren't on sale yet, so there's nothing to pay today.
+              Release &amp; Unwind (0x03) has already happened.
+            </p>
+            <button class="primary-btn" on:click={resetAndClose}>Got it</button>
+          </div>
+        {:else if step === 1}
           <div class="step-pane">
             <h3 class="pane-subtitle">1. Select Pass Tier & Inclusions Breakdown</h3>
             <div class="tier-grid">
@@ -236,6 +251,9 @@
 
             {#if cancelNote}
               <p class="field-error muted" role="status">Payment cancelled — try again whenever you're ready.</p>
+            {/if}
+            {#if checkoutUnavailable}
+              <p class="field-error" role="alert">Checkout is unavailable. No pass was issued or payment taken.</p>
             {/if}
 
             <div class="btn-row">
@@ -325,6 +343,18 @@
     font-size: 1.8rem;
     color: var(--muted);
     cursor: pointer;
+  }
+
+  .closed-lede {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .closed-note {
+    margin: 0 0 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    opacity: 0.8;
   }
 
   .sheet-body {

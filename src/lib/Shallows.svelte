@@ -124,7 +124,7 @@
         The waves come in sets — restless, then still.<br />
         Drag sideways to wander. Tap to ripple.
       </p>
-      <button type="button" class="cta" on:click={onOpenDrawer}>Claim your pass →</button>
+      <button type="button" class="cta" on:click={onOpenDrawer}>Pass details →</button>
     </div>
   {/if}
 
