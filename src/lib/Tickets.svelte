@@ -1,6 +1,6 @@
 <script>
+  import { SALES_MODE } from './sales.js';
   export let visible = false;
-  export let showSticky = false;
   export let onOpenDrawer = () => {};
 
   let selectedTier = 'explorer';
@@ -38,21 +38,21 @@
 
         <div class="pass-details">
           <div class="detail-block">
-            <label>PASSENGER</label>
+            <span class="detail-label">PASSENGER</span>
             <div>LAGOS ESCAPER</div>
           </div>
           <div class="detail-block">
-            <label>DATE</label>
+            <span class="detail-label">DATE</span>
             <div>NOVEMBER &middot; TBA</div>
           </div>
           <div class="detail-block">
-            <label>BOARDING</label>
-            <div>IMMEDIATELY</div>
+            <span class="detail-label">BOARDING</span>
+            <div>{SALES_MODE === 'open' ? 'IMMEDIATELY' : 'DATE TBA'}</div>
           </div>
         </div>
 
         <div class="special-instructions">
-          <label>SPECIAL INSTRUCTIONS</label>
+          <span class="detail-label">SPECIAL INSTRUCTIONS</span>
           <div>Mute work Slack &middot; Leave problems at the door</div>
         </div>
       </div>
@@ -60,31 +60,30 @@
       <div class="pass-perforation"></div>
 
       <div class="pass-right">
-        <div class="stub-header">STUB COPY</div>
-        <div class="seat-badge">SEAT: 1A</div>
-        <div class="barcode"></div>
-        
-        <div class="tier-selector">
-          <button 
-            class="tier-btn" 
-            class:active={selectedTier === 'explorer'}
-            on:click={() => selectedTier = 'explorer'}>
-            <span class="tier-name">Explorer</span>
-            <span class="tier-price">&#8358;15,000</span>
+        {#if SALES_MODE === 'open'}
+          <div class="stub-header">STUB COPY</div>
+          <div class="seat-badge">SEAT: 1A</div>
+          <div class="barcode"></div>
+          <div class="tier-selector">
+            <button class="tier-btn" class:active={selectedTier === 'explorer'} on:click={() => selectedTier = 'explorer'}>
+              <span class="tier-name">Explorer</span>
+              <span class="tier-price">&#8358;15,000</span>
+            </button>
+            <button class="tier-btn" class:active={selectedTier === 'retreat'} on:click={() => selectedTier = 'retreat'}>
+              <span class="tier-name">Retreat</span>
+              <span class="tier-price">&#8358;20,000</span>
+            </button>
+          </div>
+          <button class="claim-btn" on:click={onOpenDrawer}>
+            Claim {selectedTier === 'explorer' ? 'Explorer' : 'Retreat'} Pass &rarr;
           </button>
-          <button 
-            class="tier-btn" 
-            class:active={selectedTier === 'retreat'}
-            on:click={() => selectedTier = 'retreat'}>
-            <span class="tier-name">Retreat</span>
-            <span class="tier-price">&#8358;20,000</span>
-          </button>
-        </div>
-
-        <button class="claim-btn" on:click={onOpenDrawer}>
-          Claim {selectedTier === 'explorer' ? 'Explorer' : 'Retreat'} Pass &rarr;
-        </button>
-        <div class="secure-text">Secured by Paystack</div>
+          <div class="secure-text">Secured by Paystack</div>
+        {:else}
+          <div class="stub-header">NEXT DEPARTURE</div>
+          <div class="seat-badge">0x04 · NOVEMBER</div>
+          <p class="closed-copy">The date and venue are still to be announced. Passes are not on sale yet.</p>
+          <button class="claim-btn" on:click={onOpenDrawer}>Pass update &rarr;</button>
+        {/if}
       </div>
     </div>
   </div>
@@ -241,7 +240,7 @@
     padding: 1.5rem;
     border-radius: 8px;
   }
-  .detail-block label {
+  .detail-block .detail-label {
     display: block;
     font-size: 0.7rem;
     color: var(--muted, #6b6b6b);
@@ -254,7 +253,7 @@
     color: var(--ink, #181818);
   }
 
-  .special-instructions label {
+  .special-instructions .detail-label {
     display: block;
     font-size: 0.7rem;
     color: var(--muted, #6b6b6b);
@@ -310,6 +309,7 @@
     font-weight: 700;
     letter-spacing: 0.05em;
   }
+  .closed-copy { margin: 0; line-height: 1.5; color: var(--ink, #243e3c); }
 
   .barcode {
     height: 40px;

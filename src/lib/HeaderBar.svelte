@@ -5,6 +5,7 @@
   export let onOpenDrawer = () => {};
   export let onStatusChange = (onlineState) => {};
   export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
+  export let overlay = false;
 
   // AWAY is the site's fast lane to calm (see calm.js). The one-line
   // status note is inline feedback attached to its own control, not a
@@ -42,7 +43,7 @@
   onDestroy(() => clearTimeout(noteTimer));
 </script>
 
-<header class="bar-container {scrollState}">
+<header class="bar-container {scrollState}" class:overlay>
   <div class="bar">
     <a href="#/about" class="brand-link" title="What We Are">
       OUT OF OFFICE
@@ -94,6 +95,11 @@
     width: calc(100% - 2rem);
     max-width: 1000px;
     margin: 0 auto;
+  }
+  .bar-container.overlay {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .bar {

@@ -1,44 +1,47 @@
 <script>
-  /* The shallows — the arrival at the end of the Crossing (see
-   * OOO-0x04-DESIGN-ROOM.md §4). The page is the boat ride; this is the shore.
-   *
-   * The section's gradient paints instantly and doubles as the loading state
-   * and the no-WebGL fallback. The Three.js scene is only fetched once the
-   * section comes within about a viewport of the screen, so it never competes
-   * with the hero for first paint.
-   */
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { muted } from './ambientSound.js';
 
   export let onOpenDrawer = () => {};
-  // 10 taps on the paper boat → the auto-reply generator (design room D4).
   export let onOpenOooGen = () => {};
+  export let onScrollToContent = () => {};
 
   let section;
   let stage;
+  let wanderButton;
+  let exploreCard;
   let scene = null;
-  let status = 'idle'; // idle | loading | ready | failed | context-lost
+  let status = 'idle';
   let message = '';
-  let hintFaded = false;
-  let arrived = false;
   let destroyed = false;
   let viewMode = 'preview';
 
-  function showView(nextMode) {
+  async function showView(nextMode) {
     viewMode = nextMode;
     scene?.setMode(nextMode);
+    await tick();
+    if (nextMode === 'explore') exploreCard?.focus();
+    else wanderButton?.focus();
+  }
+
+  function onKeydown(event) {
+    if (event.key === 'Escape' && viewMode === 'explore') {
+      event.preventDefault();
+      showView('preview');
+    }
   }
 
   let isMuted = false;
-  const unsubMuted = muted.subscribe((m) => {
-    isMuted = m;
-    scene?.setSound(!m);
+  const unsubMuted = muted.subscribe((value) => {
+    isMuted = value;
+    scene?.setSound(!value);
   });
 
-  function handleStatus(s) {
-    if (s.kind === 'sound-failed') return; // header mute stays the control
-    status = s.kind;
-    message = s.message || '';
+  function handleStatus(next) {
+    if (next.kind === 'sound-failed') return;
+    status = next.kind;
+    message = next.message || '';
+    if ((status === 'failed' || status === 'context-lost') && viewMode === 'explore') showView('preview');
   }
 
   async function mountScene() {
@@ -51,323 +54,150 @@
         sound: !isMuted,
         initialMode: viewMode,
         onStatus: handleStatus,
-        onInteract: () => (hintFaded = true),
-        onBoatEgg: () => onOpenOooGen(),
+        onBoatEgg: onOpenOooGen,
       });
-    } catch (err) {
-      console.error('[shallows]', err);
+    } catch (error) {
+      console.error('[shallows]', error);
       status = 'failed';
       message = 'The water could not load here.';
     }
   }
 
   let nearObserver;
-  let arriveObserver;
   onMount(() => {
-    // Fetch + build the scene a viewport early so it's ready on arrival.
-    nearObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          nearObserver.disconnect();
-          mountScene();
-        }
-      },
-      { rootMargin: '100% 0px' }
-    );
+    nearObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        nearObserver.disconnect();
+        mountScene();
+      }
+    }, { rootMargin: '100% 0px' });
     nearObserver.observe(section);
-
-    arriveObserver = new IntersectionObserver(
-      (entries) => (arrived = entries[0].isIntersecting),
-      { threshold: 0.35 }
-    );
-    arriveObserver.observe(section);
   });
 
   onDestroy(() => {
     destroyed = true;
     unsubMuted();
     nearObserver?.disconnect();
-    arriveObserver?.disconnect();
     scene?.dispose();
     scene = null;
   });
 </script>
 
-<section
-  id="shallows"
-  class="shallows"
-  class:arrived
-  class:preview={viewMode === 'preview'}
-  bind:this={section}
-  aria-labelledby="shallows-title"
->
-  <div class="stage" bind:this={stage}></div>
+<svelte:window on:keydown={onKeydown} />
 
-  <div class="view-switch" role="group" aria-label="Water view">
-    <button type="button" aria-pressed={viewMode === 'preview'} on:click={() => showView('preview')}>Background preview</button>
-    <button type="button" aria-pressed={viewMode === 'explore'} disabled={status === 'failed' || status === 'context-lost'} on:click={() => showView('explore')}>Explore water</button>
-  </div>
+<section id="shallows" class="hero" class:exploring={viewMode === 'explore'} bind:this={section} aria-label="Out of Office water">
+  <div class="stage" bind:this={stage}></div>
 
   {#if viewMode === 'preview'}
     <div class="preview-wash" aria-hidden="true"></div>
-    <div class="background-copy">
-      <p class="eyebrow">Out of Office &nbsp;/&nbsp; No. 04</p>
-      <h2 id="shallows-title">Out of office.<br />Into blue Lagos.</h2>
-      <p>Auto replies enabled.<br />Stress disabled.</p>
-      <button type="button" class="cta" on:click={onOpenDrawer}>View boarding pass →</button>
+    <div class="hero-copy">
+      <p class="eyebrow">OUT OF OFFICE</p>
+      <h1>Away from<br />the everyday.</h1>
+      <p class="description">A little space to slow down.<br />Leave the rush on the other side.</p>
+      <p class="event-status">0x04 <span aria-hidden="true">·</span> November <span aria-hidden="true">·</span> date TBA</p>
+      <button type="button" class="primary-button" on:click={onOpenDrawer}>Get your pass <span aria-hidden="true">↗</span></button>
     </div>
+
+    <aside class="auto-reply" aria-label="An Out of Office auto-reply">
+      <span class="tape" aria-hidden="true"></span>
+      <p class="mail-label">THE AUTO REPLY</p>
+      <p class="subject"><span>Subject</span><br />Auto-reply: back when my social battery gets recharged</p>
+      <p class="mail-body">I am currently away from emails, responsibilities, and Lagos stress.</p>
+      <button type="button" class="write-link" on:click={onOpenOooGen}>Write your own <span aria-hidden="true">→</span></button>
+      <span class="postmark" aria-hidden="true">OUT OF<br />OFFICE<br /><strong>0x04</strong></span>
+    </aside>
+
+    <button type="button" class="scroll-cue" aria-label="Scroll to the rest of the page" on:click={onScrollToContent}>↓</button>
+    <button type="button" class="wander-button" bind:this={wanderButton} disabled={status === 'failed' || status === 'context-lost'} on:click={() => showView('explore')}>
+      Wander the water <span aria-hidden="true">↗</span>
+    </button>
   {:else}
-    <div class="intro-card">
-      <p class="eyebrow">Out of office &nbsp;/&nbsp; No. 04</p>
-      <h2 id="shallows-title">The shallows.</h2>
-      <p class="caption" class:faded={hintFaded}>
-        The waves come in sets — restless, then still.<br />
-        Drag sideways to wander. Tap to ripple.
-      </p>
-      <button type="button" class="cta" on:click={onOpenDrawer}>Pass details →</button>
+    <div class="explore-card" tabindex="-1" bind:this={exploreCard}>
+      <p class="eyebrow">TAKE A MOMENT</p>
+      <p class="explore-hint">Drag to wander.<br />Tap to ripple.</p>
+      <div class="explore-actions">
+        <button type="button" on:click={() => showView('preview')}>← Back to the page</button>
+        <button type="button" on:click={() => scene?.resetView()}>Reset view</button>
+      </div>
     </div>
   {/if}
 
   {#if status === 'loading'}
-    <p class="status" role="status">The water is loading…</p>
+    <p class="scene-status loading-status" role="status">The water is loading…</p>
   {:else if status === 'failed' || status === 'context-lost'}
-    <p class="status" role="status">{message}</p>
+    <p class="scene-status" role="status">{message}</p>
   {/if}
-
-  <p class="finale-line">Leaving yellow Lagos. Entering blue Lagos.</p>
 </section>
 
 <style>
-  /* Hallmark · macrostructure: water arrival · tone: atmospheric · anchor hue: deep water */
-  /* Hallmark · pre-emit critique: P5 H4 E4 S5 R4 V4 */
-  .shallows {
-    /* Water palette (design room §4). Local until stream A lands the
-       site-wide tokens; each falls back to the literal value. */
-    --sh-ink: var(--ink-water, #243e3c);
-    --sh-deep: var(--deep, #376a65);
-    --sh-paper: #f6f5e9;
-
+  .hero {
+    --water-ink: var(--color-ink, #243e3c);
+    --water-deep: var(--color-deep, #376a65);
+    --water-paper: var(--color-paper, #f2efe8);
     position: relative;
-    height: 100svh;
-    min-height: 560px;
-    overflow: hidden;
-    color: var(--sh-ink);
-    background: linear-gradient(165deg, #dce7df, #7aaea8 58%, #376a65);
     isolation: isolate;
+    height: 100svh;
+    min-height: 590px;
+    overflow: hidden;
+    color: var(--water-ink);
+    background: linear-gradient(145deg, #e5eae2 5%, #92bcb3 55%, #376a65 100%);
   }
-
-  .stage {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-  .stage :global(.shallows-canvas) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    outline-offset: -5px;
-  }
-  .stage :global(.shallows-canvas:focus-visible) {
-    outline: 2px solid var(--sh-paper);
-  }
-
-  .view-switch {
-    position: absolute;
-    z-index: 3;
-    top: clamp(80px, 10vh, 104px);
-    right: clamp(18px, 3vw, 44px);
-    display: flex;
-    background: var(--bg);
-    border: 1px solid var(--sh-ink);
-  }
-  .view-switch button {
-    min-height: 44px;
-    padding: 10px 14px;
-    border: 0;
-    border-bottom: 3px solid transparent;
-    background: transparent;
-    color: var(--sh-ink);
-    font-family: var(--sans);
-    font-size: 0.72rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-  }
-  .view-switch button[aria-pressed='true'] {
-    border-bottom-color: var(--sh-deep);
-  }
-  .view-switch button:focus-visible {
-    outline: 3px solid var(--sh-deep);
-    outline-offset: 3px;
-  }
-  .view-switch button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
+  .stage { position: absolute; inset: 0; z-index: 0; }
+  .stage :global(.shallows-canvas) { display: block; width: 100%; height: 100%; pointer-events: none; }
+  .exploring .stage :global(.shallows-canvas) { pointer-events: auto; }
+  .stage :global(.shallows-canvas:focus-visible) { outline: 3px solid var(--water-paper); outline-offset: -6px; }
   .preview-wash {
-    position: absolute;
-    z-index: 1;
-    inset: 0;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 93%, transparent), color-mix(in srgb, var(--bg) 75%, transparent) 45%, transparent 80%);
-    pointer-events: none;
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(90deg, var(--water-paper) 0%, color-mix(in srgb, var(--water-paper) 94%, transparent) 20%, color-mix(in srgb, var(--water-paper) 69%, transparent) 46%, transparent 79%);
   }
-  .background-copy {
-    position: absolute;
-    z-index: 2;
-    top: clamp(180px, 25vh, 260px);
-    left: clamp(24px, 6vw, 96px);
-    width: min(610px, calc(100% - 48px));
+  .hero-copy { position: absolute; z-index: 2; top: clamp(146px, 22vh, 226px); left: clamp(26px, 6vw, 100px); max-width: min(59vw, 770px); }
+  .eyebrow { margin: 0; font-family: var(--marker); font-size: clamp(.82rem, 1.2vw, 1rem); letter-spacing: .025em; }
+  h1 { margin: 19px 0 20px; font-family: var(--serif); font-size: clamp(4.3rem, 7.7vw, 8.6rem); line-height: .99; letter-spacing: -.065em; font-weight: 700; }
+  .description { margin: 0 0 27px; font-size: clamp(1rem, 1.25vw, 1.22rem); line-height: 1.48; }
+  .event-status { margin: 0 0 20px; font-family: var(--bungee); font-size: clamp(.85rem, 1.15vw, 1rem); letter-spacing: .01em; }
+  .event-status span { margin: 0 .28em; }
+  button { cursor: pointer; font: inherit; }
+  button:focus-visible, .explore-card:focus-visible { outline: 3px solid var(--water-ink); outline-offset: 4px; }
+  .primary-button { min-height: 47px; padding: 12px 23px; border: 1px solid var(--water-deep); border-radius: 99px; background: var(--water-deep); color: #faf8f2; font-weight: 700; }
+  .primary-button:hover { background: var(--water-ink); }
+  .auto-reply { position: absolute; z-index: 2; top: 38%; right: clamp(38px, 7vw, 124px); width: clamp(330px, 30vw, 465px); padding: 28px 30px 27px; transform: rotate(3deg); border: 1px solid #cad3cc; border-radius: 9px; background: #f8f7f2; box-shadow: 0 20px 45px #17393727; }
+  .tape { position: absolute; top: -17px; left: 38%; width: 105px; height: 29px; transform: rotate(-4deg); background: #77aaa4c7; }
+  .mail-label { margin: 0 0 20px; font-family: var(--marker); font-size: .82rem; color: var(--water-deep); }
+  .subject { padding-bottom: 15px; border-bottom: 1px solid #cbd4cf; font-size: 1.02rem; line-height: 1.36; font-weight: 700; }
+  .subject span { color: #586a67; font-size: .8rem; font-weight: 400; }
+  .mail-body { max-width: 290px; font-family: var(--serif); font-size: clamp(1.3rem, 1.6vw, 1.7rem); line-height: 1.3; }
+  .write-link { padding: 0; border: 0; background: none; color: var(--water-deep); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+  .postmark { position: absolute; right: -25px; bottom: -35px; display: grid; place-content: center; width: 98px; height: 98px; transform: rotate(-13deg); border: 3px double var(--water-deep); border-radius: 50%; color: var(--water-deep); font-family: var(--bungee); font-size: .68rem; text-align: center; line-height: 1.1; }
+  .postmark strong { font-size: 1.2rem; }
+  .wander-button { position: absolute; z-index: 3; right: clamp(24px, 4vw, 60px); bottom: max(30px, env(safe-area-inset-bottom)); min-height: 46px; padding: 11px 20px; border: 1px solid var(--water-ink); border-radius: 99px; background: #f8f7f2e8; color: var(--water-ink); font-weight: 700; box-shadow: 0 3px 12px #17393719; }
+  .wander-button:hover { background: #fff; }
+  .wander-button:disabled { opacity: .5; cursor: not-allowed; }
+  .scroll-cue { position: absolute; z-index: 2; bottom: 27px; left: 50%; width: 44px; height: 44px; transform: translateX(-50%); border: 0; background: transparent; color: var(--water-ink); font-size: 2rem; }
+  .explore-card { position: absolute; z-index: 2; bottom: max(28px, env(safe-area-inset-bottom)); left: clamp(22px, 5vw, 80px); max-width: calc(100% - 44px); padding: 23px 27px; border: 1px solid #cad3cc; border-radius: 12px; background: #f8f7f2ed; box-shadow: 0 12px 32px #17393730; }
+  .explore-hint { margin: 12px 0 21px; font-family: var(--serif); font-size: clamp(1.5rem, 2.2vw, 2.2rem); line-height: 1.15; }
+  .explore-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .explore-actions button { min-height: 42px; padding: 8px 12px; border: 1px solid var(--water-deep); border-radius: 99px; background: transparent; color: var(--water-deep); font-size: .84rem; font-weight: 700; }
+  .explore-actions button:hover { background: var(--water-deep); color: #fff; }
+  .scene-status { position: absolute; z-index: 4; top: 102px; right: 30px; max-width: 220px; margin: 0; padding: 7px 11px; border-radius: 5px; background: #f8f7f2dd; font-size: .75rem; }
+  .loading-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  @media (max-width: 1100px) {
+    .auto-reply { display: none; }
   }
-  .background-copy h2 {
-    margin: 12px 0 22px;
-    font-family: var(--serif);
-    font-size: clamp(44px, 6vw, 84px);
-    line-height: 1.02;
-    font-weight: 700;
-    letter-spacing: -0.05em;
-    overflow-wrap: anywhere;
+  @media (max-width: 700px) {
+    .hero { min-height: 600px; }
+    .preview-wash { background: linear-gradient(180deg, var(--water-paper) 0%, color-mix(in srgb, var(--water-paper) 98%, transparent) 32%, color-mix(in srgb, var(--water-paper) 77%, transparent) 51%, transparent 75%); }
+    .hero-copy { top: clamp(114px, 16vh, 152px); left: 24px; max-width: calc(100% - 48px); }
+    h1 { margin: 14px 0 14px; font-size: clamp(3.35rem, 11.5vw, 5.2rem); line-height: 1.01; }
+    .description { display: none; }
+    .event-status { margin-bottom: 15px; font-size: .82rem; }
+    .auto-reply, .scroll-cue { display: none; }
+    .wander-button { right: 21px; bottom: max(22px, env(safe-area-inset-bottom)); }
+    .explore-card { left: 20px; bottom: max(22px, env(safe-area-inset-bottom)); }
+    .scene-status { top: auto; right: auto; left: 24px; bottom: 81px; }
   }
-  .background-copy > p:not(.eyebrow) {
-    font-family: var(--sans);
-    font-size: clamp(14px, 1.5vw, 18px);
-    line-height: 1.6;
+  @media (max-width: 365px) {
+    .hero-copy { left: 18px; max-width: calc(100% - 36px); }
+    h1 { font-size: 3rem; }
   }
-
-  .intro-card {
-    position: absolute;
-    z-index: 1;
-    left: clamp(18px, 2.6vw, 40px);
-    bottom: clamp(96px, 13vh, 132px);
-    max-width: min(360px, 44vw);
-    padding: clamp(18px, 2vw, 26px) clamp(20px, 2.2vw, 28px);
-    background: linear-gradient(160deg, #f7f3e5e6, #e8efe2cc);
-    border: 1px solid #ffffff96;
-    border-radius: 18px;
-    box-shadow: 0 14px 44px #0e2b231a, inset 0 1px 0 #ffffffb0;
-    backdrop-filter: blur(14px) saturate(115%);
-    -webkit-backdrop-filter: blur(14px) saturate(115%);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-  }
-  .shallows.arrived .intro-card {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .eyebrow {
-    margin: 0 0 10px;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    /* ink at ~0.8 on the card: ≥4.5:1 (card is near-opaque paper) */
-    color: color-mix(in srgb, var(--sh-ink) 82%, transparent);
-  }
-
-  h2 {
-    margin: 0;
-    font-family: 'Fraunces', Georgia, serif;
-    font-weight: 600;
-    font-size: clamp(26px, 3.2vw, 42px);
-    line-height: 1.05;
-    letter-spacing: -0.042em;
-  }
-
-  .caption {
-    margin: 12px 0 0;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 0.78rem;
-    line-height: 1.8;
-    color: color-mix(in srgb, var(--sh-ink) 85%, transparent);
-    transition: opacity 0.5s ease;
-  }
-  .caption.faded {
-    opacity: 0;
-  }
-
-  .cta {
-    margin-top: 16px;
-    border: none;
-    border-radius: 999px;
-    padding: 0.7rem 1.3rem;
-    background: var(--sh-deep);
-    color: var(--sh-paper); /* 5.61:1 */
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(55, 106, 101, 0.3);
-    transition: background 0.2s ease;
-  }
-  .cta:hover {
-    background: #2b5753;
-    transform: none;
-  }
-  .cta:focus-visible {
-    outline: 2px solid var(--sh-ink);
-    outline-offset: 3px;
-  }
-
-  .status {
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0;
-    padding: 0.8rem 1.2rem;
-    border-radius: 14px;
-    background: #f5f6eceb;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 0.85rem;
-    text-align: center;
-    max-width: calc(100% - 48px);
-  }
-
-  .finale-line {
-    position: absolute;
-    z-index: 1;
-    left: 0;
-    right: 0;
-    bottom: max(clamp(14px, 4vh, 28px), env(safe-area-inset-bottom));
-    margin: 0;
-    text-align: center;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    /* The sand at the bottom of the frame is light, so white text washed
-       out; ink with a paper halo reads on both sand and deeper water. */
-    color: var(--sh-ink);
-    text-shadow: 0 0 6px rgba(247, 243, 229, 0.95), 0 0 14px rgba(247, 243, 229, 0.8);
-    pointer-events: none;
-  }
-
-  @media (max-width: 600px) {
-    .view-switch {
-      top: 82px;
-      right: 18px;
-    }
-    .view-switch button {
-      padding: 8px 10px;
-      font-size: 0.65rem;
-    }
-    .preview-wash {
-      background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 94%, transparent), color-mix(in srgb, var(--bg) 80%, transparent) 52%, transparent 78%);
-    }
-    .background-copy {
-      top: 175px;
-    }
-    .background-copy h2 {
-      font-size: clamp(38px, 10vw, 56px);
-    }
-    .intro-card {
-      max-width: min(300px, calc(100vw - 36px));
-      bottom: clamp(84px, 12vh, 108px);
-    }
-  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
 </style>

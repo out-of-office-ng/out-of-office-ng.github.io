@@ -1528,6 +1528,7 @@ if (navigator.userActivation?.hasBeenActive) armAudio();
 
 return {
   setMode,
+  resetView: resetCamera,
   setSound(enabled) {
     soundEnabled = !!enabled;
     if (soundEnabled) armAudio();
