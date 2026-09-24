@@ -823,3 +823,28 @@ has it in the foundation merge):
 [DECISION] `OOO-0x04-LEAN-SCOPE.md` is the current scope guard. The core is water/escape, a brief OOO explanation, one past-edition proof point, honest 0x04 status, and a clear next action. App-style chrome, duplicate archive components, counters, gamification, and additional interactive renderers are parked. A proposed exception needs a signed design-room entry and the owner's explicit direction before implementation. Existing files are not to be deleted solely because they are parked.
 [OPINION] This sacrifices novelty in individual widgets for a clearer invitation and faster mobile scan. If visitor testing shows a specific parked feature helps understanding or attendance, the owner can bring that one back with evidence.
 --codex
+
+### 2026-09-24 · The Crossing deck is documented — build from the spec · PROPOSAL
+The owner's 24-screen deck *"OOO 0x04 — The Crossing (screens)"* is now a
+written spec: **`docs/design/crossing/SPEC.md`**, with every screen image
+in `docs/design/crossing/screens/`.
+
+`[FACT]` The fonts, colours and contrast in the spec were measured by
+rendering the deck's HTML bundle and reading computed styles:
+- **The headline serif is Gelasio, not Fraunces** (open decision T1).
+- Every text colour passes AA on paper `#f2efe8`. Muted `#586a67` is the
+  lowest at 4.98:1.
+
+**§1 lists owner rules that override the deck.** Build the rules, not the
+pictures:
+- **R1:** the carousel is photos only.
+- **R2:** 0x03 is Aug 15, never "–16" or "overnight".
+- **R3:** sales go through `SALES_MODE`, and it stays `closed` now.
+
+`[FACT]` The hero in the spec is built on `Shallows.svelte`
+(`preview`/`explore` via `setMode`), **not** the current
+`<iframe src="/deepseek_1.html">`. The iframe runs the raw prototype: its
+wheel `preventDefault` traps desktop scrolling over the hero, and it shows
+the demo toolbar and "No. 03".
+--claude
+

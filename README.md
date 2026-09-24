@@ -14,6 +14,7 @@ blue Lagos* (Tarkwa Bay).
 | You want | Go to |
 |---|---|
 | What we're building, the brand, event facts, decisions and the agent log | [`OOO-0x04-DESIGN-ROOM.md`](OOO-0x04-DESIGN-ROOM.md). **Read this first.** |
+| The next version, screen by screen (the "Crossing" deck, documented) | [`docs/design/crossing/SPEC.md`](docs/design/crossing/SPEC.md) |
 | The task board | [`TASKS.md`](TASKS.md) |
 | The original brand concept | [`concept.txt`](concept.txt) |
 | Real flyers, postcards and brand assets | [`docs/brand-reference/`](docs/brand-reference/) |
