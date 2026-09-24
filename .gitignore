@@ -26,3 +26,7 @@ dist-ssr
 
 # Scripts
 take-screenshots*
+
+# Owner/agent scratch notes (see OOO-0x04-DESIGN-ROOM.md)
+.dump/
+public/audio/beach-waves.m4a

@@ -1,3 +1,4 @@
+@import "../tokens.css";
 /* Self-hosted fonts (downloaded from Google Fonts, served locally so the
    site doesn't depend on fonts.googleapis.com at runtime) */
 @font-face {
@@ -83,22 +84,6 @@
   --dur-slow: 0.8s;
 }
 
-:root[data-theme="dark"] {
-  /* Pitch obsidian warm dark — matches About page palette */
-  --bg: #0a0b0c;
-  --ink: #e6e6dc;
-  --cream: #141513;
-  --muted: #c6c7bd;
-  --card-surface: #1a1b18;
-  --border-soft: #2a2b27;
-  --border-soft-deep: #34352f;
-  --border-dashed: #3e3f38;
-  --island-divider: rgba(255, 255, 255, 0.14);
-  --blue: oklch(70% 0.15 245);
-  --pink-deep: oklch(72% 0.22 340);
-  --chaos-yellow: oklch(82% 0.19 85);
-}
-
 * {
   box-sizing: border-box;
 }
@@ -115,6 +100,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   transition: background-color 0.4s var(--ease-out-expo), color 0.4s var(--ease-out-expo);
+}
+
+html, body {
+  overflow-x: clip;
 }
 
 #app {
@@ -162,4 +151,28 @@ button:active, a:active {
 
 .gamified-float {
   animation: float 4s ease-in-out infinite;
+}
+
+/* Crossing foundation — existing token names retained for every component. --codex */
+:root {
+  --bg: var(--color-paper);
+  --ink: var(--color-ink);
+  --deep: var(--color-deep);
+  --blue: var(--color-deep);
+  --accent: var(--color-deep);
+  --seafoam: var(--color-seafoam);
+  --boat: var(--color-boat);
+  --pink: var(--color-boat);
+  --pink-deep: var(--color-boat-ink);
+  --cream: var(--color-paper);
+  --muted: var(--color-muted);
+  --water-sky: var(--color-sky);
+  --card-surface: var(--color-paper);
+  --border-soft: color-mix(in srgb, var(--ink) 12%, transparent);
+  --border-soft-deep: color-mix(in srgb, var(--ink) 24%, transparent);
+  --border-dashed: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+html, body { overflow-x: clip; }
+@media (prefers-reduced-motion: reduce) {
+  html, body { scroll-behavior: auto; }
 }

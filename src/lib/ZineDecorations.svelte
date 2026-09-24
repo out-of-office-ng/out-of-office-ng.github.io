@@ -60,6 +60,12 @@
     letter-spacing: 0.15em;
     color: #6b6b6b;
     text-transform: uppercase;
+    pointer-events: auto;
+    cursor: default;
+    transition: color 0.3s ease;
+  }
+  .spine:hover {
+    color: var(--ink);
   }
 
   .barcode {
@@ -72,6 +78,13 @@
     gap: 2px;
     color: var(--ink);
     opacity: 0.7;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  }
+  .barcode:hover {
+    opacity: 1;
+    transform: scale(1.05) rotate(2deg);
   }
   .barcode svg {
     width: clamp(40px, 8vw, 60px);
@@ -98,17 +111,43 @@
 
   .splat {
     position: absolute;
+    pointer-events: auto;
+    cursor: grab;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+  .splat:hover {
+    transform: scale(1.15) rotate(15deg);
+  }
+  .splat:active {
+    cursor: grabbing;
+    transform: scale(0.95) rotate(-5deg);
+  }
+
   .splat-1 {
-    top: 20%;
-    left: 12%;
-    width: clamp(20px, 4vw, 30px);
-    transform: rotate(-25deg);
+    width: clamp(50px, 12vw, 120px);
+    height: clamp(40px, 10vw, 100px);
+    top: clamp(2rem, 5vh, 4rem);
+    right: clamp(1rem, 4vw, 3rem);
+    transform: rotate(12deg);
   }
+  .splat-1:hover {
+    transform: scale(1.15) rotate(25deg);
+  }
+  .splat-1:active {
+    transform: scale(0.95) rotate(5deg);
+  }
+
   .splat-2 {
-    bottom: 25%;
-    right: 30%;
-    width: clamp(15px, 3vw, 25px);
-    transform: rotate(40deg);
+    width: clamp(70px, 18vw, 160px);
+    height: clamp(60px, 15vw, 130px);
+    bottom: clamp(1rem, 2vh, 3rem);
+    left: clamp(4rem, 15vw, 12rem);
+    transform: rotate(-24deg);
+  }
+  .splat-2:hover {
+    transform: scale(1.15) rotate(-10deg);
+  }
+  .splat-2:active {
+    transform: scale(0.95) rotate(-35deg);
   }
 </style>

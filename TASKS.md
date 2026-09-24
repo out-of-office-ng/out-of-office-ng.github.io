@@ -128,3 +128,40 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
     reads as a stack of competing alerts instead of four neatly placed
     widgets.
   - **Consolidated Header & Zine Aesthetic**: Removed the SaaS-style glassmorphic iOS "Dynamic Island" look from `HeaderBar.svelte`. It is now a flat, ink-colored printed ticket header with solid borders and mono typography, completely matching `ZineDecorations`' physical print aesthetic.
+
+## P5 — Strip-down pass (2026-09-24, branch `v2`)
+
+- [x] **Cut SaaS layer** — deleted CommandPalette, ToastSystem+toastStore,
+  AudioControlDeck (dead code), ScrollToTop, theme.js/dark mode; removed
+  cube mini-modal (generator unified behind OooGeneratorModal).
+- [x] **calm store** — `src/lib/calm.js`; one value, two writers
+  (pageProgress scenic / AWAY toggle fast lane, tweened ~1.8s). Cube, pill,
+  ChaosLayer, StressMeter, MorphText, AmbientSound all read it. AWAY toggle
+  now has page-wide payoff (Concept 3's "Tamagotchi" realized).
+- [x] **Inline feedback** — copied ✓ states + field errors replace toasts.
+- [x] **Date honesty** — 0x03 (Release & Unwind, Tarkwa Bay, Aug 15–16
+  2026) marked done on trail/timeline; 0x04 is up next. Expired countdown →
+  "Date TBA" chip (`EVENT_DATE` const in App.svelte; set it when 0x04 is
+  dated). Boarding pass DATE → TBA; hero arrow repointed to boarding pass.
+- [x] **Header strip** — 4 controls (brand, status, mute, OOO PASS).
+- [ ] **0x04 tickets** — Paystack still sells 0x03's tiers/prices under a
+  0x04 · Date TBA label. Decide tiers or switch to a waitlist before v2 ships.
+- [ ] **Real community photos** — still pending from P3.
+- [ ] **Audio files** — still pending from P1 (city-busy.mp3, beach-waves.mp3).
+
+## P6 — Crossing foundation (2026-09-24, --codex)
+
+- [x] Select `deepseek_1.html` as the arrival reference (pink paper boat,
+  wave sets, refraction composite); Stream B owns the scene port.
+- [x] Paper hero for No. 04 / November, boarding-pass navigation, and the
+  existing optional EVENT_DATE countdown hook.
+- [x] Water palette mapped onto existing global tokens; reusable `tokens.css`.
+- [x] Crossing section order; remove cube, companion, stress meter and file
+  audio from the home composition without deleting their source files.
+- [x] Integrate Stream C's committed AWAY/ONLINE behavior and content edits.
+- [x] Integrate Stream B's completed `Shallows.svelte` after Tickets.
+- [x] Offer Background preview first, with an Explore water switch and a hero shortcut.
+- [ ] Resolve ticket policy and remaining content decisions before shipping.
+- [ ] Full integrated Lighthouse, keyboard and reduced-motion release audit.
+
+--codex

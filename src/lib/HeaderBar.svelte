@@ -1,49 +1,60 @@
 <script>
-  import { onMount } from 'svelte';
-  import { isDark, toggleTheme } from './theme.js';
+  import { onDestroy } from 'svelte';
   import { muted, toggleMute } from './ambientSound.js';
 
   export let onOpenDrawer = () => {};
-  export let onOpenOooGen = () => {};
   export let onStatusChange = (onlineState) => {};
   export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
 
-  let isOnline = true;
-  let statusToast = false;
+  // AWAY is the site's fast lane to calm (see calm.js). The one-line
+  // status note is inline feedback attached to its own control, not a
+  // toast system.
+  let isOnline = false;
+  let statusNote = false;
   let statusMessage = '';
+  let noteTimer;
+  let autoMuteTimer;
 
   function toggleStatus() {
     isOnline = !isOnline;
     onStatusChange(isOnline);
     statusMessage = isOnline
-      ? 'ONLINE ⚡ — Connected and receiving workspace alerts.'
-      : 'AWAY 🌴 — Muting notifications. Making room for life.';
-    statusToast = true;
-    setTimeout(() => { statusToast = false; }, 3200);
+      ? 'ONLINE ⚡ — Reconnected. The noise is back.'
+      : 'AWAY 🌴 — Muted. Gone to touch grass.';
+    statusNote = true;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => (statusNote = false), 3200);
+    
+    clearTimeout(autoMuteTimer);
+    if (isOnline) {
+      autoMuteTimer = setTimeout(() => {
+        if (isOnline) {
+          isOnline = false;
+          onStatusChange(false);
+          statusMessage = 'AWAY 🌴 — Auto-reply re-enabled.';
+          statusNote = true;
+          clearTimeout(noteTimer);
+          noteTimer = setTimeout(() => (statusNote = false), 3200);
+        }
+      }, 8000);
+    }
   }
-
-  // Sync the parent's isOnline (drives notification count + ChaosLayer)
-  // with our default of ONLINE on load — without popping the toggle toast.
-  onMount(() => {
-    onStatusChange(isOnline);
-  });
+  onDestroy(() => clearTimeout(noteTimer));
 </script>
 
 <header class="bar-container {scrollState}">
   <div class="bar">
-    <!-- Left: Brand -->
     <a href="#/about" class="brand-link" title="What We Are">
       OUT OF OFFICE
     </a>
 
-    <!-- Left-Middle: Minimal Status Dot -->
-    <button 
-      type="button" 
-      class="status-pill" 
+    <button
+      type="button"
+      class="status-pill"
       class:online={isOnline}
-      on:click={toggleStatus} 
-      aria-pressed={isOnline}
-      title="Toggle status"
+      on:click={toggleStatus}
+      aria-label={isOnline ? 'Status: online. Set to away' : 'Status: away. Set to online'}
+      title={isOnline ? 'Go AWAY — mute the chaos' : 'Back ONLINE'}
     >
       <span class="live-dot" aria-hidden="true"></span>
       <span class="status-label">{isOnline ? 'ONLINE' : 'AWAY'}</span>
@@ -51,40 +62,26 @@
 
     <div class="spacer" aria-hidden="true"></div>
 
-    <!-- Right: Actions -->
     <nav class="actions-wrap">
-      <button type="button" class="action-pill" on:click={onOpenDrawer}>
-        OOO PASS
-      </button>
-
-      <button type="button" class="action-pill" on:click={onOpenOooGen}>
-        AUTO-REPLY
-      </button>
-
       <button
         type="button"
-        class="action-pill"
+        class="action-pill icon-pill"
         on:click={toggleMute}
-        title="Toggle Sound"
+        aria-pressed={!$muted}
+        aria-label={$muted ? 'Unmute ambient sound' : 'Mute ambient sound'}
+        title={$muted ? 'Sound off' : 'Sound on'}
       >
-        {#if $muted} UNMUTE {:else} MUTE {/if}
+        <span aria-hidden="true">{$muted ? '🔇' : '🔊'}</span>
       </button>
 
-      <button
-        type="button"
-        class="action-pill theme-pill"
-        on:click={toggleTheme}
-        title="Toggle Theme"
-      >
-        {#if $isDark} DAY {:else} NIGHT {/if}
+      <button type="button" class="action-pill pass-pill" on:click={onOpenDrawer}>
+        OOO PASS →
       </button>
     </nav>
   </div>
 
-  {#if statusToast}
-    <div class="status-toast" class:online={isOnline}>
-      {statusMessage}
-    </div>
+  {#if statusNote}
+    <div class="status-note" class:online={isOnline} role="status">{statusMessage}</div>
   {/if}
 </header>
 
@@ -115,6 +112,10 @@
   a:focus-visible {
     outline: 2px solid var(--blue);
     outline-offset: 4px;
+  }
+  button:active:not(:disabled),
+  a:active {
+    transform: translateY(1px);
   }
 
   /* State 1: Transparent (0-80px) */
@@ -148,6 +149,7 @@
     font-family: var(--sans);
     font-size: 0.75rem;
     font-weight: 800;
+    line-height: 1;
     letter-spacing: 0.05em;
     color: var(--ink);
     text-decoration: none;
@@ -227,8 +229,21 @@
     background: var(--border-soft);
   }
 
-  /* Status Toast */
-  .status-toast {
+  .icon-pill {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.55rem;
+  }
+
+  .pass-pill {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .pass-pill:hover {
+    background: var(--ink);
+    opacity: 0.88;
+  }
+
+  .status-note {
     position: absolute;
     top: calc(100% + 0.75rem);
     left: 50%;
@@ -240,16 +255,15 @@
     font-family: var(--sans);
     font-size: 0.75rem;
     font-weight: 600;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     white-space: nowrap;
-    animation: fadeIn 0.2s ease-out;
+    animation: noteIn 0.2s ease-out;
   }
-  .status-toast.online {
+  .status-note.online {
     background: var(--chaos-yellow);
-    color: var(--bg);
+    color: var(--ink);
   }
-
-  @keyframes fadeIn {
+  @keyframes noteIn {
     from { opacity: 0; transform: translate(-50%, -6px); }
     to { opacity: 1; transform: translate(-50%, 0); }
   }

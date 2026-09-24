@@ -3,6 +3,12 @@
 
   export let visible = false;
 
+  function joinCommunity() {
+    // TODO(owner): replace with the real community link (WhatsApp/IG/Discord).
+    // Until then, the way to join is to come — send them to the boarding pass.
+    document.querySelector('.tickets-section')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   const POLAROIDS = [
     { src: 'https://images.pexels.com/photos/7149181/pexels-photo-7149181.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'no hierarchy, just vibes', rotate: -4 },
     { src: 'https://images.pexels.com/photos/3483763/pexels-photo-3483763.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'make a mess. make friends.', rotate: 3 },
@@ -20,8 +26,7 @@
     </div>
 
     <div class="cta-row" class:visible>
-      <button class="btn-join">Join the community</button>
-      <button class="btn-volunteer">Volunteer & Sponsor</button>
+      <button class="btn-join" on:click={joinCommunity}>Join the community →</button>
     </div>
   </div>
 
@@ -177,19 +182,4 @@
     background: #00aceb;
   }
 
-  .btn-volunteer {
-    font-weight: 600;
-    font-size: 1rem;
-    background: transparent;
-    color: var(--ink);
-    border: 2px solid var(--border-soft-deep);
-    padding: 0.75rem 1.5rem;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: border-color var(--dur-fast), background var(--dur-fast);
-  }
-  .btn-volunteer:hover {
-    border-color: var(--pink-deep);
-    background: rgba(252, 156, 224, 0.05);
-  }
 </style>

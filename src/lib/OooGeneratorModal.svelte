@@ -1,5 +1,5 @@
 <script>
-  import { addToast } from './toastStore.js';
+  import { onDestroy } from 'svelte';
   import { fade, scale } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
@@ -48,28 +48,33 @@
     }
   }
 
-  function copyToClipboard() {
-    navigator.clipboard.writeText(generatedText);
-    addToast({
-      title: 'OOO Message Copied! 📋',
-      description: 'Paste it into your Outlook / Gmail auto-responder and go touch grass!',
-      type: 'success'
-    });
+  // Inline confirmation on the button itself — no toasts.
+  let copied = false;
+  let copiedTimer;
+  async function copyToClipboard() {
+    try {
+      await navigator.clipboard.writeText(generatedText);
+    } catch {
+      return;
+    }
+    copied = true;
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => (copied = false), 1800);
   }
+  onDestroy(() => clearTimeout(copiedTimer));
 </script>
+
+<svelte:window on:keydown={(e) => isOpen && e.key === 'Escape' && onClose()} />
 
 {#if isOpen}
   <div
     class="overlay"
-    on:click={onClose}
-    on:keydown={(e) => e.key === 'Escape' && onClose()}
-    tabindex="-1"
-    role="button"
+    on:click={(e) => e.target === e.currentTarget && onClose()}
+    role="presentation"
     transition:fade={{ duration: dialogDuration(180) }}
   >
     <div
       class="modal"
-      on:click|stopPropagation
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -126,7 +131,7 @@
         <div class="output-card">
           <div class="card-header">
             <span class="card-title">Generated Auto-Responder</span>
-            <button class="copy-btn" on:click={copyToClipboard}>📋 Copy Auto-Reply</button>
+            <button class="copy-btn" on:click={copyToClipboard}>{copied ? 'Copied ✓' : '📋 Copy Auto-Reply'}</button>
           </div>
           <pre class="preview-box">{generatedText}</pre>
         </div>

@@ -1,6 +1,5 @@
 <script>
   import MorphText from './MorphText.svelte';
-  import { muted, toggleMute } from './ambientSound.js';
   import { fade } from 'svelte/transition';
 
   export let visible = false;
@@ -35,7 +34,7 @@
     <p class="eyebrow"><MorphText text="Boarding pass" boost={1.3} /></p>
     <h2 class="heading">Your ticket out of yellow Lagos.</h2>
     <p class="subheading">
-      Escape Lagos noise with {salesOpen ? 'Release and Unwind Beach Retreat' : 'the next Out of Office'}—reconnect with yourself, nature,
+      Escape Lagos noise with the next Out of Office—reconnect with yourself, nature,
       and community through yoga, painting, beach games, picnics, bonfires, and meaningful
       conversations by the ocean. Come for the experience. Leave with the memories.
     </p>
@@ -62,16 +61,6 @@
         <div class="route-point">
           <span class="code blue">OOO</span>
           <span class="city">Blue Lagos (Tarkwa Bay)</span>
-          <button
-            type="button"
-            class="sound-toggle"
-            aria-pressed={!$muted}
-            aria-label={$muted ? 'Unmute ambient sound' : 'Mute ambient sound'}
-            on:click={toggleMute}
-          >
-            <span aria-hidden="true">{$muted ? '🔇' : '🔊'}</span>
-            <span class="sound-toggle-label">{$muted ? 'Sound off' : 'Sound on'}</span>
-          </button>
         </div>
       </div>
 
@@ -82,7 +71,7 @@
         </div>
         <div class="detail-item">
           <span class="label">DATE</span>
-          <span class="value">{salesOpen ? 'SUN, AUG 16, 2026' : 'NOV 2026 · TBA'}</span>
+          <span class="value">November</span>
         </div>
         <div class="detail-item">
           <span class="label">GATE</span>
@@ -140,18 +129,7 @@
       <button type="button" class="cta-btn" on:click={onOpenDrawer}>
         Claim {selectedTier.name} →
       </button>
-      <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
-      {:else}
-      <p class="tier-description">
-        {NEXT_EVENT.code} lands in {NEXT_EVENT.when}. {NEXT_EVENT.detail}
-        Tickets aren't on sale yet.
-      </p>
-
-      <button type="button" class="cta-btn" on:click={onOpenDrawer}>
-        Tickets open soon →
-      </button>
-      <span class="fine-print">{NEXT_EVENT.code} · {NEXT_EVENT.when}</span>
-      {/if}
+      <span class="fine-print">Secured by Paystack · OOO 0x04 · November</span>
     </div>
   </div>
 
@@ -286,27 +264,6 @@
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
-  }
-
-  .sound-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin-top: 0.4rem;
-    padding: 0.3rem 0.6rem;
-    border: 1.5px solid var(--blue, #00bfff);
-    border-radius: 999px;
-    background: rgba(0, 191, 255, 0.06);
-    color: var(--blue, #00bfff);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
-  }
-  .sound-toggle:hover {
-    background: rgba(0, 191, 255, 0.14);
-    transform: translateY(-1px);
   }
 
   .route-arrow {
@@ -536,6 +493,7 @@
     font-weight: 700;
     font-size: 0.95rem;
     color: #fff;
+    white-space: nowrap;
     background: var(--blue, #00bfff);
     padding: 0.85rem 1rem;
     border: none;
@@ -543,10 +501,19 @@
     cursor: pointer;
     box-shadow: 0 10px 24px rgba(0, 191, 255, 0.28);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
   .cta-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(0, 191, 255, 0.4);
+  }
+  .cta-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+  }
+  .cta-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 10px rgba(0, 191, 255, 0.2);
   }
   .fine-print {
     font-size: 0.68rem;

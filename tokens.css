@@ -1,0 +1,11 @@
+/* Hallmark · macrostructure: crossing · tone: analog · anchor hue: deep water */
+:root {
+  --color-paper: oklch(0.9547487 0.0095458 93.57016);
+  --color-ink: oklch(0.3421941 0.0322100 189.56481);
+  --color-deep: oklch(0.4872014 0.0557383 187.28533);
+  --color-seafoam: oklch(0.7125562 0.0556153 187.03004);
+  --color-boat: oklch(0.6324773 0.1580702 2.19453);
+  --color-muted: oklch(0.5084599 0.0221711 184.27070);
+  --color-sky: oklch(0.9174126 0.0158903 154.45396);
+  --color-boat-ink: oklch(0.4784432 0.1251322 3.95088);
+}

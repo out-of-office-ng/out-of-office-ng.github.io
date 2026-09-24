@@ -1,8 +1,7 @@
 <script>
-  import { onMount, onDestroy, tick } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-  import { isDark } from './theme.js';
 
   // 0..1 scroll progress: 0 = fully scrambled, 1 = solved. Leave unset
   // (null) for the autonomous scramble/rest/solve/rest demo loop instead.
@@ -16,11 +15,14 @@
   // supposed to map directly to scroll position.
   export let randomSolve = false;
 
+  // The 10-click easter egg opens the site's one auto-reply generator
+  // (OooGeneratorModal, owned by App) instead of a cube-local modal.
+  export let onOpenOooGen = () => {};
+
   let canvas;
   let container;
 
   let clickCount = 0;
-  let showEasterEgg = false;
   let isSleeping = false;
   let lastActivityTime = performance.now();
 
@@ -43,7 +45,7 @@
     nudgeScheduled = true;
     if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(NUDGE_KEY)) return;
     nudgeTimer = setTimeout(() => {
-      if (clickCount === 0 && !showEasterEgg) {
+      if (clickCount === 0) {
         showNudge = true;
         if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(NUDGE_KEY, '1');
         nudgeTimer = setTimeout(dismissNudge, 5000);
@@ -51,63 +53,12 @@
     }, 4000);
   }
 
-  const AUTO_REPLIES = [
-    "I'm currently unavailable. I'm at the beach pretending my problems don't exist.",
-    "Gone to touch grass at Tarkwa Bay. Back soon.",
-    "I will return when my soul battery is charged. Currently: 2%.",
-    "Auto-reply for real life: Emails muted. Lagos stress suspended.",
-    "If this is urgent, please re-evaluate your relationship with time."
-  ];
-  let currentReply = AUTO_REPLIES[0];
-
-  let modalEl;
-  let closeBtnEl;
-  let lastFocusedEl = null;
-
-  async function openEasterEgg() {
-    lastFocusedEl = document.activeElement;
-    showEasterEgg = true;
-    currentReply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
-    await tick();
-    closeBtnEl?.focus();
-  }
-
-  function closeEasterEgg() {
-    showEasterEgg = false;
-    lastFocusedEl?.focus?.();
-  }
-
-  function handleEasterEggKeydown(e) {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeEasterEgg();
-      return;
-    }
-    if (e.key === 'Tab' && modalEl) {
-      const focusables = modalEl.querySelectorAll('button');
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  }
-
   function handleCubeClick() {
     dismissNudge();
     clickCount = (clickCount + 1) % 11;
     if (clickCount === 10) {
-      openEasterEgg();
+      onOpenOooGen();
     }
-  }
-
-  function regenerateReply() {
-    currentReply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
   }
 
   function wakeUp() {
@@ -124,8 +75,6 @@
     }
     if (liveProgress !== null && liveProgress >= 0.995) maybeScheduleNudge();
   }
-
-  let easterEggTimer;
 
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
@@ -149,14 +98,8 @@
   // calms down.
   const CHAOS_YELLOW = '#ffc72c';
   const CHAOS_RED = '#e5383b';
-  // Dynamic seam/plastic body color based on dark/light mode (`$isDark`).
-  // White edges around cube colors for light mode, obsidian black for dark mode!
-  $: seamColor = $isDark ? '#0a0b0c' : '#ffffff';
-
-  let activeRepaintAll = null;
-  $: if (activeRepaintAll && seamColor) {
-    activeRepaintAll();
-  }
+  // White seams/plastic body — the site is permanently in its paper world.
+  const seamColor = '#ffffff';
 
   function hexToRgb(hex) {
     const n = parseInt(hex.slice(1), 16);
@@ -552,7 +495,6 @@
       }
       for (const repaint of stickerRepaints) repaint(t);
     }
-    activeRepaintAll = repaintStickers;
 
     // scroll-mode-only state: a fixed scramble sequence generated once, then
     // driven by how many of its moves are currently "applied" — 0 applied
@@ -829,7 +771,6 @@
       if (frameId) cancelAnimationFrame(frameId);
       document.removeEventListener('visibilitychange', handleVisibility);
       observer.disconnect();
-      clearTimeout(easterEggTimer);
       clearTimeout(sleepTimer);
       clearTimeout(nudgeTimer);
       clearTimeout(randomSolveTimer);
@@ -851,43 +792,17 @@
 <div class="cube-stage" class:allow-scroll={progress !== null} bind:this={container}>
   <canvas bind:this={canvas}></canvas>
 
-  {#if isSleeping && !showEasterEgg}
+  {#if isSleeping}
     <div class="sleep-badge" aria-hidden="true">
       <span class="zzz">zZz</span>
       <span class="sleep-text">Cube sleeping · Click or drag to wake</span>
     </div>
   {/if}
 
-  {#if showNudge && !showEasterEgg}
+  {#if showNudge}
     <div class="nudge-tooltip" role="status">psst — try clicking me 👀</div>
   {/if}
 
-  {#if showEasterEgg}
-    <div
-      class="easter-egg-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Auto-Reply Generator"
-      tabindex="-1"
-      bind:this={modalEl}
-      on:keydown={handleEasterEggKeydown}
-    >
-      <div class="modal-content">
-        <button class="close-btn" on:click={closeEasterEgg} aria-label="Close" bind:this={closeBtnEl}>×</button>
-        <p class="modal-eyebrow">Easter Egg · 10 Clicks</p>
-        <h3 class="modal-title">Out of Office Auto-Reply</h3>
-        <div class="reply-box">
-          <p class="reply-text">"{currentReply}"</p>
-        </div>
-        <div class="modal-actions">
-          <button class="action-btn primary" on:click={regenerateReply}>Shuffle Reply</button>
-          <button class="action-btn secondary" on:click={() => {
-            navigator.clipboard?.writeText(currentReply);
-          }}>Copy</button>
-        </div>
-      </div>
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -976,107 +891,6 @@
   @keyframes nudgeFloat {
     from { opacity: 0; transform: translateX(-50%) translateY(6px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
-
-  .easter-egg-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background: rgba(24, 24, 24, 0.45);
-    backdrop-filter: blur(6px);
-    animation: fadeIn 0.3s ease;
-  }
-  .modal-content {
-    position: relative;
-    background: var(--card-surface);
-    border-radius: 16px;
-    padding: 1.5rem;
-    width: min(90%, 340px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-  .close-btn {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: none;
-    border: none;
-    font-size: 1.4rem;
-    line-height: 1;
-    color: #888;
-    cursor: pointer;
-    padding: 0.2rem 0.5rem;
-  }
-  .close-btn:hover {
-    color: #181818;
-  }
-  .close-btn:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
-    outline-offset: 2px;
-  }
-  .modal-eyebrow {
-    margin: 0;
-    font-weight: 600;
-    font-size: 0.68rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--pink-deep, #e0568f);
-  }
-  .modal-title {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: var(--blue, #00bfff);
-  }
-  .reply-box {
-    background: var(--bg);
-    border-radius: 10px;
-    padding: 0.9rem;
-    margin: 0.3rem 0;
-  }
-  .reply-text {
-    margin: 0;
-    font-style: italic;
-    font-size: 0.85rem;
-    color: #333;
-    line-height: 1.4;
-  }
-  .modal-actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    margin-top: 0.25rem;
-  }
-  .action-btn {
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 0.55rem 0.9rem;
-    border-radius: 999px;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.15s ease;
-  }
-  .action-btn:hover {
-    transform: translateY(-1px);
-  }
-  .action-btn:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
-    outline-offset: 2px;
-  }
-  .action-btn.primary {
-    background: var(--blue, #00bfff);
-    color: #fff;
-  }
-  .action-btn.secondary {
-    background: #eae8e4;
-    color: #333;
   }
 
   @keyframes fadeIn {

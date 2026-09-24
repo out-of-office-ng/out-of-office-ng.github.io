@@ -1,5 +1,5 @@
 <script>
-  import { addToast } from './toastStore.js';
+  import { onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
@@ -19,6 +19,13 @@
   let selectedBadge = 'Offline Legend';
   let confirmedPass = null;
   let paying = false;
+  // Inline feedback, shown in the step that owns the action (no toasts).
+  let nameError = false;
+  let emailError = false;
+  let cancelNote = false;
+  let copied = false;
+  let copiedTimer;
+  onDestroy(() => clearTimeout(copiedTimer));
 
   const TIERS = [
     {
@@ -63,25 +70,10 @@
   ];
 
   function handleConfirm() {
-    // Belt and braces: never start a payment while sales aren't open.
-    if (!salesOpen) return;
-    if (!attendeeName.trim()) {
-      addToast({
-        title: 'Name Required',
-        description: 'Please enter your name or alias to issue your pass.',
-        type: 'warning'
-      });
-      return;
-    }
-
-    if (!attendeeEmail.trim()) {
-      addToast({
-        title: 'Email Required',
-        description: 'Please enter your email address for your ticket confirmation.',
-        type: 'warning'
-      });
-      return;
-    }
+    nameError = !attendeeName.trim();
+    emailError = !attendeeEmail.trim();
+    cancelNote = false;
+    if (nameError || emailError) return;
 
     const tierObj = TIERS.find((t) => t.id === selectedTierId) || TIERS[0];
 
@@ -100,11 +92,7 @@
         },
         onCancel: () => {
           paying = false;
-          addToast({
-            title: 'Payment Cancelled',
-            description: 'You can try again anytime when ready.',
-            type: 'info'
-          });
+          cancelNote = true;
         }
       });
     } else {
@@ -128,44 +116,38 @@
     };
 
     step = 3;
-    addToast({
-      title: 'Pass Issued! 🎉',
-      description: `Your ${tierObj.name} pass has been confirmed for ${attendeeName}.`,
-      type: 'success'
-    });
   }
 
   function copyPassInfo() {
     if (!confirmedPass) return;
     const text = `Out of Office Pass #${confirmedPass.code}\nRef: ${confirmedPass.ref}\nHolder: ${confirmedPass.name}\nTier: ${confirmedPass.tier}\nPrice: ${confirmedPass.price}\nBadge: ${confirmedPass.badge}`;
-    navigator.clipboard.writeText(text);
-    addToast({
-      title: 'Pass Copied',
-      description: 'Pass details copied to clipboard.',
-      type: 'info'
-    });
+    navigator.clipboard?.writeText(text);
+    copied = true;
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(() => (copied = false), 1800);
   }
 
   function resetAndClose() {
     step = 1;
     confirmedPass = null;
     paying = false;
+    nameError = emailError = cancelNote = false;
+    copied = false;
     onClose();
   }
 </script>
 
+<svelte:window on:keydown={(e) => isOpen && e.key === 'Escape' && resetAndClose()} />
+
 {#if isOpen}
   <div
     class="overlay"
-    on:click={resetAndClose}
-    on:keydown={(e) => e.key === 'Escape' && resetAndClose()}
-    tabindex="-1"
-    role="button"
+    on:click={(e) => e.target === e.currentTarget && resetAndClose()}
+    role="presentation"
     transition:fade={{ duration: dialogDuration(180) }}
   >
     <div
       class="sheet"
-      on:click|stopPropagation
       role="dialog"
       aria-modal="true"
       aria-labelledby="sheet-title"
@@ -175,13 +157,8 @@
     >
       <div class="sheet-header">
         <div>
-          {#if salesOpen}
-            <span class="badge">RELEASE & UNWIND RETREAT</span>
-            <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
-          {:else}
-            <span class="badge">{NEXT_EVENT.code} · {NEXT_EVENT.when.toUpperCase()}</span>
-            <h2 id="sheet-title" class="sheet-title">Tickets open soon</h2>
-          {/if}
+          <span class="badge">OOO 0x04 · NOVEMBER</span>
+          <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
       </div>
@@ -243,7 +220,10 @@
                 class="input"
                 placeholder="e.g. Tunde (Offline)"
                 bind:value={attendeeName}
+                on:input={() => (nameError = false)}
+                aria-invalid={nameError}
               />
+              {#if nameError}<p class="field-error" role="alert">Name required to issue your pass.</p>{/if}
             </div>
 
             <div class="form-group">
@@ -254,7 +234,10 @@
                 class="input"
                 placeholder="you@example.com"
                 bind:value={attendeeEmail}
+                on:input={() => (emailError = false)}
+                aria-invalid={emailError}
               />
+              {#if emailError}<p class="field-error" role="alert">Email required for your receipt.</p>{/if}
             </div>
 
             <div class="form-group">
@@ -265,6 +248,10 @@
                 {/each}
               </select>
             </div>
+
+            {#if cancelNote}
+              <p class="field-error muted" role="status">Payment cancelled — try again whenever you're ready.</p>
+            {/if}
 
             <div class="btn-row">
               <button class="sec-btn" on:click={() => (step = 1)}>&larr; Back</button>
@@ -290,7 +277,7 @@
             </div>
 
             <div class="btn-row">
-              <button class="sec-btn" on:click={copyPassInfo}>Copy Pass Data</button>
+              <button class="sec-btn" on:click={copyPassInfo}>{copied ? 'Copied ✓' : 'Copy Pass Data'}</button>
               <button class="primary-btn" on:click={resetAndClose}>Done</button>
             </div>
           </div>
@@ -462,6 +449,17 @@
     font-size: 0.82rem;
   }
 
+  .field-error {
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--chaos-red, #e5383b);
+  }
+  .field-error.muted {
+    margin-bottom: 0.8rem;
+    color: var(--muted);
+  }
+
   .form-group {
     display: flex;
     flex-direction: column;
@@ -477,6 +475,15 @@
     border-radius: 8px;
     font-family: inherit;
     font-size: 0.9rem;
+    outline: 2px solid transparent;
+    outline-offset: 1px;
+    transition: outline 0.1s;
+  }
+  .input:hover, .select:hover {
+    background: #fff;
+  }
+  .input:focus-visible, .select:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
   }
 
   .btn-row {
@@ -491,20 +498,27 @@
     background: var(--blue, #00bfff);
     color: #fff;
     border: none;
+    white-space: nowrap;
     border-radius: 999px;
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
     box-shadow: 0 4px 14px rgba(0, 191, 255, 0.3);
     transition: transform 0.15s ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
-
   .primary-btn:hover:not(:disabled) {
     transform: translateY(-2px);
   }
-
+  .primary-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+  }
+  .primary-btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
   .primary-btn:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 
@@ -514,9 +528,22 @@
     color: var(--ink);
     border: 1.5px solid var(--border-soft-deep);
     border-radius: 999px;
+    white-space: nowrap;
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .sec-btn:hover {
+    background: var(--card-surface);
+  }
+  .sec-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+  }
+  .sec-btn:active {
+    transform: translateY(1px);
   }
 
   .pass-ticket {
