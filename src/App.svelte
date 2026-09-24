@@ -26,7 +26,6 @@
   import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
   import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
   import EventTrail from "./lib/EventTrail.svelte";
-  import CountdownTimer from "./lib/CountdownTimer.svelte";
   import ScrollToTop from "./lib/ScrollToTop.svelte";
   import { clearAllToasts } from "./lib/toastStore.js";
   import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
@@ -307,10 +306,9 @@
                 <span class="word">OFFICE</span>
               </h1>
               <div class="subhead">
-                <span class="stamp">OOO 0x03</span>
-                <span class="venue">Tarkwa Bay · Aug 15</span>
+                <span class="stamp">OOO 0x04</span>
+                <span class="venue">November · Date TBA</span>
               </div>
-              <CountdownTimer targetDateStr="August 15, 2026 12:00:00" />
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>
                 <span class="sub">Auto replies enabled. Stress disabled.</span>
