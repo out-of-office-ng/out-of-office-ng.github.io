@@ -1,185 +1,173 @@
 <script>
-  import MorphText from './MorphText.svelte';
-
   export let visible = false;
-
-  const POLAROIDS = [
-    { word: 'MAKE', caption: 'room for art', rotate: -4 },
-    { word: 'PLAY', caption: 'without a plan', rotate: 3 },
-    { word: 'MEET', caption: 'somebody new', rotate: -2 },
-  ];
 </script>
 
-<section class="community">
+<section class="community-section">
   <div class="text-content">
-    <p class="eyebrow"><MorphText text="Community > calendar invites" /></p>
-    <h2 class="heading">Good company changes the day.</h2>
-
-    <div class="manifesto" class:visible>
-      <p>Out of Office is not status-heavy nightlife. It is a small rebellion: music, art, board games, shared snacks and the kind of conversation you remember on Monday.</p>
-    </div>
-
-    <div class="cta-row" class:visible>
-      <a class="btn-join" href="#/trail">See the trail →</a>
+    <p class="eyebrow">COMMUNITY &gt; CALENDAR INVITES</p>
+    <h2 class="heading">The best memories are slightly blurry.</h2>
+    <p class="manifesto">
+      Not status-heavy nightlife. A small rebellion: music, art, board games, 
+      shared snacks and the conversation you remember on Monday.
+    </p>
+    <div class="actions">
+      <button class="primary-btn">Join the community</button>
+      <a href="#volunteer" class="secondary-link">Volunteer &amp; sponsor</a>
     </div>
   </div>
 
-  <div class="wall">
-    {#each POLAROIDS as p, i}
-      <figure class="polaroid" class:visible style="--rotate: {p.rotate}deg; --i: {i};">
-        <span class="polaroid-art" aria-hidden="true">{p.word}</span>
-        <figcaption>{p.caption}</figcaption>
-      </figure>
-    {/each}
+  <div class="polaroids">
+    <div class="polaroid p1">
+      <div class="photo">PHOTO GOES HERE</div>
+      <div class="caption">no hierarchy, just vibes</div>
+    </div>
+    <div class="polaroid p2">
+      <div class="photo">PHOTO GOES HERE</div>
+      <div class="caption">make a mess. make friends.</div>
+    </div>
+    <div class="polaroid p3">
+      <div class="photo">PHOTO GOES HERE</div>
+      <div class="caption">play is the plan</div>
+    </div>
   </div>
 </section>
 
 <style>
-  .community {
+  .community-section {
     max-width: 1200px;
     margin: 0 auto;
-    padding: clamp(3rem, 10vh, 6rem) 1.5rem;
+    padding: 6rem 1.5rem;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 4rem;
   }
-  
+
   @media (min-width: 900px) {
-    .community {
-      flex-direction: column;
-      gap: 3rem;
+    .community-section {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .text-content {
+      flex: 1;
+      padding-top: 2rem;
+      padding-right: 2rem;
+    }
+    .polaroids {
+      flex: 1.2;
     }
   }
 
   .eyebrow {
-    margin: 0 0 0.5rem;
-    font-weight: 600;
-    font-size: 0.8rem;
-    letter-spacing: 0.18em;
+    font-family: var(--marker, "Permanent Marker", cursive);
+    color: var(--pink-deep, #e0568f);
     text-transform: uppercase;
-    color: var(--pink-deep);
+    font-size: 1rem;
+    margin: 0 0 1rem;
+    letter-spacing: 0.05em;
   }
+
   .heading {
-    margin: 0 0 2.5rem;
-    font-weight: 700;
-    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-    color: var(--ink);
-    line-height: 1.15;
-  }
-
-  .wall {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-bottom: 1.5rem;
-    width: 100%;
-  }
-
-  @media (min-width: 768px) {
-    .wall {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2.5rem;
-      padding-bottom: 0;
-    }
-  }
-
-  .polaroid {
-    margin: 0;
-    background: var(--card-surface);
-    padding: 0.6rem 0.6rem 1.1rem;
-    border-radius: 4px;
-    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.14);
-    opacity: 0;
-    transform: translateY(28px) rotate(var(--rotate));
-    transition: transform 0.6s var(--ease-out-expo), opacity 0.6s var(--ease-out-expo);
-    transition-delay: calc(var(--i, 0) * 110ms);
-    position: relative;
-    z-index: 1;
-  }
-  
-  /* Stagger polaroids vertically like the Canva grid */
-  @media (min-width: 768px) {
-    .polaroid:nth-child(2) {
-      margin-top: 2.5rem;
-    }
-  }
-  
-  .polaroid.visible {
-    opacity: 1;
-    transform: translateY(0) rotate(var(--rotate));
-  }
-  .polaroid.visible:hover {
-    transition-delay: 0s;
-    transform: rotate(0deg) scale(1.05);
-    z-index: 10;
-  }
-  .polaroid-art {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 18rem;
-    background: var(--warm-sand);
-    color: var(--deep);
-    font: 700 clamp(2.5rem, 5vw, 5rem)/1 var(--serif);
-    border-radius: 2px;
-  }
-  .polaroid figcaption {
-    margin-top: 0.8rem;
-    font-size: 1.1rem;
-    font-family: "Permanent Marker", var(--sans);
-    color: var(--pink-deep);
-    text-align: center;
+    font-family: var(--serif, Georgia, serif);
+    font-size: clamp(2.8rem, 4.5vw, 4rem);
+    color: var(--deep, #1a332f);
+    margin: 0 0 1.5rem;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
   }
 
   .manifesto {
-    margin: 0 0 2.5rem;
-    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    font-size: 1.15rem;
     line-height: 1.6;
-    color: var(--ink);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
-  }
-  .manifesto p {
-    margin: 0 0 1rem;
-  }
-  .manifesto.visible {
-    opacity: 1;
-    transform: translateY(0);
+    color: var(--muted, #6b6b6b);
+    margin-bottom: 2.5rem;
+    max-width: 400px;
   }
 
-  .cta-row {
+  .actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s var(--ease-out-expo) 200ms, transform 0.8s var(--ease-out-expo) 200ms;
+    align-items: center;
+    gap: 1.5rem;
   }
-  .cta-row.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .btn-join {
-    display: inline-flex;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1rem;
-    background: var(--blue);
+
+  .primary-btn {
+    background: var(--deep, #376a65);
     color: #fff;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 999px;
+    padding: 1rem 1.8rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 191, 255, 0.25);
-    transition: transform var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast);
+    transition: opacity 0.2s;
   }
-  .btn-join:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 191, 255, 0.4);
-    background: #00aceb;
+  .primary-btn:hover {
+    opacity: 0.9;
   }
-  .btn-join:focus-visible { outline: 3px solid var(--deep); outline-offset: 3px; }
 
+  .secondary-link {
+    color: var(--deep, #376a65);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .polaroids {
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+  }
+
+  .polaroid {
+    background: #fff;
+    padding: 0.8rem 0.8rem 3rem 0.8rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    position: absolute;
+    width: 240px;
+    border-radius: 2px;
+  }
+  
+  .photo {
+    background: #e2e1d7;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted, #888);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  .caption {
+    font-family: var(--marker, "Permanent Marker", cursive);
+    color: var(--deep, #1a332f);
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+    transform: rotate(-1deg);
+  }
+
+  .p1 {
+    top: 0;
+    left: 0;
+    transform: rotate(-4deg);
+    z-index: 2;
+  }
+  .p2 {
+    top: 20px;
+    right: 0;
+    transform: rotate(5deg);
+    z-index: 1;
+  }
+  .p3 {
+    top: 240px;
+    left: 50%;
+    transform: translateX(-30%) rotate(2deg);
+    z-index: 3;
+  }
 </style>

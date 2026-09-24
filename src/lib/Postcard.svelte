@@ -1,146 +1,106 @@
 <script>
   import postcardImg from '../../docs/brand-reference/postcard-greetings-from-out-of-office.jpg';
   import stampImg from '../../docs/brand-reference/postcard-out-of-office-stamp.jpg';
-  import MorphText from './MorphText.svelte';
 
   export let visible = false;
 </script>
 
 <section class="postcard-section">
-  <div class="text-content">
-    <p class="eyebrow" class:visible><MorphText text="Wish you were here" /></p>
-    <p class="caption" class:visible>A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
+  <div class="text-content" class:visible>
+    <p class="eyebrow">WISH YOU WERE HERE</p>
+    <h2 class="heading">A postcard for whenever you're out of office.</h2>
   </div>
 
   <div class="collage" class:visible>
-    <figure class="postcard gamified-float interactive-card">
-      <img src={postcardImg} alt="Greetings from Out of Office" width="545" height="545" loading="lazy" />
+    <figure class="postcard">
+      <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
     </figure>
-    <figure class="stamp-photo gamified-float interactive-card">
-      <img src={stampImg} alt="Out of Office postage stamp, July 18 to August 18" width="736" height="920" loading="lazy" />
+    <figure class="stamp-photo">
+      <img src={stampImg} alt="Out of Office postage stamp" loading="lazy" />
     </figure>
   </div>
 </section>
 
 <style>
   .postcard-section {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: clamp(3rem, 10vh, 6rem) 1.5rem;
+    padding: 6rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3rem;
+    gap: 4rem;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 800px) {
     .postcard-section {
       flex-direction: row;
       justify-content: space-between;
-      gap: 4rem;
     }
     .text-content {
-      flex: 1 1 40%;
+      flex: 1;
+      padding-right: 2rem;
     }
     .collage {
-      flex: 1 1 60%;
-      margin: 0;
+      flex: 1.5;
     }
   }
 
-  .eyebrow,
-  .collage,
-  .caption {
-    opacity: 0;
-    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
-  }
-  .eyebrow.visible,
-  .collage.visible,
-  .caption.visible {
-    opacity: 1;
-  }
-  .caption.visible { transition-delay: 220ms; }
-
   .eyebrow {
+    font-family: var(--marker, "Permanent Marker", cursive);
+    color: var(--pink-deep, #e0568f);
+    text-transform: uppercase;
+    font-size: 1.1rem;
     margin: 0 0 1rem;
-    font-size: clamp(1.4rem, 3.5vw, 1.8rem);
-    color: var(--pink-deep);
-    transform: translateY(16px);
+    letter-spacing: 0.05em;
   }
-  .eyebrow.visible {
-    transform: translateY(0);
+  
+  .heading {
+    font-family: var(--serif, Georgia, serif);
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    color: var(--deep, #1a332f);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
-  /* Two photos scattered together like a scrapbook page — the postcard
-     sits underneath, the stamp photo overlaps its corner on top */
   .collage {
     position: relative;
-    max-width: 100%;
-    display: inline-block;
-    transform: translateY(24px);
-  }
-  .collage.visible {
-    transform: translateY(0);
+    width: 100%;
+    min-height: 400px;
   }
 
   .postcard {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 70%;
+    max-width: 380px;
+    background: #e9e8db;
+    padding: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     margin: 0;
-    display: block;
-    max-width: 100%;
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
-    transform: rotate(-1.5deg);
-  }
-  .postcard img {
-    display: block;
-    width: 100%;
-    max-width: 520px;
-    height: auto;
+    transform: rotate(-2deg);
+    z-index: 2;
   }
 
   .stamp-photo {
     position: absolute;
-    right: -6%;
-    bottom: -12%;
-    z-index: 1;
+    top: 40px;
+    right: 0;
+    width: 50%;
+    max-width: 260px;
+    background: #e9e8db;
+    padding: 0.5rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
     margin: 0;
-    width: clamp(120px, 34%, 190px);
-    padding: 0.4rem 0.4rem 1.1rem;
-    background: var(--card-surface, #fff);
-    border-radius: 4px;
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
-    transform: rotate(6deg);
-    transition: opacity 0.6s var(--ease-out-expo) 180ms, transform 0.6s var(--ease-out-expo) 180ms;
-    opacity: 0;
+    transform: rotate(4deg);
+    z-index: 1;
   }
-  .collage.visible .stamp-photo {
-    opacity: 1;
-  }
-  .stamp-photo img {
-    display: block;
+
+  img {
     width: 100%;
     height: auto;
-    border-radius: 2px;
-  }
-
-  @media (max-width: 480px) {
-    .stamp-photo {
-      right: -4%;
-      bottom: -10%;
-      width: clamp(96px, 38%, 150px);
-    }
-  }
-
-  .caption {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: #6b6b6b;
-    transform: translateY(16px);
-  }
-  .caption.visible {
-    transform: translateY(0);
+    display: block;
   }
 </style>
