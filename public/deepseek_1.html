@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#dce7df" />
-<title>The shallows — Out of office</title>
+<title>Out of Office — water preview</title>
 <style>
   :root { color-scheme: light; font-family: system-ui, sans-serif; color: #243e3c; }
   * { box-sizing: border-box; }
@@ -15,27 +15,7 @@
   button { cursor: pointer; }
   button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid #17534e; outline-offset: 4px; }
   [hidden] { display: none !important; }
-  #intro {
-    position: fixed; z-index: 1;
-    left: clamp(18px, 2.6vw, 40px);
-    bottom: clamp(96px, 13vh, 132px);
-    max-width: min(360px, 44vw);
-    padding: clamp(18px, 2vw, 26px) clamp(20px, 2.2vw, 28px);
-    pointer-events: none;
-    background: linear-gradient(160deg, #f7f3e5cc, #e8efe2a8);
-    border: 1px solid #ffffff96;
-    border-radius: 18px;
-    box-shadow: 0 14px 44px #0e2b231a, inset 0 1px 0 #ffffffb0;
-    backdrop-filter: blur(14px) saturate(115%);
-    -webkit-backdrop-filter: blur(14px) saturate(115%);
-    opacity: 0; transform: translateY(8px);
-    animation: introIn .9s .25s ease-out forwards;
-  }
-  @keyframes introIn { to { opacity: 1; transform: translateY(0); } }
-  body[data-intro-hidden="true"] #intro { opacity: 0; transform: translateY(6px); transition: opacity .5s, transform .5s; }
   .eyebrow { margin: 0 0 10px; font-size: 9px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: #243e3cb3; }
-  h1 { margin: 0; font: normal clamp(26px, 3.2vw, 42px)/1.05 Georgia, serif; letter-spacing: -.042em; }
-  #intro .caption { margin: 12px 0 0; font-size: 12px; line-height: 1.8; opacity: .76; }
   #toolbar { position: fixed; z-index: 2; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
     display: flex; align-items: center; gap: 5px; padding: 7px; max-width: calc(100% - 32px); border-radius: 999px;
     background: #fbf6e9ed; border: 1px solid #ffffff9c; box-shadow: 0 12px 50px #143e3525;
@@ -59,9 +39,8 @@
   #notice { position: fixed; z-index: 3; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;
     width: min(420px, calc(100% - 48px)); padding: 24px; border-radius: 16px; background: #f5f6eceb; font-size: 13px; line-height: 1.7; }
   #notice a { color: inherit; text-underline-offset: 4px; }
-  body[data-mode="background"] #intro, body[data-mode="background"] #toolbar { display: none; }
+  body[data-mode="background"] #toolbar { display: none; }
   body[data-mode="background"] canvas, body[data-mode="preview"] canvas { pointer-events: none; touch-action: auto; }
-  body[data-mode="preview"] #intro { display: none; }
   @media (max-width: 600px) {
     #toolbar { display: grid; grid-template-columns: repeat(3, 1fr); width: 358px; gap: 2px; padding: 6px; border-radius: 22px; }
     #toolbar button { padding: 0 10px; min-height: 44px; }
@@ -70,8 +49,6 @@
     .quality span, .divider { display: none; }
     .volume { grid-column: 2 / 4; width: auto; min-height: 44px; }
     .volume input { flex: 1; }
-    #intro { max-width: min(300px, calc(100vw - 36px)); bottom: clamp(84px, 12vh, 108px); }
-    #intro .caption { font-size: 11px; }
   }
 </style>
 <script type="importmap">
@@ -83,20 +60,15 @@
 }
 </script>
 </head>
-<body>
-<header id="intro">
-  <p class="eyebrow">Out of office &nbsp; / &nbsp; No. 03</p>
-  <h1>The shallows.</h1>
-  <p class="caption" id="hint">The waves come in sets — restless, then still.<br>Drag to wander. Scroll to zoom. Tap to ripple.</p>
-</header>
-<section id="preview-copy" aria-label="Website background preview" hidden>
+<body data-mode="preview">
+<section id="preview-copy" aria-label="Website background preview">
   <p class="eyebrow">Out of office</p>
   <h2>Away from<br>the everyday.</h2>
   <p>A little space to slow down.<br>Leave the rush on the other side.</p>
 </section>
 <nav id="toolbar" aria-label="Water scene controls">
-  <button id="explore" type="button" aria-pressed="true">Explore</button>
-  <button id="preview" type="button" aria-pressed="false">Background preview</button>
+  <button id="explore" type="button" aria-pressed="false">Explore</button>
+  <button id="preview" type="button" aria-pressed="true">Background preview</button>
   <span class="divider" aria-hidden="true"></span>
   <button id="pause" type="button" aria-pressed="false">Pause</button>
   <button id="reset" type="button">Reset view</button>
@@ -163,7 +135,7 @@ const SETTINGS = {
   dynamicScale: { enabled: true, min: .5, max: 1.0, targetMs: 16.6, sampleCount: 45, cooldownMs: 1800 },
 };
 const params = new URLSearchParams(location.search);
-let mode = params.get('mode') === 'background' ? 'background' : 'explore';
+let mode = ['explore', 'background'].includes(params.get('mode')) ? params.get('mode') : 'preview';
 let quality = Object.hasOwn(SETTINGS.quality, params.get('quality')) ? params.get('quality') : 'auto';
 let qualitySettings = SETTINGS.quality[quality];
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -1488,13 +1460,6 @@ function setMode(nextMode) {
    Animation
    ========================================================================== */
 let lastFrame = 0, renderRequest = 0, running = false;
-let introDismissed = false;
-function hideIntroOnce() {
-  if (introDismissed) return;
-  introDismissed = true;
-  document.body.dataset.introHidden = 'true';
-}
-
 function renderFrame() {
   if (disposed || contextLost) return;
   applySmoothZoom();
@@ -1554,7 +1519,6 @@ const tapPoint = new THREE.Vector3();
 let pointerStart = null;
 
 renderer.domElement.addEventListener('pointerdown', e => {
-  hideIntroOnce();
   pointerStart = { x: e.clientX, y: e.clientY };
 }, { signal: listeners.signal });
 
@@ -1580,8 +1544,8 @@ function listen(target, event, callback, options = {}) {
 listen(window, 'resize', onResize);
 listen(document, 'visibilitychange', syncAnimation);
 listen(motionPreference, 'change', () => { paused = motionPreference.matches; syncAnimation(); });
-listen(document.querySelector('#explore'), 'click', () => { hideIntroOnce(); setMode('explore'); });
-listen(document.querySelector('#preview'), 'click', () => { hideIntroOnce(); setMode('preview'); });
+listen(document.querySelector('#explore'), 'click', () => setMode('explore'));
+listen(document.querySelector('#preview'), 'click', () => setMode('preview'));
 listen(document.querySelector('#pause'), 'click', () => { paused = !paused; syncAnimation(); });
 listen(document.querySelector('#reset'), 'click', resetCamera);
 listen(soundButton, 'click', () => {
@@ -1608,7 +1572,7 @@ listen(document.querySelector('#quality'), 'change', event => {
   lastAutoAdjustTime = 0;
   onResize();
 });
-controls.addEventListener('change', () => { hideIntroOnce(); requestRender(); });
+controls.addEventListener('change', requestRender);
 
 listen(renderer.domElement, 'keydown', event => {
   if (mode !== 'explore' || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;

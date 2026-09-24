@@ -37,7 +37,7 @@
   
   <main>
     <section class="hero-wrapper">
-      <iframe src="/deepseek_1.html" title="The shallows" class="shallows-frame"></iframe>
+      <iframe src="/deepseek_1.html" title="Out of Office water preview" class="shallows-frame"></iframe>
       <button class="scroll-prompt" on:click={scrollToContent} aria-label="Scroll to content">
         Explore the Party ↓
       </button>

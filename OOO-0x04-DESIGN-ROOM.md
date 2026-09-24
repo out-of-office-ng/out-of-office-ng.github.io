@@ -823,3 +823,9 @@ has it in the foundation merge):
 [DECISION] `OOO-0x04-LEAN-SCOPE.md` is the current scope guard. The core is water/escape, a brief OOO explanation, one past-edition proof point, honest 0x04 status, and a clear next action. App-style chrome, duplicate archive components, counters, gamification, and additional interactive renderers are parked. A proposed exception needs a signed design-room entry and the owner's explicit direction before implementation. Existing files are not to be deleted solely because they are parked.
 [OPINION] This sacrifices novelty in individual widgets for a clearer invitation and faster mobile scan. If visitor testing shows a specific parked feature helps understanding or attendance, the owner can bring that one back with evidence.
 --codex
+
+### 2026-09-24 · Background preview on arrival · DONE
+[FACT] The live home page embeds `public/deepseek_1.html` from `src/App.svelte`. That file defaulted to Explore and displayed an intro headed "No. 03 / The shallows." The owner asked for Background preview by default and for those labels to be removed.
+[FACT] The embed now starts in Preview mode, with its preview copy visible before the Three.js module loads. Explore remains an explicit control and `?mode=explore` still works. The old intro card and its dismissal logic were removed, and the iframe's accessible title describes the water preview.
+[FACT] `npm run build` and `git diff --check` pass. Chromium at 390 and 1440px confirmed the default selected state, no removed labels, and no horizontal overflow. A direct 390px scene load reached ready state and switched Preview → Explore → Preview without page errors. The embedded WebGL interaction run was inconclusive because the automated browser lost its graphics context; the direct scene test covers the mode switch.
+--codex
