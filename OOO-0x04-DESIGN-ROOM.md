@@ -541,3 +541,47 @@ loading, one water canvas with no page or console errors. At 390px the
 page had no horizontal overflow. This branch is for review; `v2` and
 `main` were not changed.
 --codex
+
+### 2026-09-24 · Background preview on arrival · PROPOSAL
+[FACT] The root preview currently presents the water only in explore mode
+(`src/lib/shallows/createShallows.js:49`), although `deepseek_1.html` has a
+separate Background preview control and a calmer camera/wave treatment. The
+owner said they would have preferred that feature in the first version.
+[OPINION] Add a two-state arrival: background preview first, then optional
+exploration. This shows how the water works behind real OOO copy while keeping
+it as the end-of-page payoff. A direct hero link makes it easy to review. I
+would change the default if visitors consistently choose Explore before
+reading the arrival, or if the copy obscures the scene on mobile.
+I will edit `src/lib/Shallows.svelte`, `src/lib/shallows/createShallows.js`,
+`src/lib/PaperHero.svelte` and this log. The scene's refraction composite and
+checkout flow are untouched.
+--codex
+
+### 2026-09-24 · Background preview and current design assessment · DONE
+[FACT] The live preview now starts the shallows in Background preview mode,
+with real OOO copy over the calmer scene. Explore water enables orbit, tap
+ripples and keyboard scene focus. The hero's "Preview the shallows" link
+jumps to the arrival. This restores the useful part of `deepseek_1.html`'s
+preview mode without bringing its demo toolbar into the site.
+[FACT] `npm run build` passes without Svelte warnings. Playwright at 390 and
+1440 checked one canvas, no horizontal overflow or page errors, both mode
+transitions, canvas accessibility state, hero navigation, and the boarding
+pass drawer. Keyboard tabbing shows a visible focus ring on the mode control.
+Screenshots: `.dump/review/background-390.png`, `background-1440.png`,
+`explore-390.png`, `explore-1440.png`.
+[OPINION] The paper hero and water arrival now give the page a clear opening
+and payoff. The preview-first choice lets the water support the brand copy;
+if observation shows visitors skipping directly to Explore, switch the
+default. Cost: Preview softens waves and hides direct canvas interaction
+until the visitor opts in.
+[FACT] `EscapeMetrics.svelte:10-14` renders 87 emails, 62% stress reduction
+and 100% battery charge without a supplied measurement. Treat them as
+explicit jokes or remove them; losing the numbers reduces visual variety.
+[FACT] `FeaturedShowcase.svelte:18-27` uses repeated placeholder cards and
+no event photos. Replace them with owner-supplied event photos when available;
+using flyers now would document the events but not show the community.
+[FACT] `Tickets.svelte:12-20,60` and `RsvpDrawer.svelte:30-46` still expose
+0x03 prices/perks and Tarkwa Bay assumptions for 0x04. D1 must be resolved
+before shipping; disabling purchases until the owner decides would avoid
+selling incorrect passes but would pause conversion.
+--codex

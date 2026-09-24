@@ -33,7 +33,7 @@
   </div>
   <div class="shoreline">
     <span>Leaving yellow Lagos. Entering blue Lagos.</span>
-    <span>The shallows wait at the end <span aria-hidden="true">↓</span></span>
+    <a class="water-link" href="#shallows">Preview the shallows <span aria-hidden="true">↓</span></a>
   </div>
 </section>
 
@@ -61,6 +61,8 @@
   .postscript > span { font: 400 22px/1.5 var(--marker); color: var(--deep); }
   .postscript p { margin: 0; font: 400 13px/1.6 var(--sans); }
   .shoreline { border-top: 1px solid var(--border-dashed); padding-top: 20px; color: var(--muted); }
+  .water-link { color: inherit; text-underline-offset: 3px; white-space: nowrap; }
+  .water-link:focus-visible { outline: 3px solid var(--deep); outline-offset: 4px; }
   @media (max-width: 700px) {
     .jetty { padding-top: 44px; }
     .masthead { font-size: 9px; gap: 12px; }

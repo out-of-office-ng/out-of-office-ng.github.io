@@ -160,6 +160,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
   audio from the home composition without deleting their source files.
 - [x] Integrate Stream C's committed AWAY/ONLINE behavior and content edits.
 - [x] Integrate Stream B's completed `Shallows.svelte` after Tickets.
+- [x] Offer Background preview first, with an Explore water switch and a hero shortcut.
 - [ ] Resolve ticket policy and remaining content decisions before shipping.
 - [ ] Full integrated Lighthouse, keyboard and reduced-motion release audit.
 

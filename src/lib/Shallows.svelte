@@ -22,6 +22,12 @@
   let hintFaded = false;
   let arrived = false;
   let destroyed = false;
+  let viewMode = 'preview';
+
+  function showView(nextMode) {
+    viewMode = nextMode;
+    scene?.setMode(nextMode);
+  }
 
   let isMuted = false;
   const unsubMuted = muted.subscribe((m) => {
@@ -43,6 +49,7 @@
       if (destroyed) return;
       scene = createShallows(stage, {
         sound: !isMuted,
+        initialMode: viewMode,
         onStatus: handleStatus,
         onInteract: () => (hintFaded = true),
         onBoatEgg: () => onOpenOooGen(),
@@ -87,22 +94,39 @@
 </script>
 
 <section
+  id="shallows"
   class="shallows"
   class:arrived
+  class:preview={viewMode === 'preview'}
   bind:this={section}
   aria-labelledby="shallows-title"
 >
   <div class="stage" bind:this={stage}></div>
 
-  <div class="intro-card">
-    <p class="eyebrow">Out of office &nbsp;/&nbsp; No. 04</p>
-    <h2 id="shallows-title">The shallows.</h2>
-    <p class="caption" class:faded={hintFaded}>
-      The waves come in sets — restless, then still.<br />
-      Drag sideways to wander. Tap to ripple.
-    </p>
-    <button type="button" class="cta" on:click={onOpenDrawer}>Claim your pass →</button>
+  <div class="view-switch" role="group" aria-label="Water view">
+    <button type="button" aria-pressed={viewMode === 'preview'} on:click={() => showView('preview')}>Background preview</button>
+    <button type="button" aria-pressed={viewMode === 'explore'} disabled={status === 'failed' || status === 'context-lost'} on:click={() => showView('explore')}>Explore water</button>
   </div>
+
+  {#if viewMode === 'preview'}
+    <div class="preview-wash" aria-hidden="true"></div>
+    <div class="background-copy">
+      <p class="eyebrow">Out of Office &nbsp;/&nbsp; No. 04</p>
+      <h2 id="shallows-title">Out of office.<br />Into blue Lagos.</h2>
+      <p>Auto replies enabled.<br />Stress disabled.</p>
+      <button type="button" class="cta" on:click={onOpenDrawer}>View boarding pass →</button>
+    </div>
+  {:else}
+    <div class="intro-card">
+      <p class="eyebrow">Out of office &nbsp;/&nbsp; No. 04</p>
+      <h2 id="shallows-title">The shallows.</h2>
+      <p class="caption" class:faded={hintFaded}>
+        The waves come in sets — restless, then still.<br />
+        Drag sideways to wander. Tap to ripple.
+      </p>
+      <button type="button" class="cta" on:click={onOpenDrawer}>Claim your pass →</button>
+    </div>
+  {/if}
 
   {#if status === 'loading'}
     <p class="status" role="status">The water is loading…</p>
@@ -114,6 +138,8 @@
 </section>
 
 <style>
+  /* Hallmark · macrostructure: water arrival · tone: atmospheric · anchor hue: deep water */
+  /* Hallmark · pre-emit critique: P5 H4 E4 S5 R4 V4 */
   .shallows {
     /* Water palette (design room §4). Local until stream A lands the
        site-wide tokens; each falls back to the literal value. */
@@ -143,6 +169,69 @@
   }
   .stage :global(.shallows-canvas:focus-visible) {
     outline: 2px solid var(--sh-paper);
+  }
+
+  .view-switch {
+    position: absolute;
+    z-index: 3;
+    top: clamp(80px, 10vh, 104px);
+    right: clamp(18px, 3vw, 44px);
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--sh-ink);
+  }
+  .view-switch button {
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: var(--sh-ink);
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .view-switch button[aria-pressed='true'] {
+    border-bottom-color: var(--sh-deep);
+  }
+  .view-switch button:focus-visible {
+    outline: 3px solid var(--sh-deep);
+    outline-offset: 3px;
+  }
+  .view-switch button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .preview-wash {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 93%, transparent), color-mix(in srgb, var(--bg) 75%, transparent) 45%, transparent 80%);
+    pointer-events: none;
+  }
+  .background-copy {
+    position: absolute;
+    z-index: 2;
+    top: clamp(180px, 25vh, 260px);
+    left: clamp(24px, 6vw, 96px);
+    width: min(610px, calc(100% - 48px));
+  }
+  .background-copy h2 {
+    margin: 12px 0 22px;
+    font-family: var(--serif);
+    font-size: clamp(44px, 6vw, 84px);
+    line-height: 1.02;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    overflow-wrap: anywhere;
+  }
+  .background-copy > p:not(.eyebrow) {
+    font-family: var(--sans);
+    font-size: clamp(14px, 1.5vw, 18px);
+    line-height: 1.6;
   }
 
   .intro-card {
@@ -259,6 +348,23 @@
   }
 
   @media (max-width: 600px) {
+    .view-switch {
+      top: 82px;
+      right: 18px;
+    }
+    .view-switch button {
+      padding: 8px 10px;
+      font-size: 0.65rem;
+    }
+    .preview-wash {
+      background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 94%, transparent), color-mix(in srgb, var(--bg) 80%, transparent) 52%, transparent 78%);
+    }
+    .background-copy {
+      top: 175px;
+    }
+    .background-copy h2 {
+      font-size: clamp(38px, 10vw, 56px);
+    }
     .intro-card {
       max-width: min(300px, calc(100vw - 36px));
       bottom: clamp(84px, 12vh, 108px);

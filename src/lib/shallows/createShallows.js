@@ -18,7 +18,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-export function createShallows(container, { sound = true, onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
+export function createShallows(container, { sound = true, initialMode = 'preview', onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
 const viewW = () => Math.max(1, container.clientWidth);
 const viewH = () => Math.max(1, container.clientHeight);
 
@@ -44,9 +44,9 @@ const SETTINGS = {
   },
   dynamicScale: { enabled: true, min: .5, max: 1.0, targetMs: 16.6, sampleCount: 45, cooldownMs: 1800 },
 };
-// Site port: always the interactive "explore" mode on "auto" quality — the
-// standalone file's toolbar (mode/quality/pause/volume) is demo UI.
-const mode = 'explore';
+// Two editorial views share one scene. Preview starts quieter and leaves
+// the water behind the site's copy; Explore enables direct input.
+let mode = initialMode === 'explore' ? 'explore' : 'preview';
 const quality = 'auto';
 const qualitySettings = SETTINGS.quality[quality];
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -1315,10 +1315,12 @@ function resetCamera() {
   requestRender();
 }
 
-function setMode() {
+function setMode(nextMode = mode) {
+  mode = nextMode === 'explore' ? 'explore' : 'preview';
   controls.enabled = mode === 'explore';
   renderer.domElement.tabIndex = mode === 'explore' ? 0 : -1;
   renderer.domElement.setAttribute('aria-hidden', String(mode !== 'explore'));
+  renderer.domElement.style.touchAction = mode === 'explore' ? 'pan-y' : 'auto';
   waveStrengthU.value = SETTINGS.waveStrength * (mode === 'explore' ? 1 : .55);
   surfHeightU.value = SETTINGS.surf.height * (mode === 'explore' ? 1 : .75);
   resetCamera();
@@ -1525,6 +1527,7 @@ listen(window, 'keydown', armAudio);
 if (navigator.userActivation?.hasBeenActive) armAudio();
 
 return {
+  setMode,
   setSound(enabled) {
     soundEnabled = !!enabled;
     if (soundEnabled) armAudio();
