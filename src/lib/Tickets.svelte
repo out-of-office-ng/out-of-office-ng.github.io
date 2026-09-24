@@ -7,6 +7,9 @@
   export let showSticky = false;
   export let onOpenDrawer = () => {};
 
+  import { SALES_MODE, NEXT_EVENT } from './sales.js';
+  const salesOpen = SALES_MODE === 'open';
+
   const TIERS = [
     {
       id: 'explorer',
@@ -32,7 +35,7 @@
     <p class="eyebrow"><MorphText text="Boarding pass" boost={1.3} /></p>
     <h2 class="heading">Your ticket out of yellow Lagos.</h2>
     <p class="subheading">
-      Escape Lagos noise with Release and Unwind Beach Retreat—reconnect with yourself, nature,
+      Escape Lagos noise with {salesOpen ? 'Release and Unwind Beach Retreat' : 'the next Out of Office'}—reconnect with yourself, nature,
       and community through yoga, painting, beach games, picnics, bonfires, and meaningful
       conversations by the ocean. Come for the experience. Leave with the memories.
     </p>
@@ -79,7 +82,7 @@
         </div>
         <div class="detail-item">
           <span class="label">DATE</span>
-          <span class="value">SUN, AUG 16, 2026</span>
+          <span class="value">{salesOpen ? 'SUN, AUG 16, 2026' : 'NOV 2026 · TBA'}</span>
         </div>
         <div class="detail-item">
           <span class="label">GATE</span>
@@ -115,6 +118,7 @@
         <span class="barcode-num">4 829104 772019 OOO-BNG</span>
       </div>
 
+      {#if salesOpen}
       <div class="tier-select" role="radiogroup" aria-label="Ticket tier">
         {#each TIERS as tier (tier.id)}
           <button
@@ -137,13 +141,24 @@
         Claim {selectedTier.name} →
       </button>
       <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
+      {:else}
+      <p class="tier-description">
+        {NEXT_EVENT.code} lands in {NEXT_EVENT.when}. {NEXT_EVENT.detail}
+        Tickets aren't on sale yet.
+      </p>
+
+      <button type="button" class="cta-btn" on:click={onOpenDrawer}>
+        Tickets open soon →
+      </button>
+      <span class="fine-print">{NEXT_EVENT.code} · {NEXT_EVENT.when}</span>
+      {/if}
     </div>
   </div>
 
   {#if showSticky}
     <div class="sticky-cta-bar" transition:fade={{ duration: 200 }}>
       <button class="sticky-action-btn" on:click={onOpenDrawer} type="button">
-        Claim Event Pass →
+        {salesOpen ? 'Claim Event Pass →' : 'Tickets open soon →'}
       </button>
     </div>
   {/if}
