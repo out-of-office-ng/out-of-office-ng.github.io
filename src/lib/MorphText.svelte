@@ -1,5 +1,5 @@
 <script>
-  import { pageProgress } from './scrollProgress.js';
+  import { calm } from './calm.js';
 
   export let text;
   // Local multiplier lets a caller push its own morph further/less than raw
@@ -7,7 +7,8 @@
   // handwritten well before the literal bottom of the document).
   export let boost = 1;
 
-  $: p = Math.max(0, Math.min(1, $pageProgress * boost));
+  // calm = page scroll, or 1 while the header status is AWAY.
+  $: p = Math.max(0, Math.min(1, $calm * boost));
 
   // Crossfade window: fully corporate below 40%, fully handwritten above
   // 60%, dissolving between. Narrow on purpose — the two faces have very

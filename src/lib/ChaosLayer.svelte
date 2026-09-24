@@ -1,26 +1,28 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  // App's calm-aware progress: scroll, or the AWAY toggle's tween to 1.
   export let progress = 0;
-  export let forceOnline = false;
-
-  // Fade out completely by progress 0.55 unless forceOnline is true
-  $: opacity = forceOnline ? 1 : Math.max(0, 1 - progress * 1.85);
-  $: blurAmount = forceOnline ? 0 : Math.min(12, progress * 24);
-  $: scale = forceOnline ? 1 : Math.max(0.75, 1 - progress * 0.4);
-  $: translateY = forceOnline ? 0 : progress * -80;
-  $: visible = forceOnline || progress < 0.58;
-
-  $: if (forceOnline) {
-    dismissedIds = [];
-    try { sessionStorage.removeItem("oooChaosDismissed"); } catch {}
-  }
 
   const STORAGE_KEY = "oooChaosDismissed";
   let dismissedIds = [];
-  let burstingId = null;
+  let burstingIds = [];
+  // True while AWAY's mass burst plays: hold the layer at full strength so
+  // the bursts are actually seen, instead of fading out under them as the
+  // calm tween climbs.
+  let awayBurst = false;
+  $: if (awayBurst && burstingIds.length === 0) awayBurst = false;
+
+  // Fade out completely by progress 0.55
+  $: opacity = awayBurst ? 1 : Math.max(0, 1 - progress * 1.85);
+  $: blurAmount = awayBurst ? 0 : Math.min(12, progress * 24);
+  $: scale = awayBurst ? 1 : Math.max(0.75, 1 - progress * 0.4);
+  $: translateY = awayBurst ? 0 : progress * -80;
+  $: visible = progress < 0.58 || burstingIds.length > 0;
 
   function handleOnlineEvent() {
     dismissedIds = [];
+    burstingIds = [];
+    awayBurst = false;
     try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
     // Restart battery bounce timer
     if (!batteryTimer) {
@@ -33,6 +35,11 @@
   const ALL_POPUP_IDS = ['whatsapp','slack','email','calendar','twitter','instagram','zoom','trello','bank','battery'];
 
   function handleAwayEvent() {
+    // The mute moment: every popup still on screen bursts at once.
+    // dismissedIds is set to ALL up front so storage/restore stay
+    // consistent; burstingIds drives the burst animation.
+    burstingIds = progress < 0.58 ? ALL_POPUP_IDS.filter((id) => !dismissedIds.includes(id)) : [];
+    awayBurst = burstingIds.length > 0;
     dismissedIds = [...ALL_POPUP_IDS];
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedIds));
@@ -62,12 +69,13 @@
   });
 
   function burst(id) {
-    if (burstingId === id || dismissedIds.includes(id)) return;
-    burstingId = id;
+    if (burstingIds.includes(id) || dismissedIds.includes(id)) return;
+    burstingIds = [...burstingIds, id];
   }
 
   function settleBurst(id) {
-    burstingId = null;
+    burstingIds = burstingIds.filter((b) => b !== id);
+    if (dismissedIds.includes(id)) return; // AWAY pre-dismisses
     dismissedIds = [...dismissedIds, id];
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedIds));
@@ -104,11 +112,11 @@
   >
     <!-- WhatsApp + Slack pile up on the left, overlapping each other —
          the point is a stack of competing alerts, not four tidy corners -->
-    {#if !dismissedIds.includes("whatsapp")}
+    {#if !dismissedIds.includes("whatsapp") || burstingIds.includes("whatsapp")}
       <button
         type="button"
         class="popup-card whatsapp"
-        class:bursting={burstingId === "whatsapp"}
+        class:bursting={burstingIds.includes("whatsapp")}
         style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); left: 1%; transform: rotate(-8deg); z-index: 3;"
         aria-label="Dismiss WhatsApp notification"
         on:click={() => burst("whatsapp")}
@@ -123,11 +131,11 @@
       </button>
     {/if}
 
-    {#if !dismissedIds.includes("slack")}
+    {#if !dismissedIds.includes("slack") || burstingIds.includes("slack")}
       <button
         type="button"
         class="popup-card slack"
-        class:bursting={burstingId === "slack"}
+        class:bursting={burstingIds.includes("slack")}
         style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); left: 9%; transform: rotate(7deg) scale(0.96); z-index: 4;"
         aria-label="Dismiss Slack notification"
         on:click={() => burst("slack")}
@@ -143,11 +151,11 @@
     {/if}
 
     <!-- Email + Calendar mirror the same overlapping pile on the right -->
-    {#if !dismissedIds.includes("email")}
+    {#if !dismissedIds.includes("email") || burstingIds.includes("email")}
       <button
         type="button"
         class="popup-card email"
-        class:bursting={burstingId === "email"}
+        class:bursting={burstingIds.includes("email")}
         style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); right: 1%; transform: rotate(9deg); z-index: 3;"
         aria-label="Dismiss Mail notification"
         on:click={() => burst("email")}
@@ -162,11 +170,11 @@
       </button>
     {/if}
 
-    {#if !dismissedIds.includes("calendar")}
+    {#if !dismissedIds.includes("calendar") || burstingIds.includes("calendar")}
       <button
         type="button"
         class="popup-card calendar"
-        class:bursting={burstingId === "calendar"}
+        class:bursting={burstingIds.includes("calendar")}
         style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); right: 8%; transform: rotate(-7deg) scale(0.96); z-index: 4;"
         aria-label="Dismiss Calendar notification"
         on:click={() => burst("calendar")}
@@ -182,11 +190,11 @@
     {/if}
 
     <!-- Second wave, doubling the pile: same chaos, more channels -->
-    {#if !dismissedIds.includes("twitter")}
+    {#if !dismissedIds.includes("twitter") || burstingIds.includes("twitter")}
       <button
         type="button"
         class="popup-card twitter"
-        class:bursting={burstingId === "twitter"}
+        class:bursting={burstingIds.includes("twitter")}
         style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); left: 4%; transform: rotate(5deg) scale(0.95); z-index: 3;"
         aria-label="Dismiss X notification"
         on:click={() => burst("twitter")}
@@ -201,11 +209,11 @@
       </button>
     {/if}
 
-    {#if !dismissedIds.includes("instagram")}
+    {#if !dismissedIds.includes("instagram") || burstingIds.includes("instagram")}
       <button
         type="button"
         class="popup-card instagram"
-        class:bursting={burstingId === "instagram"}
+        class:bursting={burstingIds.includes("instagram")}
         style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); right: 4%; transform: rotate(-6deg) scale(0.95); z-index: 3;"
         aria-label="Dismiss Instagram notification"
         on:click={() => burst("instagram")}
@@ -220,11 +228,11 @@
       </button>
     {/if}
 
-    {#if !dismissedIds.includes("zoom")}
+    {#if !dismissedIds.includes("zoom") || burstingIds.includes("zoom")}
       <button
         type="button"
         class="popup-card zoom"
-        class:bursting={burstingId === "zoom"}
+        class:bursting={burstingIds.includes("zoom")}
         style="bottom: 20%; left: 3%; transform: rotate(-4deg) scale(0.95); z-index: 4;"
         aria-label="Dismiss Zoom notification"
         on:click={() => burst("zoom")}
@@ -239,11 +247,11 @@
       </button>
     {/if}
 
-    {#if !dismissedIds.includes("trello")}
+    {#if !dismissedIds.includes("trello") || burstingIds.includes("trello")}
       <button
         type="button"
         class="popup-card trello"
-        class:bursting={burstingId === "trello"}
+        class:bursting={burstingIds.includes("trello")}
         style="bottom: 20%; right: 3%; transform: rotate(6deg) scale(0.95); z-index: 4;"
         aria-label="Dismiss Trello notification"
         on:click={() => burst("trello")}
@@ -258,11 +266,11 @@
       </button>
     {/if}
 
-    {#if !dismissedIds.includes("bank")}
+    {#if !dismissedIds.includes("bank") || burstingIds.includes("bank")}
       <button
         type="button"
         class="popup-card bank"
-        class:bursting={burstingId === "bank"}
+        class:bursting={burstingIds.includes("bank")}
         style="top: 62%; left: 1%; transform: rotate(3deg) scale(0.94); z-index: 2;"
         aria-label="Dismiss GTBank notification"
         on:click={() => burst("bank")}
@@ -280,12 +288,12 @@
     <!-- System Notification — the one that keeps re-popping in a new spot
          instead of parking itself over the card footer, and reads as
          frosted glass so the card underneath stays partly visible. -->
-    {#if !dismissedIds.includes("battery")}
+    {#if !dismissedIds.includes("battery") || burstingIds.includes("battery")}
       {#key batteryIndex}
         <button
           type="button"
           class="popup-card battery glass"
-          class:bursting={burstingId === "battery"}
+          class:bursting={burstingIds.includes("battery")}
           style="{batterySpot.style} --rot: {batterySpot.rot}deg; z-index: 5;"
           aria-label="Dismiss system notification"
           on:click={() => burst("battery")}

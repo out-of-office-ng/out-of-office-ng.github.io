@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { pageProgress } from "./scrollProgress.js";
+  import { calm } from "./calm.js";
   import { muted } from "./ambientSound.js";
 
   // Concept 5 (concept.txt), reinterpreted per user direction 2026-07-17:
@@ -24,7 +24,9 @@
   let gestureArmed = false;
 
   const unsubMuted = muted.subscribe((v) => (isMuted = v));
-  const unsubProgress = pageProgress.subscribe((v) => (progress = v));
+  // calm = page scroll, or 1 while the header status is AWAY — so AWAY
+  // crossfades straight to the waves.
+  const unsubProgress = calm.subscribe((v) => (progress = v));
 
   function clamp01(v) {
     return Math.max(0, Math.min(1, v));

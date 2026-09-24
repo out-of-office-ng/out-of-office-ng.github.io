@@ -28,6 +28,7 @@
   import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
   import dropletPink from "../docs/brand-reference/paint-droplet-pink.png";
   import { pageProgress } from "./lib/scrollProgress.js";
+  import { forcedCalm, goAway, goOnline } from "./lib/calm.js";
 
   // TODO(owner): set the real OOO 0x04 date, e.g. "December 12, 2026 12:00:00".
   // null (or a past date) renders the "Date TBA" chip instead of a countdown.
@@ -156,38 +157,36 @@
     }
   }
 
-  let isOnline = true;
-
-  function handleStatusChange(onlineState) {
-    isOnline = onlineState;
-    if (isOnline) {
-      try {
-        sessionStorage.removeItem("oooChaosDismissed");
-      } catch {}
-      // Restore all chaos popups
-      window.dispatchEvent(new CustomEvent('oooStatusOnline'));
-    } else {
-      // Going AWAY — kill every popup immediately
-      window.dispatchEvent(new CustomEvent('oooStatusAway'));
-    }
+  // The fast lane: AWAY forces calm to 1, ONLINE hands control back to
+  // scroll. ChaosLayer listens to the events for popup burst/restore.
+  function handleStatusChange(online) {
+    if (online) goOnline(); else goAway();
+    window.dispatchEvent(new CustomEvent(online ? "oooStatusOnline" : "oooStatusAway"));
   }
 
   function handleArrowClick() {
     document.querySelector(".tickets-section")?.scrollIntoView({ behavior: "smooth" });
   }
 
-  $: activated = progress >= 0.995;
+  // One value, two writers: everything hero-side reads the max of where
+  // you've scrolled (scenic) and the AWAY toggle (fast lane).
+  $: effectiveProgress = Math.max(smoothedProgress, $forcedCalm);
+  $: cubeProgress = Math.max(progress, $forcedCalm);
 
-  $: notificationCount = isOnline
+  // A place in the document vs. a state of mind: the Activated section and
+  // companion cube are places, so they stay tied to real scroll; the
+  // StressMeter's "Mental State: Out of Office" readout follows either route.
+  $: activated = progress >= 0.995;
+  $: oooState = effectiveProgress >= 0.95;
+
+  $: notificationCount = effectiveProgress < 0.05
     ? "999+"
-    : smoothedProgress < 0.05
-      ? "999+"
-      : smoothedProgress >= 0.95
-        ? 0
-        : Math.floor(999 * Math.pow(1 - (smoothedProgress - 0.05) / 0.9, 3));
+    : effectiveProgress >= 0.95
+      ? 0
+      : Math.floor(999 * Math.pow(1 - (effectiveProgress - 0.05) / 0.9, 3));
 
   // Chaos -> calm color arc for the notification pill
-  $: notifStage = notificationCount === 0 ? "zero" : (smoothedProgress < 0.25 || isOnline) ? "high" : "mid";
+  $: notifStage = notificationCount === 0 ? "zero" : effectiveProgress < 0.25 ? "high" : "mid";
 </script>
 
 <svelte:window on:hashchange={onHashChange} />
@@ -211,7 +210,7 @@
     <div class="stage-wrap">
       <div class="grain"></div>
       <!-- Chaos Layer chat bubbles outside of the main postcard card to frame the digital noise around our escape -->
-      <ChaosLayer progress={smoothedProgress} forceOnline={isOnline} />
+      <ChaosLayer progress={effectiveProgress} />
       <main class="frame">
         <ZineDecorations />
 
@@ -268,7 +267,7 @@
               </div>
             </div>
             <div class="cube-slot">
-              <RotatingCube {progress} onOpenOooGen={openOooGen} />
+              <RotatingCube progress={cubeProgress} onOpenOooGen={openOooGen} />
             </div>
           </div>
           <Boat progress={smoothedProgress} />
@@ -286,7 +285,7 @@
   </div>
 {/if}
 
-<StressMeter progress={smoothedProgress} {activated} />
+<StressMeter progress={effectiveProgress} activated={oooState} />
 <AmbientSound />
 
 <section class="activated" class:visible={activated}>
