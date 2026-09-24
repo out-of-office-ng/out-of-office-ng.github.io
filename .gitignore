@@ -30,3 +30,6 @@ take-screenshots*
 # Owner/agent scratch notes (see OOO-0x04-DESIGN-ROOM.md)
 .dump/
 public/audio/beach-waves.m4a
+
+# Design-skill run logs (local tooling noise)
+.hallmark/

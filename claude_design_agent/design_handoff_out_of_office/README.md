@@ -1,3 +1,8 @@
+> **⚠️ Superseded (2026-09-24).** This handoff describes the 2026-07 site:
+> the cube hero, cube mini-modal and the dark/light theme toggle, all since
+> removed or reworked. It's kept as design history only. For current
+> direction and decisions, see `OOO-0x04-DESIGN-ROOM.md` in the repo root.
+
 # Handoff: Out of Office — header/UX copy revisions + cube interactions
 
 ## Overview
