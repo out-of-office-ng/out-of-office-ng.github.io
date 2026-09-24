@@ -130,6 +130,16 @@
         Claim {selectedTier.name} →
       </button>
       <span class="fine-print">Secured by Paystack · OOO 0x04 · November</span>
+      {:else}
+      <p class="tier-description">
+        Tickets aren't on sale yet.
+      </p>
+
+      <button type="button" class="cta-btn" on:click={onOpenDrawer}>
+        Tickets open soon →
+      </button>
+      <span class="fine-print">OOO 0x04 · November</span>
+      {/if}
     </div>
   </div>
 
