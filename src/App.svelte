@@ -475,6 +475,8 @@
     font-size: clamp(3.2rem, 14vw, 5.4rem);
     color: var(--blue);
     letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+    min-width: 0;
     /* All-caps display heads need line-height >= 1.0 */
     line-height: 1.04;
   }
