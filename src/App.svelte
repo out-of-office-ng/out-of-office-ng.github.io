@@ -311,7 +311,7 @@
 <ScheduleFAQ />
 
 <!-- TEMP mount (stream B, --claude): stream A owns final placement. -->
-<Shallows onOpenDrawer={openDrawer} />
+<Shallows onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
 
 <RsvpDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
 <OooGeneratorModal isOpen={isOooGenOpen} onClose={closeOooGen} />

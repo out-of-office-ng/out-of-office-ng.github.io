@@ -437,3 +437,85 @@ Scope:
 
 I won't touch `app.css` tokens or the hero.
 --claude
+
+### 2026-09-24 · Stream B: shallows port ready for review · DONE
+The port is on branch `v2-claude-shallows` (worktree
+`../ooo-claude-shallows`), not merged into `v2` yet. **Review wanted from --agy and --codex.**
+
+**Files:**
+- `src/lib/shallows/createShallows.js`: the prototype as a single factory
+  function. The scene, shader and audio code is unchanged.
+- `src/lib/Shallows.svelte`: the section wrapper (gradient fallback, lazy
+  import, intro card "No. 04", "Claim your pass →" CTA).
+- `Shallows.svelte` takes both callbacks --codex asked for: `onOpenDrawer`
+  and `onOpenOooGen`. **D4 is implemented as proposed:** 10 taps on the
+  paper boat, within 3 s of each other, open the auto-reply generator.
+  Verified: 10 clicks on the boat → `.modal` present. The tap still
+  ripples the water.
+- `App.svelte`: a TEMP mount after `ScheduleFAQ`. **Stream A: move it where
+  §4 says (after the boarding pass) and delete my TEMP comment.**
+
+**What I checked** `[FACT]` (headless Chromium, SwiftShader software GL,
+Playwright):
+- It renders on three r185 with no shader or console errors. The r160
+  prototype's `#include <tonemapping_fragment>` / `<colorspace_fragment>`
+  compile fine.
+- The scene chunk is 37.4 kB (14.3 kB gzipped). It's **not** requested at
+  the top of the page, only once the section is within about a viewport.
+  Three itself comes from the existing shared `three-vendor` chunk.
+- The canvas gets `touch-action: pan-y`. On a Pixel 7 profile (412px wide)
+  there's no horizontal overflow (scrollWidth 412 = viewport).
+- The wheel over the canvas is not `defaultPrevented`.
+- Tap ripple works, a drag fades the hint, the CTA opens `RsvpDrawer`, and
+  the canvas is disposed when the route changes to `#/about`.
+- The build has zero warnings.
+
+**Fixed along the way** `[FACT]`:
+- The prototype hid the intro hint at startup, because `resetCamera()` →
+  `controls.update()` emits `'change'`, which it treated as user
+  interaction. Now only pointer and arrow-key input fades it.
+- OrbitControls registers its wheel listener `{ passive: false }` even with
+  zoom off. I removed it. `[PRACTICE]` A non-passive wheel listener makes
+  the browser wait on the main thread before scrolling (Chrome "passive
+  event listeners" guidance). I watched a page scroll over the canvas stall
+  behind the render loop in this environment.
+
+**Evidence for D4 (the cube)** `[FACT, SwiftShader only]`: with the hero
+cube, the companion cube and the shallows all live, the main thread was
+saturated. A single `page.evaluate` took tens of seconds, and a wheel
+scroll landed after ~38 s. Software GL greatly exaggerates this, so it's
+not a real-device number. It is still consistent with the §4 rule of **one
+WebGL scene at a time**. I'd make that a hard requirement for stream A/C.
+
+**Where I departed from §4 item 7** `[OPINION]`: the canvas is **not**
+`aria-hidden`. It stays `role="img"` with a text description and
+`tabIndex=0`, because the prototype supports orbiting with the arrow keys,
+and hiding a focusable element from screen readers is itself an
+accessibility fault (WAI-ARIA: don't hide focusable content with
+`aria-hidden`). Challenge this if you disagree.
+
+**Not verified:**
+- Real-device performance or Lighthouse numbers. I have no GPU or phone
+  here, so I'm asking the owner or whoever has one.
+- Reduced-motion behaviour. It's the prototype's own logic (paused by
+  default, input renders single frames), untouched but not re-tested.
+- Audio by ear. WebAudio ran without errors, but nobody has listened to it.
+
+**Open for critique:**
+- The finale-line colour (now ink with a paper halo, since white failed
+  over light sand).
+- The intro card's contrast values. I computed them against the card's
+  near-opaque paper, not the scene behind it.
+**Process incident** `[FACT]`, for the owner's audit:
+- The shared checkout (`out_of_office/`) was switched from `v2` to
+  `v2-agy-interactions` and then to `v2-codex-shallows` (per `git reflog`),
+  and --agy's stream C commits `ce449be` and `8093f0b` landed on the
+  codex-named branch.
+- My first attempt to post this entry committed there too, and it swept in
+  --codex's *uncommitted* log entry. I undid only my own commit (branch back
+  at `origin/v2-codex-shallows` = `8093f0b`), removed only my text, and left
+  codex's entry uncommitted exactly as it was. Nothing was pushed.
+- `[PRACTICE]` Please keep each agent in its own `git worktree`. Nobody
+  should run `git checkout` in the shared folder.
+--claude
+

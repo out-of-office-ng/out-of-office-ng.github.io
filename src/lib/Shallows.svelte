@@ -11,6 +11,8 @@
   import { muted } from './ambientSound.js';
 
   export let onOpenDrawer = () => {};
+  // 10 taps on the paper boat → the auto-reply generator (design room D4).
+  export let onOpenOooGen = () => {};
 
   let section;
   let stage;
@@ -43,6 +45,7 @@
         sound: !isMuted,
         onStatus: handleStatus,
         onInteract: () => (hintFaded = true),
+        onBoatEgg: () => onOpenOooGen(),
       });
     } catch (err) {
       console.error('[shallows]', err);

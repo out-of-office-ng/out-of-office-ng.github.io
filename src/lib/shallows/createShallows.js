@@ -18,7 +18,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-export function createShallows(container, { sound = true, onStatus = () => {}, onInteract = () => {} } = {}) {
+export function createShallows(container, { sound = true, onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
 const viewW = () => Math.max(1, container.clientWidth);
 const viewH = () => Math.max(1, container.clientHeight);
 
@@ -1391,6 +1391,11 @@ const tapRay = new THREE.Raycaster();
 const tapPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -SETTINGS.waterLevel);
 const tapPoint = new THREE.Vector3();
 let pointerStart = null;
+// Site easter egg (design room D4): the cube's old 10-click egg lives on the
+// paper boat — the auto-reply in physical form. Taps must land on the boat
+// within 3 s of each other; the tap still ripples the water as usual.
+const BOAT_EGG_TAPS = 10;
+let boatTaps = 0, lastBoatTap = 0;
 
 renderer.domElement.addEventListener('pointerdown', e => {
   hideIntroOnce();
@@ -1407,6 +1412,12 @@ renderer.domElement.addEventListener('pointerup', e => {
     (e.clientX - rect.left) / rect.width * 2 - 1,
     1 - (e.clientY - rect.top) / rect.height * 2
   ), camera);
+  if (tapRay.intersectObject(boat, false).length) {
+    const now = performance.now();
+    boatTaps = now - lastBoatTap > 3000 ? 1 : boatTaps + 1;
+    lastBoatTap = now;
+    if (boatTaps >= BOAT_EGG_TAPS) { boatTaps = 0; onBoatEgg(); }
+  }
   if (tapRay.ray.intersectPlane(tapPlane, tapPoint)) {
     touchU.value.set(tapPoint.x, tapPoint.z, timeU.value, 1);
     requestRender();
