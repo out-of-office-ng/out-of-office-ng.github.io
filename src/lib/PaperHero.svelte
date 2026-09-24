@@ -1,4 +1,7 @@
 <script>
+  import CountdownTimer from './CountdownTimer.svelte';
+  export let eventDate = null;
+  $: hasUpcomingDate = eventDate !== null && new Date(eventDate) > new Date();
   export let onBoard = () => {};
 </script>
 
@@ -17,7 +20,11 @@
       <h2>Gone to touch grass.<br />Back soon.</h2>
       <p class="body">Away from emails, responsibilities,<br class="desktop-break" /> and Lagos stress.</p>
       <button on:click={onBoard}>Find your boarding pass <span aria-hidden="true">↗</span></button>
-      <p class="date">November · Exact date & venue TBA</p>
+      {#if hasUpcomingDate}
+        <CountdownTimer targetDateStr={eventDate} />
+      {:else}
+        <p class="date">November · Exact date & venue TBA</p>
+      {/if}
       <div class="postscript">
         <span aria-hidden="true">P.S.</span>
         <p>Auto replies enabled.<br />Stress disabled.</p>

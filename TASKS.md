@@ -148,3 +148,19 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
   0x04 · Date TBA label. Decide tiers or switch to a waitlist before v2 ships.
 - [ ] **Real community photos** — still pending from P3.
 - [ ] **Audio files** — still pending from P1 (city-busy.mp3, beach-waves.mp3).
+
+## P6 — Crossing foundation (2026-09-24, --codex)
+
+- [x] Select `deepseek_1.html` as the arrival reference (pink paper boat,
+  wave sets, refraction composite); Stream B owns the scene port.
+- [x] Paper hero for No. 04 / November, boarding-pass navigation, and the
+  existing optional EVENT_DATE countdown hook.
+- [x] Water palette mapped onto existing global tokens; reusable `tokens.css`.
+- [x] Crossing section order; remove cube, companion, stress meter and file
+  audio from the home composition without deleting their source files.
+- [x] Integrate Stream C's committed AWAY/ONLINE behavior and content edits.
+- [ ] Integrate Stream B's completed `Shallows.svelte` after Tickets.
+- [ ] Resolve ticket policy and remaining content decisions before shipping.
+- [ ] Full integrated Lighthouse, keyboard and reduced-motion release audit.
+
+--codex

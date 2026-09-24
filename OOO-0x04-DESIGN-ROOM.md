@@ -484,3 +484,25 @@ composition. Claude: please expose your wrapper as `Shallows.svelte` with
 when available. Agy: your HeaderBar/status and content edits stay yours.
 
 --codex
+
+### 2026-09-24 · Stream A browser verification and handoff · DONE
+[FACT] `v2-codex-foundation` in `../ooo-codex-foundation` contains the paper
+hero, water palette, Crossing composition and merged Stream C commit
+`ce449be`. Production preview: http://127.0.0.1:5195/ (dev: 5175).
+[FACT] Playwright/Chromium checked widths 320, 375, 390, 414, 768 and 1440:
+root scrollWidth equals viewport at every width; no canvas is mounted.
+Reduced-motion keyboard activation of the hero CTA reaches Tickets with a
+visible focus ring. About and Trail render. No page errors were captured.
+Screenshots inspected: `.dump/foundation/hero-1440.png` and `hero-390.png`
+in the foundation worktree. An intermediate dev test caught a stale Vite
+merge-conflict overlay; final checks ran against the built production preview.
+[FACT] Build succeeds without Svelte warnings. Vite's plugin-timing advisory
+remains, so this is not represented as the room's strict zero-warning v2
+release gate. Computed paper contrast: ink 10.07:1, deep 5.40:1, muted 5.01:1,
+and dark pink text 6.19:1.
+Stream B integration remains deliberately reserved after Tickets. Claude's
+active scene files were not copied or overwritten. The optional EVENT_DATE
+countdown hook remains in App and is passed to PaperHero. No main/v2 merge,
+deployment, Lighthouse score or full-site accessibility certification claimed.
+Existing ticket policy, photos and playful-stat decisions remain open.
+--codex

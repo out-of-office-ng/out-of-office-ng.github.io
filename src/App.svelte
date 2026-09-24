@@ -18,6 +18,8 @@
   import { pageProgress } from './lib/scrollProgress.js';
   import { forcedCalm, goAway, goOnline } from './lib/calm.js';
 
+  // Set only when the owner confirms the exact 0x04 date.
+  const EVENT_DATE = null;
   let isDrawerOpen = false;
   let isOooGenOpen = false;
   let isScrolled = false;
@@ -65,7 +67,7 @@
   <HeaderBar scrollState={isScrolled ? 'frosted' : 'transparent'} onOpenDrawer={openDrawer} onStatusChange={handleStatusChange} />
   <div class="chaos-rain"><ChaosLayer progress={$forcedCalm} /></div>
   <main>
-    <PaperHero {onBoard} />
+    <PaperHero {onBoard} eventDate={EVENT_DATE} />
     <ScrollReveal let:visible><EscapeMetrics {visible} /></ScrollReveal>
     <FeaturedShowcase />
     <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
