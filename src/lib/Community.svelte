@@ -1,7 +1,3 @@
-<script>
-  export let visible = false;
-</script>
-
 <section class="community-section">
   <div class="text-content">
     <p class="eyebrow">COMMUNITY &gt; CALENDAR INVITES</p>

@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import HeaderBar from './lib/HeaderBar.svelte';
+  import Shallows from './lib/Shallows.svelte';
   import Postcard from './lib/Postcard.svelte';
   import Playlist from './lib/Playlist.svelte';
   import Community from './lib/Community.svelte';
@@ -22,7 +23,8 @@
   function onHashChange() { currentRoute = window.location.hash || '#/'; }
   
   function scrollToContent() {
-    document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' });
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('content-start')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth' });
   }
 </script>
 
@@ -33,62 +35,21 @@
 {:else if currentRoute === '#/trail'}
   <EventTrail />
 {:else}
-  <HeaderBar scrollState="transparent" onOpenDrawer={openDrawer} />
+  <HeaderBar scrollState="cream" overlay onOpenDrawer={openDrawer} />
   
   <main>
-    <section class="hero-wrapper">
-      <iframe src="/deepseek_1.html" title="Out of Office water preview" class="shallows-frame"></iframe>
-      <button class="scroll-prompt" on:click={scrollToContent} aria-label="Scroll to content">
-        Explore the Party ↓
-      </button>
-    </section>
+    <Shallows onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} onScrollToContent={scrollToContent} />
 
     <div id="content-start">
       <ScrollReveal let:visible><Postcard {visible} /></ScrollReveal>
       <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
-      <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
+      <ScrollReveal><Community /></ScrollReveal>
       <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
       <ScheduleFAQ />
-      <ScrollReveal let:visible><Tickets {visible} showSticky={false} onOpenDrawer={openDrawer} /></ScrollReveal>
+      <ScrollReveal let:visible><Tickets {visible} onOpenDrawer={openDrawer} /></ScrollReveal>
     </div>
   </main>
 
   <RsvpDrawer isOpen={isDrawerOpen} onClose={() => isDrawerOpen = false} />
   <OooGeneratorModal isOpen={isOooGenOpen} onClose={() => isOooGenOpen = false} />
 {/if}
-
-<style>
-  .hero-wrapper {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-  }
-  .shallows-frame {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-    pointer-events: auto;
-  }
-  .scroll-prompt {
-    position: absolute;
-    bottom: max(24px, env(safe-area-inset-bottom));
-    right: 24px;
-    z-index: 10;
-    background: var(--ink, #181818);
-    color: var(--bg, #f6f4f1);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 999px;
-    font-family: var(--sans, system-ui, sans-serif);
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease, background 0.2s ease;
-  }
-  .scroll-prompt:hover {
-    transform: translateY(-2px);
-    background: var(--blue, #00bfff);
-  }
-</style>

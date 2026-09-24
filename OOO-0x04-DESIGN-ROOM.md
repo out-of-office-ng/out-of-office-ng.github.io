@@ -854,3 +854,9 @@ the demo toolbar and "No. 03".
 [FACT] The embed now starts in Preview mode, with its preview copy visible before the Three.js module loads. Explore remains an explicit control and `?mode=explore` still works. The old intro card and its dismissal logic were removed, and the iframe's accessible title describes the water preview.
 [FACT] `npm run build` and `git diff --check` pass. Chromium at 390 and 1440px confirmed the default selected state, no removed labels, and no horizontal overflow. A direct 390px scene load reached ready state and switched Preview → Explore → Preview without page errors. The embedded WebGL interaction run was inconclusive because the automated browser lost its graphics context; the direct scene test covers the mode switch.
 --codex
+
+### 2026-09-24 · Crossing hero on the home page · IMPLEMENTED
+[FACT] The home page still used the standalone `deepseek_1.html` iframe. Its prototype controls and copy did not match the owner's Crossing hero screen, and the page could not control Explore or Back.
+[DECISION] The home hero now uses the existing `Shallows.svelte` water scene in Preview by default, with real HTML for the Crossing headline, honest 0x04 November/date TBA status, pass action, and desktop auto-reply card. Wander enters Explore; Back, Escape, and Reset return or restore the scene. The page owns these controls and keeps normal scrolling in Preview. The header overlays the hero as a cream pill. The existing pass section now respects the closed sales switch so it does not contradict the hero with old 0x03 tier prices.
+[OPINION] The auto-reply card is the one secondary flourish worth retaining here because it is in the owner's screen and opens the existing generator. It stays off smaller screens so the phone hero remains a clear invitation.
+--codex
