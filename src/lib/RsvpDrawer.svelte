@@ -448,6 +448,15 @@
     border-radius: 8px;
     font-family: inherit;
     font-size: 0.9rem;
+    outline: 2px solid transparent;
+    outline-offset: 1px;
+    transition: outline 0.1s;
+  }
+  .input:hover, .select:hover {
+    background: #fff;
+  }
+  .input:focus-visible, .select:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
   }
 
   .btn-row {
@@ -462,20 +471,27 @@
     background: var(--blue, #00bfff);
     color: #fff;
     border: none;
+    white-space: nowrap;
     border-radius: 999px;
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
     box-shadow: 0 4px 14px rgba(0, 191, 255, 0.3);
     transition: transform 0.15s ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
-
   .primary-btn:hover:not(:disabled) {
     transform: translateY(-2px);
   }
-
+  .primary-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+  }
+  .primary-btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
   .primary-btn:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 
@@ -485,9 +501,22 @@
     color: var(--ink);
     border: 1.5px solid var(--border-soft-deep);
     border-radius: 999px;
+    white-space: nowrap;
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  .sec-btn:hover {
+    background: var(--card-surface);
+  }
+  .sec-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+  }
+  .sec-btn:active {
+    transform: translateY(1px);
   }
 
   .pass-ticket {

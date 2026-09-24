@@ -489,6 +489,7 @@
     font-weight: 700;
     font-size: 0.95rem;
     color: #fff;
+    white-space: nowrap;
     background: var(--blue, #00bfff);
     padding: 0.85rem 1rem;
     border: none;
@@ -496,10 +497,19 @@
     cursor: pointer;
     box-shadow: 0 10px 24px rgba(0, 191, 255, 0.28);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
   .cta-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(0, 191, 255, 0.4);
+  }
+  .cta-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+  }
+  .cta-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 10px rgba(0, 191, 255, 0.2);
   }
   .fine-print {
     font-size: 0.68rem;

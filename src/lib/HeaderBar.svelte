@@ -113,6 +113,10 @@
     outline: 2px solid var(--blue);
     outline-offset: 4px;
   }
+  button:active:not(:disabled),
+  a:active {
+    transform: translateY(1px);
+  }
 
   /* State 1: Transparent (0-80px) */
   .bar-container.transparent .bar {
@@ -145,6 +149,7 @@
     font-family: var(--sans);
     font-size: 0.75rem;
     font-weight: 800;
+    line-height: 1;
     letter-spacing: 0.05em;
     color: var(--ink);
     text-decoration: none;

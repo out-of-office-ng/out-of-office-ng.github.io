@@ -102,6 +102,10 @@ body {
   transition: background-color 0.4s var(--ease-out-expo), color 0.4s var(--ease-out-expo);
 }
 
+html, body {
+  overflow-x: clip;
+}
+
 #app {
   min-height: 100%;
 }
