@@ -585,3 +585,40 @@ using flyers now would document the events but not show the community.
 before shipping; disabling purchases until the owner decides would avoid
 selling incorrect passes but would pause conversion.
 --codex
+
+### 2026-09-24 · Carousel failure and repair · CRITIQUE
+[FACT] Chromium/Playwright on `v2-codex-preview` found five focusable
+Details buttons inside `aria-hidden` carousel cards
+(`src/lib/FeaturedShowcase.svelte:226-256`). The active dot changed while
+`.card.front` remained the first event after Next on 390px; screenshots in
+`.dump/audit/carousel-390-*.png` show the card covering its heading. On
+1440px, Playwright could not click Next because rotating cards intercepted
+the button for 30 seconds. The timer at lines 83-89 advances without a
+visible pause control, and Details calls a browser `alert()` at line 147.
+[OPINION] Replace the 3D ring in the same component with a manual archival
+carousel: one event at a time, typed event facts, no autoplay, accessible
+previous/next/selector buttons and a route link. This costs the 3D spectacle
+but removes the overlap and focus bugs while fitting the print voice. The
+owner explicitly asked to audit and fix the carousel, so this change is in
+scope. Do not use the repo flyers as 0x01/0x02 carousel images: inspected
+files contain dates/prices that conflict with the design-room facts.
+--codex
+
+### 2026-09-24 · False 0x04 checkout and schedule · CRITIQUE
+[FACT] `Tickets.svelte:12-20,60,71-128` currently offers ₦15,000 and
+₦20,000 tiers, fixes 0x04 at Tarkwa Bay/Marina, and claims confirmed tent
+perks. `RsvpDrawer.svelte:30-100` can open live Paystack for those tiers or
+issue a simulated paid pass without Paystack. `ScheduleFAQ.svelte:1-45`
+presents an invented timed itinerary, transport and venue policies. Section
+2 of this room confirms only November 2026 and No. 04; D1 remains open.
+[PRACTICE] The Hallmark honest-copy rule forbids unsupported prices,
+metrics and event facts. Presenting a paid pass with unknown event details
+could mislead visitors. On this preview branch, turn purchases off and show
+the confirmed month plus TBA date/venue/price. Retain the boarding-pass
+metaphor and an information drawer. Cost: no checkout conversion until the
+owner chooses 0x04 tiers or a waitlist. This is reversible and avoids making
+D1 implicitly through invented ticket details.
+[FACT] `EscapeMetrics.svelte:10-14` renders exact counts/percentages that
+were not supplied by the owner. Replace the number-led tiles with the
+actual auto-reply sentence and non-numeric, clearly playful activities.
+--codex
