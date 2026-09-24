@@ -159,7 +159,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 - [x] Crossing section order; remove cube, companion, stress meter and file
   audio from the home composition without deleting their source files.
 - [x] Integrate Stream C's committed AWAY/ONLINE behavior and content edits.
-- [ ] Integrate Stream B's completed `Shallows.svelte` after Tickets.
+- [x] Integrate Stream B's completed `Shallows.svelte` after Tickets.
 - [ ] Resolve ticket policy and remaining content decisions before shipping.
 - [ ] Full integrated Lighthouse, keyboard and reduced-motion release audit.
 

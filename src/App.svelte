@@ -3,6 +3,7 @@
   import HeaderBar from './lib/HeaderBar.svelte';
   import BootSequence from './lib/BootSequence.svelte';
   import PaperHero from './lib/PaperHero.svelte';
+  import Shallows from './lib/Shallows.svelte';
   import EscapeMetrics from './lib/EscapeMetrics.svelte';
   import MemoryTimeline from './lib/MemoryTimeline.svelte';
   import FeaturedShowcase from './lib/FeaturedShowcase.svelte';
@@ -26,6 +27,7 @@
   let showStickyCta = false;
   let currentRoute = typeof window !== 'undefined' ? window.location.hash || '#/' : '#/';
   const openDrawer = () => isDrawerOpen = true;
+  const openOooGen = () => isOooGenOpen = true;
   function onHashChange() { currentRoute = window.location.hash || '#/'; }
   function handleStatusChange(online) {
     if (online) goOnline(); else goAway();
@@ -74,11 +76,7 @@
     <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
     <ScheduleFAQ />
     <ScrollReveal let:visible><Tickets {visible} showSticky={showStickyCta} onOpenDrawer={openDrawer} /></ScrollReveal>
-    <!-- Stream B mounts Shallows here: the boarding pass is the last stop on land. -->
-    <section class="arrival-reserved" aria-label="The shallows">
-      <p>Leaving yellow Lagos. Entering blue Lagos.</p>
-      <p class="arrival-note">The shallows · No. 04</p>
-    </section>
+    <Shallows onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
   </main>
   <RsvpDrawer isOpen={isDrawerOpen} onClose={() => isDrawerOpen = false} />
   <OooGeneratorModal isOpen={isOooGenOpen} onClose={() => isOooGenOpen = false} />
@@ -87,7 +85,4 @@
 <style>
   /* Hallmark · macrostructure: crossing · tone: analog · anchor hue: deep water */
   .chaos-rain { position: fixed; inset: 80px 0 0; pointer-events: none; z-index: 90; }
-  .arrival-reserved { min-height: 45vh; display: flex; flex-direction: column; justify-content: end; padding: 48px clamp(24px, 6vw, 96px); background: linear-gradient(var(--water-sky), var(--seafoam)); color: var(--ink); }
-  .arrival-reserved p { font: 700 clamp(24px, 4vw, 48px)/1.2 var(--serif); max-width: 680px; }
-  .arrival-reserved .arrival-note { font: 500 12px/1.5 var(--sans); }
 </style>

@@ -518,3 +518,16 @@ changes and Stream B wrapper after my foundation commit. Please keep
 [FACT] Build succeeds; Vite emitted a plugin-timing advisory (no Svelte
 warnings). Responsive browser checks are in progress.
 --codex
+
+### 2026-09-24 · Integrated preview branch · DONE
+[FACT] Stream B's committed `Shallows.svelte` and scene module from
+`v2-claude-shallows` @ `c425201` now mount after Tickets on
+`v2-codex-foundation`; the old placeholder is gone. Stream C's design-audit
+fixes from `8093f0b` are merged. The scene's boat egg opens the existing
+auto-reply generator through App's callback.
+[FACT] `npm run build` passes without Svelte warnings. Production-preview
+Playwright at 390 and 1440 found one canvas in the arrival section, no
+horizontal page overflow and no page or console errors. Screenshots at
+`.dump/foundation/integrated-390.png` and `integrated-1440.png` were captured.
+This branch is a review preview. D1 ticket policy still blocks shipping.
+--codex
