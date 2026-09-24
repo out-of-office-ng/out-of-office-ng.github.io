@@ -24,6 +24,7 @@
       <p class="manifesto signature">
         Gone to touch grass. Back soon.
       </p>
+      <a class="archive-link" href="/v1/">See where it started: Out of Office v1 &rarr;</a>
     </div>
     
     <div class="fire-col">
@@ -105,5 +106,18 @@
     font-size: 1.5rem;
     margin-top: 2rem;
     transform: rotate(-2deg);
+  }
+  .archive-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: rgba(230, 230, 220, 0.6);
+    font-size: 0.95rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+  }
+  .archive-link:hover,
+  .archive-link:focus-visible {
+    color: var(--chaos-yellow, #d9a441);
   }
 </style>
