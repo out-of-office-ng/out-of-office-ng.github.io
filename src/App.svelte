@@ -24,6 +24,7 @@
   import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
   import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
   import EventTrail from "./lib/EventTrail.svelte";
+  import FeaturedShowcase from "./lib/FeaturedShowcase.svelte";
   import CountdownTimer from "./lib/CountdownTimer.svelte";
   import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
   import dropletPink from "../docs/brand-reference/paint-droplet-pink.png";
@@ -302,6 +303,7 @@
 <ScrollReveal let:visible><EscapeMetrics {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
 <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
+<FeaturedShowcase />
 <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Tickets {visible} showSticky={showStickyCta} onOpenDrawer={openDrawer} /></ScrollReveal>
 

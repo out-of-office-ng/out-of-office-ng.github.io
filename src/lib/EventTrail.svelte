@@ -111,7 +111,6 @@
       Home
     </a>
     <span class="nav-mono">OOO · EVENT TRAIL</span>
-    <span class="nav-tally">{EVENTS.filter(e => e.done).length}/{EVENTS.length} done</span>
   </nav>
 
   <!-- Page header -->
@@ -135,86 +134,87 @@
         class:pending={ev.pending}
         style="--node-color: {ev.color}; --node-text: {ev.textColor}; --ni: {i};"
       >
-        <!-- Side stamp bullet -->
-        <div class="bullet-col">
-          <div class="bullet" aria-hidden="true">
-            <span class="bullet-hex">{ev.hex}</span>
-            {#if ev.done}
-              <svg class="check-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M5 10.5 L8.5 14 L15 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            {:else if ev.active}
-              <span class="pulse-dot" aria-hidden="true"></span>
-            {:else}
-              <span class="lock-icon" aria-hidden="true">?</span>
-            {/if}
-          </div>
-
-          <!-- Connector line to next node -->
-          {#if i < EVENTS.length - 1}
-            <div class="connector">
-              <div class="connector-fill" class:drawn={linesDrawn[i]}></div>
-            </div>
-          {/if}
-        </div>
-
         <!-- Event card -->
         <article class="event-card" class:has-href={ev.done || ev.active}>
-          <!-- Top badge row -->
-          <div class="card-badge-row">
-            <span class="stamp-chip">{ev.stamp}</span>
-            {#if ev.done}
-              <span class="status-chip done-chip">Completed ✓</span>
-            {:else if ev.active}
-              <span class="status-chip active-chip">Up next ⚡</span>
-            {:else}
-              <span class="status-chip pending-chip">Coming soon</span>
-            {/if}
-          </div>
-
-          <!-- Event title -->
-          <h2 class="card-title">{ev.title}</h2>
-          <p class="card-tagline">{ev.tagline}</p>
-
-          <!-- Flyer Thumbnail -->
+          <!-- Flyer Thumbnail FULL BLEED -->
           {#if ev.image}
             <div class="card-image-wrap" class:pending={ev.pending}>
               <img src={ev.image} alt={ev.title} class="card-image" loading="lazy" />
             </div>
           {/if}
 
-          <!-- Meta row -->
-          <div class="card-meta">
-            <span class="meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {ev.venue}
-            </span>
-            <span class="meta-sep">·</span>
-            <span class="meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              {ev.date}
-            </span>
-            {#if ev.time && !ev.pending}
-              <span class="meta-sep">·</span>
-              <span class="meta-item clock">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                {ev.time}
+          <!-- Content Wrapper -->
+          <div class="card-content">
+            <!-- Top badge row -->
+            <div class="card-badge-row">
+              <span class="stamp-chip">{ev.stamp}</span>
+              {#if ev.done}
+                <span class="status-chip done-chip">Completed ✓</span>
+              {:else if ev.active}
+                <span class="status-chip active-chip">Up next ⚡</span>
+              {:else}
+                <span class="status-chip pending-chip">Coming soon</span>
+              {/if}
+            </div>
+
+            <!-- Event title -->
+            <h2 class="card-title">{ev.title}</h2>
+            <p class="card-tagline">{ev.tagline}</p>
+
+            <!-- Meta row -->
+            <div class="card-meta">
+              <span class="meta-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {ev.venue}
               </span>
-            {:else if ev.pending}
               <span class="meta-sep">·</span>
-              <span class="meta-item clock">{ev.time}</span>
+              <span class="meta-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                {ev.date}
+              </span>
+              {#if ev.time && !ev.pending}
+                <span class="meta-sep">·</span>
+                <span class="meta-item clock">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {ev.time}
+                </span>
+              {:else if ev.pending}
+                <span class="meta-sep">·</span>
+                <span class="meta-item clock">{ev.time}</span>
+              {/if}
+            </div>
+
+            <!-- CTA -->
+            {#if ev.done}
+              <a href="#/about" class="card-cta done-cta">View recap ↗</a>
+            {:else if ev.active}
+              <a href="#/" class="card-cta active-cta">Get on the list ↗</a>
+            {:else}
+              <span class="card-cta pending-cta">Reveal TBA</span>
             {/if}
           </div>
-
-          <!-- CTA -->
-          {#if ev.done}
-            <a href="#/about" class="card-cta done-cta">View recap ↗</a>
-          {:else if ev.active}
-            <a href="#/" class="card-cta active-cta">Get on the list ↗</a>
-          {:else}
-            <span class="card-cta pending-cta">Reveal TBA</span>
-          {/if}
         </article>
+
+        <!-- Connector line to next node -->
+        {#if i < EVENTS.length - 1}
+          <div class="connector-centered">
+            <svg class="curve-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="grad-{i}" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="{ev.color}" />
+                  <stop offset="100%" stop-color="{EVENTS[i+1].color}" />
+                </linearGradient>
+              </defs>
+              {#if i % 2 === 0}
+                <path class="curve-bg" d="M 50 0 C 130 30, 130 70, 50 100" />
+                <path class="curve-fg" stroke="url(#grad-{i})" pathLength="100" class:drawn={linesDrawn[i]} d="M 50 0 C 130 30, 130 70, 50 100" />
+              {:else}
+                <path class="curve-bg" d="M 50 0 C -30 30, -30 70, 50 100" />
+                <path class="curve-fg" stroke="url(#grad-{i})" pathLength="100" class:drawn={linesDrawn[i]} d="M 50 0 C -30 30, -30 70, 50 100" />
+              {/if}
+            </svg>
+          </div>
+        {/if}
       </li>
     {/each}
   </ol>
@@ -358,9 +358,10 @@
 
   /* ─── Node row ───────────────────────────────────────── */
   .node-row {
-    display: grid;
-    grid-template-columns: 52px 1fr;
-    gap: 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
     opacity: 0;
     transform: translateY(32px) scale(0.97);
     transition:
@@ -373,112 +374,54 @@
     transform: translateY(0) scale(1);
   }
 
-  /* ─── Bullet column ──────────────────────────────────── */
-  .bullet-col {
+  /* ─── Centered Connector ─────────────────────────────── */
+  .connector-centered {
+    width: 60px;
+    height: 70px;
+    margin: 4px 0;
+    position: relative;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 0.15rem;
-  }
-
-  .bullet {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--node-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    box-shadow:
-      0 0 0 4px var(--bg),
-      0 0 0 6px var(--node-color),
-      0 8px 24px color-mix(in oklch, var(--node-color) 40%, transparent);
-    position: relative;
-    z-index: 2;
-    transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s ease;
-  }
-  .node-row.visible .bullet { animation: bulletPop 0.5s var(--ease-out-expo) both; }
-  @keyframes bulletPop {
-    0%   { transform: scale(0.4); }
-    70%  { transform: scale(1.12); }
-    100% { transform: scale(1); }
   }
 
-  .bullet-hex {
-    font-size: 0.58rem;
-    font-weight: 900;
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    color: var(--node-text);
-    letter-spacing: 0.04em;
-    line-height: 1;
-    margin-bottom: 2px;
-  }
-
-  .check-icon {
-    width: 18px;
-    height: 18px;
-    color: var(--node-text);
-    margin-top: 2px;
-  }
-
-  .pulse-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--node-text);
-    animation: pulseDot 1.8s infinite ease-in-out;
-    margin-top: 2px;
-  }
-  @keyframes pulseDot {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50%       { transform: scale(1.55); opacity: 0.6; }
-  }
-
-  .lock-icon {
-    font-size: 1.2rem;
-    color: var(--node-text);
-    opacity: 0.75;
-    margin-top: 2px;
-    line-height: 1;
-  }
-
-  /* ─── Connector line ─────────────────────────────────── */
-  .connector {
-    flex: 1;
-    width: 4px;
-    background: var(--border-soft);
-    border-radius: 2px;
-    margin: 6px 0;
-    min-height: 40px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .connector-fill {
+  .curve-svg {
     width: 100%;
-    height: 0%;
-    background: linear-gradient(180deg, var(--node-color), var(--blue));
-    border-radius: 2px;
-    transition: height 0.9s var(--ease-out-expo);
+    height: 100%;
+    overflow: visible;
   }
-  .connector-fill.drawn { height: 100%; }
+
+  .curve-bg {
+    fill: none;
+    stroke: var(--border-soft);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .curve-fg {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 0.9s var(--ease-out-expo);
+  }
+  .curve-fg.drawn {
+    stroke-dashoffset: 0;
+  }
 
   /* ─── Event card ─────────────────────────────────────── */
   .event-card {
+    width: 100%;
     background: var(--card-surface);
     border: 1.5px solid var(--border-soft-deep);
     border-radius: 18px;
-    padding: clamp(1.1rem, 3vw, 1.6rem);
-    margin-bottom: 2rem;
+    margin-bottom: 0;
     position: relative;
     overflow: hidden;
     transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--ease-out-expo);
-    /* Subtle color accent on the left edge */
-    border-left: 4px solid var(--node-color);
+    border-top: 5px solid var(--node-color);
   }
-  /* Accent top stripe */
+  /* Accent stripe */
   .event-card::before {
     content: '';
     position: absolute;
@@ -486,7 +429,15 @@
     background: linear-gradient(135deg, color-mix(in oklch, var(--node-color) 8%, transparent) 0%, transparent 55%);
     pointer-events: none;
     border-radius: 17px;
+    z-index: 0;
   }
+  
+  .card-content {
+    padding: clamp(1.1rem, 3vw, 1.6rem);
+    position: relative;
+    z-index: 1;
+  }
+
   .node-row.visible .event-card:hover {
     border-color: var(--node-color);
     box-shadow: 0 12px 40px color-mix(in oklch, var(--node-color) 18%, transparent);
@@ -548,11 +499,13 @@
 
   /* ─── Flyer Thumbnail ────────────────────────────────── */
   .card-image-wrap {
-    margin: 1.25rem 0;
-    border-radius: 12px;
+    margin: 0;
+    width: 100%;
     overflow: hidden;
-    border: 1px solid var(--border-soft);
     background: color-mix(in oklch, var(--bg) 50%, transparent);
+    border-bottom: 1px solid var(--border-soft);
+    position: relative;
+    z-index: 1;
   }
   .card-image-wrap.pending {
     filter: grayscale(100%) blur(4px) opacity(0.5);
@@ -561,9 +514,8 @@
     display: block;
     width: 100%;
     height: auto;
-    max-height: 280px;
-    object-fit: contain;
-    border-radius: 12px;
+    max-height: 400px;
+    object-fit: cover;
   }
 
   /* ─── Meta row ───────────────────────────────────────── */
