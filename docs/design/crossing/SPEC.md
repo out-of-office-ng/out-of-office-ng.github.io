@@ -44,7 +44,7 @@ them. Build the rule, not the picture.**
 | Display and headings | **Gelasio** (variable, weights 400–700) | "Away from the everyday.", every section title, the drawer titles | **DECIDED (T1, owner 2026-09-25): Gelasio.** Self-hosted as `public/fonts/gelasio-latin.woff2` + `gelasio-latin-ext.woff2` (the latter carries ₦); `--serif` and `--display` point to it. Fraunces is removed. |
 | Handwritten eyebrow | **Permanent Marker** | "The auto reply", "Memory timeline", "Boarding pass", "Last escape", "Gone to touch grass. Back soon." | Already self-hosted |
 | Stamps and badges | **Bungee** | 0x01–0x04 roundels, "OOO 0X04" drawer badge, the 0x04 postmark | Already self-hosted |
-| Body and UI | **system-ui** | Everything else | The PDF looks like Ubuntu only because it was rendered on Linux. **OPEN (T2):** keep the system stack, as the deck does, or use the repo's Space Grotesk. |
+| Body and UI | **system-ui** stack | Everything else | **DECIDED (T2, 2026-09-25): system font, as the deck.** `--sans` = `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`. Space Grotesk and the phantom "DM Sans" are removed. |
 
 ### Colour
 
@@ -505,10 +505,9 @@ button, in three steps:
 
 ## 7. Open decisions (summary)
 
-The page order (O1) and the headline font (T1: Gelasio) are decided; see §3 and §2.
+The page order (O1) the headline font (T1: Gelasio) and body font (T2: system font) are decided; see §3 and §2.
 
 
-- **T2:** system-ui or Space Grotesk for body text?
 - **X1:** where the cube lives.
 - **D8:** the stats' numbers.
 - **M1:** custom track list or the Spotify embed alone.

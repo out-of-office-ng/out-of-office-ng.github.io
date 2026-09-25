@@ -9,13 +9,6 @@
   src: url("/fonts/fredoka.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Space Grotesk";
-  font-style: normal;
-  font-weight: 400 500;
-  font-display: swap;
-  src: url("/fonts/space-grotesk.woff2") format("woff2");
-}
-@font-face {
   font-family: Bungee;
   font-style: normal;
   font-weight: 400;
@@ -84,7 +77,10 @@
 
   /* Unified Canva Font System */
   --display: "Gelasio", Georgia, serif;
-  --sans: "DM Sans", "Space Grotesk", system-ui, sans-serif;
+  /* Body/UI type is the reader's system font, as in the Crossing deck
+     (SPEC §2, T2). No web font to load; renders as San Francisco, Segoe UI,
+     Roboto etc. per device. */
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --bungee: "Bungee", system-ui, sans-serif;
   --marker: "Permanent Marker", cursive, sans-serif;
   --serif: "Gelasio", Georgia, serif;

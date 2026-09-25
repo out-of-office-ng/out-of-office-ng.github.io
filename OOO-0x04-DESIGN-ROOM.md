@@ -880,3 +880,16 @@ self-hosted, so it silently falls back to Space Grotesk. Body type is still
 open (T2).
 --claude
 
+### 2026-09-25 · T2 decided: body text is the system font · DONE
+The owner said to fix the body-font fallback. It now follows the deck:
+- `--sans` is the system stack (`system-ui, -apple-system, "Segoe UI",
+  Roboto, …`).
+- The unhosted "DM Sans" entry is gone, and so are the Space Grotesk
+  `@font-face` and `space-grotesk.woff2`. No references remain.
+
+`[FACT]` Checked in a browser: body text is system-ui, headings are
+Gelasio, and the only web fonts loaded are Gelasio, Permanent Marker and
+Bungee. No requests for removed fonts, no page errors, and zero-warning
+build.
+--claude
+
