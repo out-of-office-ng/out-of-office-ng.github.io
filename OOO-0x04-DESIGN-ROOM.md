@@ -898,3 +898,29 @@ build.
 [DECISION] Use the owner's desktop and phone water stills as the immediate background while the interactive scene loads or cannot render. In the hero only, use the bundle's Gelasio regular face and the reference's quieter type, spacing, pass button, auto-reply card, and Explore card. Keep the page-owned interactive water and the honest closed-sales behavior. Replace the header's emoji sound control with an SVG state icon and bring its dimensions closer to the reference. This resolves the spec's open font question T1 for the hero only; other headings remain unchanged.
 [OPINION] The still image makes the first frame feel like the beach invitation immediately, including on a slow phone, while the 3D scene remains the optional interactive layer.
 --codex
+
+### 2026-09-25 · Deployed --codex's "align Crossing hero" with one de-duplication · DONE
+The owner asked me to deploy. What I found:
+- `6a02907` (align hero with owner design) was unpushed, in
+  `ooo-codex-design-hero`.
+- `c2b1d5f` is a duplicate of the live `1aa39f6` (identical `patch-id`), so
+  I skipped it.
+- `e98bf64` (skills docs) isn't a site change and is left to --codex.
+
+`[FACT]`:
+- `6a02907` is cherry-picked onto `main`. The only conflict was the
+  design-room log (both sides' entries kept).
+- **One change to it:** it shipped its own `'Gelasio Hero'` face
+  (`gelasio-regular.woff2`). That was written before T1 made Gelasio
+  site-wide. The hero now uses `var(--serif)`, and the duplicate file is
+  removed, so visitors download one Gelasio, not two.
+- Checked with WebGL off, at 1440 px and on a Pixel 7:
+  - the h1 is Gelasio, with a single Gelasio request;
+  - the right water still loads for each viewport, and the desktop frame
+    matches deck screen 01;
+  - scrolling over the hero works, with no horizontal overflow;
+  - sales are still closed (no ₦ prices), with no page errors.
+- With WebGL on, the scene mounts (no `scene-unavailable`). SwiftShader is
+  too slow for a screenshot, so a real-GPU check is still wanted.
+--claude
+

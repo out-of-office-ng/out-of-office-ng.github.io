@@ -135,13 +135,6 @@
 <style>
   /* Hallmark · macrostructure: Crossing water hero · tone: calm · anchor hue: deep water */
   /* Hallmark · pre-emit critique: P5 H5 E4 S5 R5 V4 */
-  @font-face {
-    font-family: 'Gelasio Hero';
-    src: url('/fonts/gelasio-regular.woff2') format('woff2');
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-  }
   .hero {
     --hero-ink: var(--color-ink, #243e3c);
     --hero-deep: var(--color-deep, #376a65);
@@ -153,7 +146,8 @@
     --hero-tape: rgb(122 174 168 / .6);
     --hero-shadow: rgb(36 62 60 / .14);
     --hero-card-shadow: rgb(36 62 60 / .12);
-    --hero-display: 'Gelasio Hero', Georgia, serif;
+    /* Site-wide Gelasio (app.css, owner pick T1) — no separate hero copy. */
+    --hero-display: var(--serif, 'Gelasio', Georgia, serif);
     --hero-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
     position: relative;
     isolation: isolate;
