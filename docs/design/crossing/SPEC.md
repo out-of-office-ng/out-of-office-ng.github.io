@@ -41,7 +41,7 @@ them. Build the rule, not the picture.**
 
 | Role | Deck font | Where | Note |
 |---|---|---|---|
-| Display and headings | **Gelasio** (serif, weights 400 / 700) | "Away from the everyday.", every section title, the drawer titles | **OPEN (T1):** the repo self-hosts **Fraunces**, not Gelasio. Either self-host Gelasio (SIL OFL, so it's allowed) or map the headings to Fraunces and accept the look change. Don't add a Google Fonts link (repo rule). |
+| Display and headings | **Gelasio** (variable, weights 400–700) | "Away from the everyday.", every section title, the drawer titles | **DECIDED (T1, owner 2026-09-25): Gelasio.** Self-hosted as `public/fonts/gelasio-latin.woff2` + `gelasio-latin-ext.woff2` (the latter carries ₦); `--serif` and `--display` point to it. Fraunces is removed. |
 | Handwritten eyebrow | **Permanent Marker** | "The auto reply", "Memory timeline", "Boarding pass", "Last escape", "Gone to touch grass. Back soon." | Already self-hosted |
 | Stamps and badges | **Bungee** | 0x01–0x04 roundels, "OOO 0X04" drawer badge, the 0x04 postmark | Already self-hosted |
 | Body and UI | **system-ui** | Everything else | The PDF looks like Ubuntu only because it was rendered on Linux. **OPEN (T2):** keep the system stack, as the deck does, or use the repo's Space Grotesk. |
@@ -505,10 +505,9 @@ button, in three steps:
 
 ## 7. Open decisions (summary)
 
-The page order (O1) is decided; see §3.
+The page order (O1) and the headline font (T1: Gelasio) are decided; see §3 and §2.
 
 
-- **T1:** Gelasio (self-host) or Fraunces for headings?
 - **T2:** system-ui or Space Grotesk for body text?
 - **X1:** where the cube lives.
 - **D8:** the stats' numbers.

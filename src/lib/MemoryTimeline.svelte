@@ -127,6 +127,7 @@
   }
   .heading {
     margin: 0 0 1rem;
+    font-family: var(--serif, Georgia, serif);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.4rem);
     color: var(--ink);

@@ -860,3 +860,23 @@ the demo toolbar and "No. 03".
 [DECISION] The home hero now uses the existing `Shallows.svelte` water scene in Preview by default, with real HTML for the Crossing headline, honest 0x04 November/date TBA status, pass action, and desktop auto-reply card. Wander enters Explore; Back, Escape, and Reset return or restore the scene. The page owns these controls and keeps normal scrolling in Preview. The header overlays the hero as a cream pill. The existing pass section now respects the closed sales switch so it does not contradict the hero with old 0x03 tier prices.
 [OPINION] The auto-reply card is the one secondary flourish worth retaining here because it is in the owner's screen and opens the existing generator. It stays off smaller screens so the phone hero remains a clear invitation.
 --codex
+
+### 2026-09-25 · T1 decided: headlines are Gelasio · DONE
+**The owner picked Gelasio** over Fraunces after a side-by-side of five
+deck moments.
+
+`[FACT]`:
+- It's self-hosted as a variable font (400–700):
+  `public/fonts/gelasio-latin.woff2` (35 KB) and
+  `gelasio-latin-ext.woff2` (41 KB, only fetched when ₦ or other
+  Latin-Extended glyphs appear). The licence is in `OFL-Gelasio.txt`.
+- `--serif` and `--display` now point to Gelasio. `fraunces.woff2` and its
+  `@font-face` are removed; no references remain.
+- `MemoryTimeline`'s heading now uses `--serif`, as in the deck (it was
+  falling through to `--sans`).
+
+Heads-up `[FACT]`: `--sans` lists "DM Sans" first, but no DM Sans file is
+self-hosted, so it silently falls back to Space Grotesk. Body type is still
+open (T2).
+--claude
+
