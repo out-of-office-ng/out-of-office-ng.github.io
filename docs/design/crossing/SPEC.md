@@ -87,18 +87,19 @@ The home page is one long scroll, with the water behind the hero and the
 paper world below it. The deck numbers screens 01–05 as the page's spine
 and 10–15 as the sections that sit between them.
 
-**Proposed order** (**OPEN O1**: owner to confirm):
+**Order: DECIDED** (owner, already live on `main` as of 2026-09-25):
 
 1. Hero on the water (01; phone 07), with "Wander the water" → explore mode (02; phone 08)
-2. The auto reply, stats (10)
-3. Last escape, the photo carousel (03)
-4. Memory timeline (11)
-5. The mixtape (12; phone 12b)
-6. Community (13)
-7. Postcard (14)
-8. Schedule & survival FAQ (15)
-9. Boarding pass (04)
-10. Closing band (05; phone 09)
+2. Postcard (14)
+3. The mixtape (12; phone 12b)
+4. Community (13)
+5. Memory timeline (11)
+6. Schedule & survival FAQ (15)
+7. Boarding pass (04)
+8. Closing band (05; phone 09), as the page footer
+
+The deck's **auto reply stats (10)** and **Last escape carousel (03)** are
+not in the decided order. Don't add them unless the owner places them.
 
 Other routes and overlays:
 
@@ -504,9 +505,11 @@ button, in three steps:
 
 ## 7. Open decisions (summary)
 
+The page order (O1) is decided; see §3.
+
+
 - **T1:** Gelasio (self-host) or Fraunces for headings?
 - **T2:** system-ui or Space Grotesk for body text?
-- **O1:** confirm the page order in §3.
 - **X1:** where the cube lives.
 - **D8:** the stats' numbers.
 - **M1:** custom track list or the Spotify embed alone.
