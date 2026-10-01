@@ -17,6 +17,7 @@
  */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createAsset as createPolyforkSailboat } from '../vendor/polyfork-sailboat.mjs';
 
 export function createShallows(container, { sound = true, initialMode = 'preview', onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
 const viewW = () => Math.max(1, container.clientWidth);
@@ -781,6 +782,21 @@ boatShadowGeo.rotateX(-Math.PI / 2);
 const boatShadow = new THREE.Mesh(boatShadowGeo, shadowMat);
 scene.add(boatShadow);
 
+// A second, low-poly sailboat from Polyfork sits farther out in the pool.
+// It complements the paper boat without replacing it: the paper boat carries
+// the site's identity, while this one gives the water a small sense of scale.
+const polyforkBoat = createPolyforkSailboat();
+polyforkBoat.name = 'Polyfork low-poly sailboat';
+polyforkBoat.scale.setScalar(4.6);
+polyforkBoat.traverse(part => {
+  if (part.isMesh) {
+    part.castShadow = false;
+    part.receiveShadow = false;
+    part.frustumCulled = false;
+  }
+});
+scene.add(polyforkBoat);
+
 /* ==========================================================================
    Shells
    ========================================================================== */
@@ -921,6 +937,18 @@ function updateBoat() {
   boat.quaternion.setFromRotationMatrix(_boatBasis);
   boatShadow.position.set(x - .5, bedHeight(x - .5, z - .3) + .028, z - .3);
   boatShadow.rotation.y = Math.atan2(_boatForward.x, _boatForward.z);
+
+  // The Polyfork boat follows a separate, slower path so the two silhouettes
+  // do not overlap. It shares the same swell envelope and stays lightweight.
+  const px = -2.6 + Math.sin(t * .045 + 1.8) * 1.05;
+  const pz = -1.85 + Math.cos(t * .045 + 1.8) * .82;
+  const pWave = .16 * Math.sin(t * .82 + px * .8) + .08 * Math.sin(t * 1.35 + pz * .65);
+  polyforkBoat.position.set(px, waterLevelU.value + pWave + .12, pz);
+  polyforkBoat.rotation.set(
+    .025 * Math.sin(t * .62),
+    Math.atan2(Math.cos(t * .045 + 1.8), -Math.sin(t * .045 + 1.8)) + .32,
+    .035 * Math.cos(t * .54 + .7),
+  );
 }
 
 /* ==========================================================================
