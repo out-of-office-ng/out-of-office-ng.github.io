@@ -1149,6 +1149,13 @@ const fragmentShader = `
     float deepT = 1.0 - exp(-waterDepth * 0.28);
     refr = mix(refr, refr * vec3(0.96, 0.99, 1.0), deepT * 0.10);
 
+    // Keep the near shore bright and translucent while allowing the deeper
+    // pool to hold onto Out of Office's blue-green depth. This is the visual
+    // separation that makes the shore-water reference read immediately.
+    float shallowT = 1.0 - smoothstep(0.12, 2.8, waterDepth);
+    vec3 shallowLift = refr * vec3(0.88, 1.08, 1.04) + vec3(0.012, 0.035, 0.028);
+    refr = mix(refr, shallowLift, shallowT * 0.26);
+
     float NdotV = max(dot(N, V), 0.0);
     float fres = 0.012 + 0.988 * pow(1.0 - NdotV, 5.0);
     vec3 refl = skyColor(reflect(-V, N));
@@ -1178,6 +1185,9 @@ const fragmentShader = `
     float sideways = abs(dot(wakeDelta, vec2(-uWake.w, uWake.z)));
     float wake = exp(-pow((sideways - behind * .31) / .055, 2.0)) * exp(-behind * 1.2) * smoothstep(.1, .5, behind);
     col += vec3(.10, .15, .14) * wake;
+    float wakeFoam = exp(-pow((sideways - behind * .31) / .13, 2.0))
+                   * exp(-behind * .82) * smoothstep(.04, .34, behind);
+    col = mix(col, vec3(.88, .95, .90), wakeFoam * (.10 + .13 * vEnvelope));
     col += vec3(.05, .075, .065) * ringWindow;
 
     // Crest foam appears earlier during sets (looser threshold as the envelope
