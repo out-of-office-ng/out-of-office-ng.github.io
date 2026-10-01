@@ -3,6 +3,7 @@
   import { fade, scale } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
+  import { dialogFocus } from './dialogFocus.js';
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -75,6 +76,7 @@
   >
     <div
       class="modal"
+      use:dialogFocus
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

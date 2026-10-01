@@ -1,625 +1,177 @@
 <script>
-  /* Hallmark · component: event-trail-roadmap · genre: playful · theme: custom Escape palette
-   * Pre-emit critique: P5 H5 E5 S5 R4 V5
-   * states: default · path-drawn · node-done · node-active · node-pending
-   */
-  import { onMount, onDestroy } from 'svelte';
-  import { createDialKit } from 'dialkit/svelte';
-  import tarkwaBay from '../../docs/brand-reference/flyer-post-nysc-hangout-tarkwa-bay.png';
-  import openCanvas from '../../docs/brand-reference/flyer-open-canvas-jaekel-house.png';
-  import saveTheDate from '../../docs/brand-reference/flyer-save-the-date-painting.png';
+  import { editions } from './editions.js';
+  import { NEXT_EVENT, SALES_MODE } from './sales.js';
+  import EditionArtwork from './EditionArtwork.svelte';
+  import ScrollReveal from './ScrollReveal.svelte';
 
-  const trailRoadmap = createDialKit('trail-roadmap', {
-    springStiffness: [240, 60, 700],
-    springDamping:   [22,  4,  70],
-    staggerDelay:    [200, 80, 600],
-  });
+  export let onOpenDrawer = () => {};
+  export let activeEdition = null;
 
-  const EVENTS = [
-    {
-      stamp: 'OOO 0x01',
-      hex: '0x01',
-      title: 'The Post-NYSC Hangout',
-      venue: 'Tarkwa Bay Beach',
-      date:  'Apr 11, 2025',
-      time:  '12pm till daybreak',
-      color: 'var(--sunset-orange)',
-      textColor: '#fff',
-      done: true,
-      tagline: 'Where we first exhaled.',
-      image: tarkwaBay,
-    },
-    {
-      stamp: 'OOO 0x02',
-      hex: '0x02',
-      title: 'Open Canvas',
-      venue: 'Jaekel House Garden',
-      date:  'May 30, 2025',
-      time:  'TBA',
-      color: 'var(--blue)',
-      textColor: '#fff',
-      done: true,
-      tagline: 'You don\'t need to know how to paint.',
-      image: openCanvas,
-    },
-    {
-      stamp: 'OOO 0x03',
-      hex: '0x03',
-      title: 'Release and Unwind',
-      venue: 'Tarkwa Bay Beach',
-      date:  'Aug 15, 2026',
-      time:  '',
-      color: 'var(--pink-deep)',
-      textColor: '#fff',
-      done: true,
-      tagline: 'Take a break from the Lagos palava.',
-      image: saveTheDate,
-    },
-    {
-      stamp: 'OOO 0x04',
-      hex: '0x04',
-      title: '???',
-      venue: 'TBA',
-      date:  'November 2026',
-      time:  'TBA',
-      color: 'var(--muted-green)',
-      textColor: 'var(--ink)',
-      active: true,
-      tagline: 'The next escape is loading. Stay tuned.',
-    },
-  ];
-
-  // Per-node connector heights (space between nodes in the trail)
-  // Drives the animated line
-  let connectorEls = [];
-  let cardEls = [];
-  let visible = [];
-  let linesDrawn = [];
-  let sectionEl;
-
-  function initObserver() {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const idx = parseInt(entry.target.dataset.idx);
-        if (entry.isIntersecting && !isNaN(idx)) {
-          // Stagger: card fades in first, then line draws after
-          setTimeout(() => { visible[idx] = true; visible = [...visible]; }, idx * 240);
-          setTimeout(() => { linesDrawn[idx] = true; linesDrawn = [...linesDrawn]; }, idx * 240 + 360);
-        }
-      });
-    }, { threshold: 0.2 });
-    cardEls.forEach(el => { if (el) io.observe(el); });
-    return io;
+  // A repeated hash does not dispatch hashchange. Keep the current edition's
+  // jump link useful after someone has scrolled elsewhere. --codex
+  function repeatJump(event, code) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (window.location.hash !== `#/trail/${code}`) return;
+    event.preventDefault();
+    const target = document.getElementById(`edition-${code}`);
+    target?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    target?.focus({ preventScroll: true });
   }
-
-  let io;
-  onMount(() => {
-    visible = EVENTS.map(() => false);
-    linesDrawn = EVENTS.map(() => false);
-    // Small delay so DOM is ready
-    setTimeout(() => { io = initObserver(); }, 80);
-  });
-  onDestroy(() => io?.disconnect());
 </script>
 
-<section class="trail-page" bind:this={sectionEl} aria-label="OOO Lagos Event Trail">
-
-  <!-- Back nav -->
-  <nav class="trail-nav">
-    <a href="#/" class="back-btn" aria-label="Back to home">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Home
-    </a>
-    <span class="nav-mono">OOO · EVENT TRAIL</span>
+<div class="trail-page">
+  <nav class="trail-nav" aria-label="Event trail navigation">
+    <a class="back-link" href="#/" aria-label="Back to home"><span aria-hidden="true">←</span> Out of Office</a>
+    <a class="next-link text-link" href="#/trail/0x04" on:click={(event) => repeatJump(event, '0x04')}>Next escape <span aria-hidden="true">↗</span></a>
   </nav>
 
-  <!-- Page header -->
-  <header class="trail-header">
-    <p class="eyebrow">Every escape gets a stamp</p>
-    <h1 class="heading">The <em class="accent-word">OOO</em> Roadmap</h1>
-    <p class="sub">Three events. One trail. The blue Lagos we didn't know we needed.</p>
-  </header>
+  <main class="trail-main">
+    <header class="trail-heading">
+      <p class="eyebrow">THE THINGS WE KEEP</p>
+      <h1 tabindex="-1">A little time away.<br /><em>A trail of memories.</em></h1>
+      <p class="intro">From the beach to the garden and back again. Three editions of stepping out of the everyday.</p>
+      <p class="handwritten">Every escape gets a stamp.</p>
+    </header>
 
-  <!-- Roadmap -->
-  <ol class="roadmap" aria-label="OOO event roadmap">
-    {#each EVENTS as ev, i}
-      <!-- Node row -->
-      <li
-        class="node-row"
-        data-idx={i}
-        bind:this={cardEls[i]}
-        class:visible={visible[i]}
-        class:done={ev.done}
-        class:active={ev.active}
-        class:pending={ev.pending}
-        style="--node-color: {ev.color}; --node-text: {ev.textColor}; --ni: {i};"
-      >
-        <!-- Event card -->
-        <article class="event-card" class:has-href={ev.done || ev.active}>
-          <!-- Flyer Thumbnail FULL BLEED -->
-          {#if ev.image}
-            <div class="card-image-wrap" class:pending={ev.pending}>
-              <img src={ev.image} alt={ev.title} class="card-image" loading="lazy" />
-            </div>
-          {/if}
+    <div class="trail-layout">
+      <aside class="edition-index">
+        <nav aria-label="Jump to an edition">
+          <span class="index-label">THE TRAIL</span>
+          {#each editions as edition}
+            <a href={`#/trail/${edition.code}`} on:click={(event) => repeatJump(event, edition.code)} aria-current={activeEdition === edition.code ? 'location' : undefined} aria-label={`${edition.code}: ${edition.title}`}>
+              <span class="index-code">{edition.code}</span><span class="index-name">{edition.word.replace('.', '')}</span>
+            </a>
+          {/each}
+          <a href="#/trail/0x04" on:click={(event) => repeatJump(event, '0x04')} class="index-next" aria-current={activeEdition === '0x04' ? 'location' : undefined} aria-label="0x04: The next escape"><span class="index-code">0x04</span><span class="index-name">Up next</span></a>
+        </nav>
+      </aside>
 
-          <!-- Content Wrapper -->
-          <div class="card-content">
-            <!-- Top badge row -->
-            <div class="card-badge-row">
-              <span class="stamp-chip">{ev.stamp}</span>
-              {#if ev.done}
-                <span class="status-chip done-chip">Completed ✓</span>
-              {:else if ev.active}
-                <span class="status-chip active-chip">Up next ⚡</span>
-              {:else}
-                <span class="status-chip pending-chip">Coming soon</span>
-              {/if}
-            </div>
-
-            <!-- Event title -->
-            <h2 class="card-title">{ev.title}</h2>
-            <p class="card-tagline">{ev.tagline}</p>
-
-            <!-- Meta row -->
-            <div class="card-meta">
-              <span class="meta-item">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                {ev.venue}
-              </span>
-              <span class="meta-sep">·</span>
-              <span class="meta-item">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                {ev.date}
-              </span>
-              {#if ev.time && !ev.pending}
-                <span class="meta-sep">·</span>
-                <span class="meta-item clock">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  {ev.time}
-                </span>
-              {:else if ev.pending}
-                <span class="meta-sep">·</span>
-                <span class="meta-item clock">{ev.time}</span>
-              {/if}
-            </div>
-
-            <!-- CTA -->
-            {#if ev.done}
-              <a href="#/about" class="card-cta done-cta">View recap ↗</a>
-            {:else if ev.active}
-              <a href="#/" class="card-cta active-cta">Get on the list ↗</a>
-            {:else}
-              <span class="card-cta pending-cta">Reveal TBA</span>
-            {/if}
-          </div>
-        </article>
-
-        <!-- Connector line to next node -->
-        {#if i < EVENTS.length - 1}
-          <div class="connector-centered">
-            <svg class="curve-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-              <defs>
-                <linearGradient id="grad-{i}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="{ev.color}" />
-                  <stop offset="100%" stop-color="{EVENTS[i+1].color}" />
-                </linearGradient>
-              </defs>
-              {#if i % 2 === 0}
-                <path class="curve-bg" d="M 50 0 C 130 30, 130 70, 50 100" />
-                <path class="curve-fg" stroke="url(#grad-{i})" pathLength="100" class:drawn={linesDrawn[i]} d="M 50 0 C 130 30, 130 70, 50 100" />
-              {:else}
-                <path class="curve-bg" d="M 50 0 C -30 30, -30 70, 50 100" />
-                <path class="curve-fg" stroke="url(#grad-{i})" pathLength="100" class:drawn={linesDrawn[i]} d="M 50 0 C -30 30, -30 70, 50 100" />
-              {/if}
-            </svg>
-          </div>
-        {/if}
-      </li>
-    {/each}
-  </ol>
-
-  <!-- Footer legend -->
-  <footer class="trail-footer">
-    <div class="legend">
-      <span class="legend-item"><span class="legend-dot done-dot"></span>Completed</span>
-      <span class="legend-item"><span class="legend-dot active-dot"></span>Up next</span>
-      <span class="legend-item"><span class="legend-dot pending-dot"></span>Coming soon</span>
+      <ol class="trail" aria-label="Out of Office editions in chronological order">
+        {#each editions as edition}
+          <li>
+            <ScrollReveal>
+              <article class="trail-card" id={`edition-${edition.code}`} tabindex="-1" aria-labelledby={`title-${edition.code}`}>
+                <div class="paper-image"><EditionArtwork {edition} /></div>
+                <div class="card-copy">
+                  <p class="card-kicker"><span>OOO {edition.code}</span><span class="past-label">Past edition</span></p>
+                  <h2 id={`title-${edition.code}`}>{edition.title}</h2>
+                  <p class="card-note">{edition.note}</p>
+                  <dl class="edition-facts">
+                    <div><dt>WHEN</dt><dd><time datetime={edition.dateTime}>{edition.date}</time></dd></div>
+                    <div><dt>WHERE</dt><dd>{edition.location}</dd></div>
+                  </dl>
+                </div>
+              </article>
+            </ScrollReveal>
+          </li>
+        {/each}
+        <li>
+          <ScrollReveal>
+            <article class="next-card" id="edition-0x04" tabindex="-1" aria-labelledby="title-0x04">
+              <div class="next-stamp" aria-hidden="true"><span>OUT OF OFFICE</span><strong>0x04</strong><span>ROOM FOR WHAT'S NEXT</span></div>
+              <div class="next-copy">
+                <p class="eyebrow">THE NEXT CHAPTER</p>
+                <h2 id="title-0x04">More time<br />for real life.</h2>
+                <p class="next-date">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}</p>
+                <p class="next-detail">{NEXT_EVENT.detail}</p>
+                <p class="sales-note">{SALES_MODE === 'open' ? 'Pass details are available below.' : 'Passes are not on sale yet.'}</p>
+                <button class="pass-button ui-action" type="button" on:click={onOpenDrawer}>{SALES_MODE === 'open' ? 'See pass details' : 'See the pass update'} <span aria-hidden="true">↗</span></button>
+              </div>
+            </article>
+          </ScrollReveal>
+        </li>
+      </ol>
     </div>
-    <p class="footer-note">More escapes loading…</p>
-  </footer>
 
-</section>
+    <footer class="trail-footer">
+      <p>Lagos, with love.</p>
+      <a class="text-link" href="#/">Back to the water <span aria-hidden="true">↗</span></a>
+    </footer>
+  </main>
+</div>
 
 <style>
-  /* Hallmark · pre-emit critique: P5 H5 E5 S5 R4 V5
-   * genre: playful · theme: custom Escape OKLCH palette
-   * tokens: all colours via var(--*) — no inline hex
-   */
-
-  /* ─── Page shell ─────────────────────────────────────── */
-  .trail-page {
-    min-height: 100vh;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    overflow-x: clip;
-    padding: 0 0 clamp(4rem, 8vh, 6rem);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .trail-page { min-height: 100vh; background: var(--bg); color: var(--ink); }
+  .trail-nav { position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; gap: 20px; min-height: 76px; padding: 12px max(24px, calc((100vw - 1160px) / 2)); border-bottom: 1px solid var(--border-soft); background: #f2f0e9f5; backdrop-filter: blur(12px); }
+  .back-link { display: inline-flex; align-items: center; min-height: 44px; gap: 12px; color: var(--ink); font: 600 13px var(--sans); text-decoration: none; }
+  .back-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+  .trail-main { max-width: 1208px; padding: 0 24px; margin: auto; }
+  .trail-heading { padding: clamp(64px, 7vw, 100px) 0 clamp(48px, 6vw, 80px); }
+  h1 { margin: 0; font: 400 clamp(40px, 5.8vw, 76px)/1.06 var(--serif); letter-spacing: -.045em; }
+  h1 em { font-weight: 400; color: var(--deep); }
+  .intro { margin: 28px 0 0; max-width: 430px; color: var(--muted); font-size: 16px; line-height: 1.8; }
+  .handwritten { margin: 28px 0 0; color: var(--pink-deep); font: 400 15px/1.6 var(--marker); }
+  .trail-layout { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 40px; align-items: start; }
+  .edition-index { position: sticky; top: 104px; }
+  .edition-index nav { display: flex; flex-direction: column; gap: 10px; }
+  .index-label { color: var(--muted); font-size: 9px; letter-spacing: .18em; padding: 0 12px 12px; }
+  .edition-index a { display: flex; align-items: center; gap: 12px; padding: 8px 12px; min-height: 48px; color: var(--ink); border: 1px solid transparent; border-radius: 4px; text-decoration: none; transition: background 180ms, border-color 180ms; }
+  .edition-index a:hover, .edition-index a[aria-current] { border-color: var(--border-soft-deep); background: #e4e9e1; }
+  .index-code { font: 400 14px var(--serif); }
+  .index-name { font-size: 11px; color: var(--muted); }
+  .edition-index .index-next { border-top: 1px dashed var(--border-soft-deep); border-radius: 0; margin-top: 8px; padding-top: 18px; }
+  .trail { position: relative; list-style: none; margin: 0; padding: 0 0 0 28px; display: flex; flex-direction: column; gap: 48px; min-width: 0; }
+  .trail::before { content: ''; position: absolute; top: 28px; bottom: 80px; left: 0; border-left: 1px dashed var(--border-soft-deep); }
+  .trail > li { position: relative; min-width: 0; }
+  .trail > li::before { content: ''; position: absolute; top: 28px; left: -33px; width: 10px; height: 10px; border-radius: 50%; background: var(--deep); box-shadow: 0 0 0 6px var(--bg); }
+  .trail-card { min-width: 0; display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1fr); gap: 28px; padding: 16px; background: #faf8f2; border: 1px solid #d1d2c6; border-radius: 6px; box-shadow: 0 14px 30px -22px #243e3c50; scroll-margin-top: 110px; }
+  .paper-image { align-self: center; padding: 6px; background: #f2f0e9; transform: rotate(-2deg); transition: transform 300ms var(--ease-out-expo); }
+  .trail > li:nth-child(2) .paper-image { transform: rotate(2deg); }
+  .card-copy { padding: 18px 12px 18px 0; align-self: center; min-width: 0; }
+  .card-kicker { margin: 0 0 24px; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; font-size: 10px; letter-spacing: .09em; }
+  .past-label { color: var(--muted); letter-spacing: .02em; }
+  h2 { margin: 0; font: 400 clamp(27px, 3vw, 39px)/1.13 var(--serif); letter-spacing: -.035em; }
+  .card-note { margin: 18px 0 26px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+  .edition-facts { margin: 0; border-top: 1px dashed var(--border-soft-deep); padding-top: 20px; display: grid; gap: 16px; }
+  dt { color: var(--muted); font-size: 9px; letter-spacing: .13em; }
+  dd { margin: 5px 0 0; font-size: 13px; }
+  .next-card { position: relative; overflow: hidden; padding: clamp(28px, 5vw, 60px); border: 1px solid var(--deep); border-radius: 6px; background: var(--deep); color: #faf8f2; scroll-margin-top: 110px; }
+  .next-copy { position: relative; z-index: 1; }
+  .next-copy .eyebrow { color: #faf8f2; }
+  .next-copy h2 { font-size: clamp(38px, 4.8vw, 60px); }
+  .next-date { font-size: 16px; margin: 28px 0 12px; }
+  .next-date span { margin: 0 6px; }
+  .next-detail, .sales-note { max-width: 340px; font-size: 14px; line-height: 1.7; }
+  .sales-note { margin: 0 0 26px; }
+  .next-stamp { position: absolute; right: -15px; top: 28px; width: 180px; height: 180px; border: 4px double #faf8f244; color: #faf8f244; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotate(15deg); font-size: 9px; letter-spacing: .09em; pointer-events: none; }
+  .next-stamp strong { font: 400 64px/1.2 var(--serif); }
+  .next-stamp span:last-child { font-size: 7px; }
+  .pass-button { display: inline-flex; align-items: center; justify-content: center; gap: 18px; min-height: 48px; padding: 12px 22px; border: 1px solid #faf8f2; border-radius: 30px; background: #faf8f2; color: var(--deep); font: 500 13px var(--sans); cursor: pointer; }
+  .next-card :global(:focus-visible) { outline-color: #faf8f2; }
+  .next-card:focus-visible { outline-color: var(--ink); }
+  .trail-footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 64px; padding: 32px 0; border-top: 1px solid var(--border-soft-deep); }
+  .trail-footer p { font: 400 14px var(--marker); color: var(--pink-deep); }
+  @media (hover: hover) and (pointer: fine) { .trail-card:hover .paper-image { transform: rotate(0deg); } }
+  @media (max-width: 980px) {
+    .trail-layout { grid-template-columns: 100px minmax(0, 1fr); gap: 24px; }
+    .index-name { display: none; }
+    .trail-card { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .card-copy { padding: 20px 12px; }
+    .edition-facts { grid-template-columns: 1fr 1fr; }
+    .paper-image { max-width: 100%; }
   }
-
-  /* ─── Back nav ───────────────────────────────────────── */
-  .trail-nav {
-    width: 100%;
-    max-width: 680px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.1rem 1.5rem;
-    border-bottom: 1px solid var(--border-soft);
-    position: sticky;
-    top: 0;
-    background: color-mix(in oklch, var(--bg) 88%, transparent);
-    backdrop-filter: blur(14px);
-    z-index: 50;
+  @media (max-width: 600px) {
+    .trail-nav { min-height: 68px; gap: 12px; padding: 10px 20px; }
+    .back-link { font-size: 12px; gap: 8px; }
+    .next-link { font-size: 12px; gap: 8px; }
+    .trail-main { padding: 0 20px; }
+    .trail-heading { padding: 48px 0 32px; }
+    .intro { font-size: 14px; }
+    .trail-layout { display: block; }
+    .edition-index { top: 68px; z-index: 40; background: var(--bg); padding: 8px 0 12px; margin: 0 -4px 28px; border-bottom: 1px solid var(--border-soft-deep); }
+    .edition-index nav { flex-direction: row; justify-content: space-between; gap: 4px; }
+    .index-label { display: none; }
+    .edition-index a { min-height: 44px; padding: 8px 12px; }
+    .edition-index .index-next { margin: 0; padding: 8px 12px; border: 1px dashed var(--deep); border-radius: 4px; }
+    .trail { padding-left: 0; gap: 32px; }
+    .trail::before, .trail > li::before { display: none; }
+    .trail-card { padding: 10px; scroll-margin-top: 152px; }
+    .card-copy { padding: 20px 10px 16px; }
+    .edition-facts { grid-template-columns: 1fr; gap: 14px; }
+    .next-card { padding: 28px 22px; scroll-margin-top: 152px; }
+    .next-stamp { width: 140px; height: 140px; right: -55px; top: 16px; opacity: .6; }
+    .next-stamp strong { font-size: 44px; }
+    .trail-footer { align-items: flex-start; flex-direction: column; gap: 8px; margin-top: 40px; }
   }
-
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--ink);
-    padding: 0.3rem 0.7rem 0.3rem 0.5rem;
-    border: 1.5px solid var(--border-soft-deep);
-    border-radius: 999px;
-    transition:
-      background 0.2s ease,
-      border-color 0.2s ease,
-      transform 0.22s var(--ease-out-expo);
-  }
-  .back-btn:hover { background: var(--card-surface); border-color: var(--ink); transform: translateX(-3px); }
-
-  .nav-mono {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  }
-
-  /* ─── Page header ────────────────────────────────────── */
-  .trail-header {
-    text-align: center;
-    max-width: 520px;
-    padding: clamp(2.5rem, 6vh, 4rem) 1.5rem 2rem;
-  }
-
-  .eyebrow {
-    margin: 0 0 0.6rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-
-  .heading {
-    margin: 0 0 0.75rem;
-    font-size: clamp(2.4rem, 7vw, 4rem);
-    font-weight: 900;
-    line-height: 1.0;
-    color: var(--ink);
-    letter-spacing: -0.04em;
-    font-style: normal;
-  }
-  .accent-word {
-    font-style: normal;
-    background: linear-gradient(110deg, var(--sunset-orange) 0%, var(--blue) 60%, var(--pink-deep) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .sub {
-    margin: 0;
-    font-size: clamp(0.9rem, 2.2vw, 1.05rem);
-    color: var(--muted);
-    line-height: 1.65;
-    max-width: 400px;
-    margin-inline: auto;
-  }
-
-  /* ─── Roadmap list ───────────────────────────────────── */
-  .roadmap {
-    list-style: none;
-    margin: 0;
-    padding: 0 1.5rem;
-    width: 100%;
-    max-width: 620px;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  /* ─── Node row ───────────────────────────────────────── */
-  .node-row {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-    opacity: 0;
-    transform: translateY(32px) scale(0.97);
-    transition:
-      opacity 0.6s var(--ease-out-expo),
-      transform 0.6s var(--ease-out-expo);
-    transition-delay: calc(var(--ni, 0) * 80ms);
-  }
-  .node-row.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  /* ─── Centered Connector ─────────────────────────────── */
-  .connector-centered {
-    width: 60px;
-    height: 70px;
-    margin: 4px 0;
-    position: relative;
-    display: flex;
-    justify-content: center;
-  }
-
-  .curve-svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .curve-bg {
-    fill: none;
-    stroke: var(--border-soft);
-    stroke-width: 4;
-    stroke-linecap: round;
-  }
-
-  .curve-fg {
-    fill: none;
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-    transition: stroke-dashoffset 0.9s var(--ease-out-expo);
-  }
-  .curve-fg.drawn {
-    stroke-dashoffset: 0;
-  }
-
-  /* ─── Event card ─────────────────────────────────────── */
-  .event-card {
-    width: 100%;
-    background: var(--card-surface);
-    border: 1.5px solid var(--border-soft-deep);
-    border-radius: 18px;
-    margin-bottom: 0;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--ease-out-expo);
-    border-top: 5px solid var(--node-color);
-  }
-  /* Accent stripe */
-  .event-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, color-mix(in oklch, var(--node-color) 8%, transparent) 0%, transparent 55%);
-    pointer-events: none;
-    border-radius: 17px;
-    z-index: 0;
-  }
-  
-  .card-content {
-    padding: clamp(1.1rem, 3vw, 1.6rem);
-    position: relative;
-    z-index: 1;
-  }
-
-  .node-row.visible .event-card:hover {
-    border-color: var(--node-color);
-    box-shadow: 0 12px 40px color-mix(in oklch, var(--node-color) 18%, transparent);
-    transform: translateY(-2px);
-  }
-
-  /* ─── Card badge row ─────────────────────────────────── */
-  .card-badge-row {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.75rem;
-  }
-
-  .stamp-chip {
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    color: var(--node-color);
-    background: color-mix(in oklch, var(--node-color) 12%, transparent);
-    border: 1px solid color-mix(in oklch, var(--node-color) 30%, transparent);
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-  }
-
-  .status-chip {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-  }
-  .done-chip    { background: color-mix(in oklch, var(--sunset-orange) 14%, transparent); color: var(--sunset-orange); border: 1px solid color-mix(in oklch, var(--sunset-orange) 30%, transparent); }
-  .active-chip  { background: color-mix(in oklch, var(--blue) 14%, transparent);         color: var(--blue);         border: 1px solid color-mix(in oklch, var(--blue) 30%, transparent); }
-  .pending-chip { background: color-mix(in oklch, var(--muted-green) 12%, transparent);  color: var(--muted-green);  border: 1px solid color-mix(in oklch, var(--muted-green) 28%, transparent); }
-
-  /* ─── Card typography ────────────────────────────────── */
-  .card-title {
-    margin: 0 0 0.35rem;
-    font-size: clamp(1.2rem, 4vw, 1.65rem);
-    font-weight: 900;
-    color: var(--ink);
-    line-height: 1.15;
-    letter-spacing: -0.025em;
-    font-style: normal;
-  }
-  .pending .card-title { color: var(--muted); letter-spacing: 0.08em; }
-
-  .card-tagline {
-    margin: 0 0 1rem;
-    font-size: 0.9rem;
-    color: var(--muted);
-    line-height: 1.55;
-    font-style: italic;
-  }
-  .pending .card-tagline { font-style: normal; }
-
-  /* ─── Flyer Thumbnail ────────────────────────────────── */
-  .card-image-wrap {
-    margin: 0;
-    width: 100%;
-    overflow: hidden;
-    background: color-mix(in oklch, var(--bg) 50%, transparent);
-    border-bottom: 1px solid var(--border-soft);
-    position: relative;
-    z-index: 1;
-  }
-  .card-image-wrap.pending {
-    filter: grayscale(100%) blur(4px) opacity(0.5);
-  }
-  .card-image {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-    object-fit: cover;
-  }
-
-  /* ─── Meta row ───────────────────────────────────────── */
-  .card-meta {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.5rem;
-    margin-bottom: 1.1rem;
-  }
-
-  .meta-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--muted);
-    line-height: 1;
-  }
-  .meta-item svg { opacity: 0.6; flex-shrink: 0; }
-  .meta-sep { color: var(--border-soft-deep); font-size: 0.75rem; }
-  .clock { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.72rem; }
-
-  /* ─── CTAs ───────────────────────────────────────────── */
-  .card-cta {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 0.5rem 1.1rem;
-    border-radius: 999px;
-    text-decoration: none;
-    transition: transform 0.22s var(--ease-out-expo), box-shadow 0.22s ease, background 0.2s ease;
-  }
-  .done-cta {
-    background: color-mix(in oklch, var(--sunset-orange) 15%, transparent);
-    color: var(--sunset-orange);
-    border: 1.5px solid color-mix(in oklch, var(--sunset-orange) 40%, transparent);
-  }
-  .done-cta:hover { background: var(--sunset-orange); color: #fff; transform: translateY(-2px); box-shadow: 0 6px 20px color-mix(in oklch, var(--sunset-orange) 35%, transparent); }
-
-  .active-cta {
-    background: var(--blue);
-    color: #fff;
-    border: 1.5px solid transparent;
-    box-shadow: 0 4px 16px color-mix(in oklch, var(--blue) 35%, transparent);
-  }
-  .active-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px color-mix(in oklch, var(--blue) 45%, transparent); }
-
-  .pending-cta {
-    background: transparent;
-    color: var(--muted);
-    border: 1.5px dashed var(--border-dashed);
-    cursor: default;
-    letter-spacing: 0.1em;
-  }
-
-  /* ─── Footer ─────────────────────────────────────────── */
-  .trail-footer {
-    margin-top: 2.5rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .legend {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-  }
-  .legend-dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .done-dot    { background: var(--sunset-orange); }
-  .active-dot  { background: var(--blue); animation: pulseDot 1.8s infinite ease-in-out; }
-  .pending-dot { background: var(--muted-green); opacity: 0.55; }
-
-  .footer-note {
-    margin: 0;
-    font-size: 0.72rem;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    opacity: 0.6;
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  }
-
-  /* ─── Reduced motion ─────────────────────────────────── */
-  @media (prefers-reduced-motion: reduce) {
-    .node-row  { transition: none; }
-    .active-dot { animation: none; }
-    @keyframes bulletPop { from { transform: scale(1); } to { transform: scale(1); } }
-  }
+  @media (prefers-reduced-motion: reduce) { .paper-image, .trail > li:nth-child(2) .paper-image, .trail-card:hover .paper-image { transform: none; transition: none; } }
 </style>

@@ -61,3 +61,31 @@ Because of that:
 - Get the owner's approval before anything reaches `main`.
 - Never push `v1` except for safety fixes.
 - Never move the `v1.0` tag.
+
+## UX review branch
+
+The Playground-inspired implementation notes are in
+[`docs/design/PLAYGROUND-UX-NOTES.md`](docs/design/PLAYGROUND-UX-NOTES.md).
+The homepage now keeps the water first, followed by a brief introduction,
+a manually controlled edition-card archive, confirmed event details and FAQ,
+and the closed-sales pass preview. Approved event photos can be assigned in
+`src/lib/editions.js`; until then, the cards use printed edition
+artwork rather than stock photos or flyers.
+
+For browser checks, start the local preview on port 5174, then run:
+
+```sh
+CHROMIUM_PATH=/path/to/chromium node scripts/check-ux.mjs
+```
+
+`UX_BASE_URL` can override the preview URL. Screenshots are written to the
+ignored `.dump/ux-review/` directory. Checks cover phone/desktop widths,
+archive gestures and keyboard controls, FAQ, modal focus, reduced motion,
+closed sales and the failed-WebGL fallback.
+
+
+The event trail uses the same edition data and artwork. Links such as
+`#/trail/0x03` open an individual edition, including on a direct visit or
+reload. Its 0x04 action opens the same pass drawer as the homepage.
+Run `node scripts/check-trail.mjs` (with the same browser environment above)
+for trail navigation, deep-link, reduced-motion and closed-sales checks.

@@ -1,297 +1,44 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { SALES_MODE } from './sales.js';
+  import ThemeControl from './ThemeControl.svelte';
   import { muted, toggleMute } from './ambientSound.js';
-
   export let onOpenDrawer = () => {};
-  export let onStatusChange = (onlineState) => {};
-  export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
-  export let overlay = false;
-
-  // AWAY is the site's fast lane to calm (see calm.js). The one-line
-  // status note is inline feedback attached to its own control, not a
-  // toast system.
-  let isOnline = false;
-  let statusNote = false;
-  let statusMessage = '';
-  let noteTimer;
-  let autoMuteTimer;
-
-  function toggleStatus() {
-    isOnline = !isOnline;
-    onStatusChange(isOnline);
-    statusMessage = isOnline
-      ? 'ONLINE ⚡ — Reconnected. The noise is back.'
-      : 'AWAY 🌴 — Muted. Gone to touch grass.';
-    statusNote = true;
-    clearTimeout(noteTimer);
-    noteTimer = setTimeout(() => (statusNote = false), 3200);
-    
-    clearTimeout(autoMuteTimer);
-    if (isOnline) {
-      autoMuteTimer = setTimeout(() => {
-        if (isOnline) {
-          isOnline = false;
-          onStatusChange(false);
-          statusMessage = 'AWAY 🌴 — Auto-reply re-enabled.';
-          statusNote = true;
-          clearTimeout(noteTimer);
-          noteTimer = setTimeout(() => (statusNote = false), 3200);
-        }
-      }, 8000);
-    }
-  }
-  onDestroy(() => clearTimeout(noteTimer));
 </script>
 
-<header class="bar-container {scrollState}" class:overlay>
-  <div class="bar">
-    <a href="#/about" class="brand-link" title="What We Are">
-      OUT OF OFFICE
-    </a>
-
-    <button
-      type="button"
-      class="status-pill"
-      class:online={isOnline}
-      on:click={toggleStatus}
-      aria-label={isOnline ? 'Status: online. Set to away' : 'Status: away. Set to online'}
-      title={isOnline ? 'Go AWAY — mute the chaos' : 'Back ONLINE'}
-    >
-      <span class="live-dot" aria-hidden="true"></span>
-      <span class="status-label">{isOnline ? 'ONLINE' : 'AWAY'}</span>
-    </button>
-
-    <div class="spacer" aria-hidden="true"></div>
-
-    <nav class="actions-wrap">
-      <button
-        type="button"
-        class="action-pill icon-pill"
-        on:click={toggleMute}
-        aria-pressed={!$muted}
-        aria-label={$muted ? 'Unmute ambient sound' : 'Mute ambient sound'}
-        title={$muted ? 'Sound off' : 'Sound on'}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11 5 6 9H3v6h3l5 4z" />
-          {#if $muted}<path d="m16 9 5 6m0-6-5 6" />{:else}<path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13" />{/if}
-        </svg>
-      </button>
-
-      <button type="button" class="action-pill pass-pill" on:click={onOpenDrawer}>
-        OOO PASS →
-      </button>
-    </nav>
+<header class="site-header">
+  <div class="header-left">
+    <a class="brand" href="#top" aria-label="Out of Office, back to top">OUT OF OFFICE</a>
+    <a class="status-link" href="#/about" aria-label="Away, read about Out of Office"><span class="status-dot" aria-hidden="true"></span>AWAY</a>
   </div>
-
-  {#if statusNote}
-    <div class="status-note" class:online={isOnline} role="status">{statusMessage}</div>
-  {/if}
+  <div class="header-actions">
+    <ThemeControl />
+    <button class="sound-button" type="button" on:click={toggleMute} aria-label={$muted ? 'Sound is off. Turn on' : 'Sound is on. Turn off'} aria-pressed={!$muted}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z" /><path class="sound-wave" d="M16 9.2a4 4 0 0 1 0 5.6M18.5 6.8a7.5 7.5 0 0 1 0 10.4" /></svg>
+    </button>
+    <button class="pass-button ui-action" type="button" on:click={onOpenDrawer}>{SALES_MODE === 'open' ? 'OOO pass' : 'Pass update'} <span aria-hidden="true">→</span></button>
+  </div>
 </header>
 
 <style>
-  /* Hallmark N5 Floating Pill Navigation */
-  .bar-container {
-    position: sticky;
-    top: calc(1rem + env(safe-area-inset-top));
-    z-index: 1000;
-    width: calc(100% - 2rem);
-    max-width: 966px;
-    margin: 0 auto;
-  }
-  .bar-container.overlay {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 56px;
-    padding: 5px 6px 5px 22px;
-    border-radius: 999px;
-    transition: background 0.3s ease, 
-                border-color 0.3s ease, 
-                box-shadow 0.3s ease;
-  }
-
-  /* Keyboard Focus Rings */
-  button:focus-visible,
-  a:focus-visible {
-    outline: 2px solid var(--blue);
-    outline-offset: 4px;
-  }
-  button:active:not(:disabled),
-  a:active {
-    transform: translateY(1px);
-  }
-
-  /* State 1: Transparent (0-80px) */
-  .bar-container.transparent .bar {
-    background: transparent;
-    border: 1px solid transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  /* State 2: Frosted / Blur (80px - 500px) */
-  .bar-container.frosted .bar {
-    background: color-mix(in srgb, var(--card-surface) 60%, transparent);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    border: 1px solid var(--border-soft);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  }
-
-  /* State 3: Solid Cream (Past 500px) */
-  .bar-container.cream .bar {
-    background: var(--bg);
-    border: 1px solid var(--border-soft-deep);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  .brand-link {
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: 0.05em;
-    color: var(--ink);
-    text-decoration: none;
-    padding-left: 0;
-    white-space: nowrap;
-    border-radius: 999px;
-  }
-
-  .spacer {
-    flex: 1 1 auto;
-  }
-
-  /* Status */
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 999px;
-    background: transparent;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  .status-pill:hover {
-    background: var(--border-soft);
-  }
-
-  .live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--muted);
-    transition: background 0.2s ease;
-  }
-  .status-pill.online .live-dot {
-    background: var(--chaos-yellow);
-    box-shadow: 0 0 8px var(--chaos-yellow);
-  }
-
-  .status-label {
-    font-family: var(--sans);
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-  .status-pill.online .status-label {
-    color: var(--ink);
-  }
-
-  /* Actions */
-  .actions-wrap {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .action-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem 0.75rem;
-    font-family: var(--sans);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--ink);
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
-    white-space: nowrap;
-  }
-  .action-pill:hover {
-    background: var(--border-soft);
-  }
-
-  .icon-pill {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-  }
-
-  .pass-pill {
-    height: 44px;
-    padding: 0 20px;
-    font-size: 0.6875rem;
-    background: var(--ink);
-    color: var(--bg);
-  }
-  .pass-pill:hover {
-    background: var(--ink);
-    opacity: 0.88;
-  }
-
-  .status-note {
-    position: absolute;
-    top: calc(100% + 0.75rem);
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--ink);
-    color: var(--bg);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-family: var(--sans);
-    font-size: 0.75rem;
-    font-weight: 600;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    white-space: nowrap;
-    animation: noteIn 0.2s ease-out;
-  }
-  .status-note.online {
-    background: var(--chaos-yellow);
-    color: var(--ink);
-  }
-  @keyframes noteIn {
-    from { opacity: 0; transform: translate(-50%, -6px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
-  }
-
-  @media (max-width: 768px) {
-    .bar { padding-left: 16px; }
-    .pass-pill { padding-inline: 16px; }
-  }
-  @media (max-width: 360px) {
-    .bar { gap: 2px; padding-left: 10px; }
-    .brand-link { font-size: 0.67rem; }
-    .status-pill { padding-inline: 3px; }
-    .status-label { font-size: 0.55rem; }
-    .icon-pill { width: 32px; }
-    .pass-pill { padding-inline: 10px; font-size: 0.6rem; }
+  .site-header { position: fixed; z-index: 50; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 966px; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 6px 0 22px; border: 1px solid #cdc9b890; border-radius: 999px; background: rgba(250, 248, 242, .56); box-shadow: 0 8px 24px #243e3c12, inset 0 1px 0 #fff8; -webkit-backdrop-filter: blur(18px) saturate(1.12); backdrop-filter: blur(18px) saturate(1.12); }
+  .header-left, .header-actions { display: flex; align-items: center; }
+  .header-left { gap: 14px; min-width: 0; }
+  .brand { flex-shrink: 0; color: var(--ink); font: 700 13px/1 var(--sans); letter-spacing: .04em; text-decoration: none; }
+  .status-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-decoration: none; }
+  .status-link:hover { color: var(--ink); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #df6c56; box-shadow: 0 0 0 3px #df6c5624; }
+  .header-actions { gap: 4px; }
+  .sound-button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+  .sound-button:hover, .sound-button:focus-visible { background: #243e3c0c; }
+  .sound-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
+  .sound-button svg path:first-child { fill: currentColor; stroke: none; }
+  .sound-button[aria-pressed="false"] .sound-wave { display: none; }
+  .pass-button { display: inline-flex; justify-content: center; align-items: center; gap: 12px; min-height: 44px; padding: 10px 20px; border: 1px solid var(--deep); border-radius: 30px; background: var(--deep); color: #faf8f2; font: 500 12px var(--sans); letter-spacing: .02em; white-space: nowrap; cursor: pointer; }
+  @media (max-width: 580px) {
+    .site-header { width: calc(100% - 24px); padding-left: 14px; }
+    .header-left { gap: 10px; }
+    .brand { font-size: 11px; }
+    .status-link { font-size: 9px; }
+    .pass-button { padding-inline: 14px; }
   }
 </style>

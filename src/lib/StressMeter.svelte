@@ -92,7 +92,7 @@
     transform: none;
   }
   .stress-meter:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
+    outline: 2px solid var(--deep);
     outline-offset: 3px;
   }
 

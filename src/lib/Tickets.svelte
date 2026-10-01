@@ -1,24 +1,39 @@
 <script>
+  import { onDestroy } from 'svelte';
   import { SALES_MODE } from './sales.js';
   export let visible = false;
   export let onOpenDrawer = () => {};
 
   let selectedTier = 'explorer';
+  let isRipping = false;
+  let ripTimer;
+  onDestroy(() => clearTimeout(ripTimer));
+
+  function openPass() {
+    clearTimeout(ripTimer);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    isRipping = !reduced;
+    const delay = reduced ? 0 : 360;
+    ripTimer = setTimeout(() => {
+      isRipping = false;
+      onOpenDrawer();
+    }, delay);
+  }
 </script>
 
-<section class="tickets-section">
+<section id="passes" class="tickets-section">
   <div class="header-text" class:visible>
-    <p class="eyebrow">BOARDING PASS</p>
+    <p class="eyebrow">YOUR NEXT ESCAPE</p>
     <h2 class="heading">Your ticket out.</h2>
-    <p class="subheading">Come for the experience. Leave with the memories.</p>
+    <p class="subheading">A little anticipation. No reservations just yet.</p>
   </div>
 
   <div class="pass-container" class:visible>
-    <div class="pass-card">
+    <div class="pass-card" class:ripping={isRipping} aria-busy={isRipping}>
       <div class="pass-left">
         <div class="pass-header">
-          <span>OUT OF OFFICE AIR & MARINE</span>
-          <span>FLIGHT <strong>OOO-0x04</strong></span>
+          <span>OUT OF OFFICE · PASS PREVIEW</span>
+          <span>EDITION <strong>OOO-0x04</strong></span>
         </div>
         
         <div class="route-display">
@@ -74,15 +89,15 @@
               <span class="tier-price">&#8358;20,000</span>
             </button>
           </div>
-          <button class="claim-btn" on:click={onOpenDrawer}>
+          <button class="claim-btn ui-action" on:click={openPass}>
             Claim {selectedTier === 'explorer' ? 'Explorer' : 'Retreat'} Pass &rarr;
           </button>
           <div class="secure-text">Secured by Paystack</div>
         {:else}
-          <div class="stub-header">NEXT DEPARTURE</div>
+          <div class="stub-header">PREVIEW · NOT AN ISSUED PASS</div>
           <div class="seat-badge">0x04 · NOVEMBER</div>
           <p class="closed-copy">The date and venue are still to be announced. Passes are not on sale yet.</p>
-          <button class="claim-btn" on:click={onOpenDrawer}>Pass update &rarr;</button>
+          <button class="claim-btn ui-action" on:click={openPass}>Pass update &rarr;</button>
         {/if}
       </div>
     </div>
@@ -135,7 +150,10 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
+    transition: box-shadow 360ms ease;
   }
+  .pass-card.ripping { box-shadow: 0 26px 42px rgba(36, 62, 60, .18); }
   
   @media (min-width: 800px) {
     .pass-card {
@@ -149,9 +167,11 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    transition: transform 360ms cubic-bezier(.22, 1, .36, 1);
   }
 
   .pass-header {
+    flex-wrap: wrap; gap: 12px;
     display: flex;
     justify-content: space-between;
     font-size: 0.8rem;
@@ -233,6 +253,7 @@
   }
 
   .pass-details {
+    min-width: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
@@ -270,6 +291,7 @@
     height: 2px;
     border-top: 2px dashed var(--deep, #376a65);
     position: relative;
+    transition: transform 360ms cubic-bezier(.22, 1, .36, 1), opacity 360ms ease;
   }
   @media (min-width: 800px) {
     .pass-perforation {
@@ -286,7 +308,10 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    transition: transform 360ms cubic-bezier(.22, 1, .36, 1);
   }
+  .pass-card.ripping .pass-right { transform: translateX(12px) rotate(.45deg); }
+  .pass-card.ripping .pass-perforation { transform: scaleY(1.3); opacity: .55; }
   @media (min-width: 800px) {
     .pass-right {
       width: 320px;
@@ -376,5 +401,21 @@
     text-align: center;
     font-size: 0.75rem;
     color: var(--muted, #6b6b6b);
+  }
+  @media (max-width: 580px) {
+    .tickets-section { padding: 64px 24px; }
+    .pass-left, .pass-right { padding: 20px; min-width: 0; }
+    .pass-details { grid-template-columns: 1fr; padding: 16px; }
+    .route-display { gap: 8px; }
+    .city-box { width: 82px; flex-shrink: 0; }
+    .city-box h2 { font-size: 28px; }
+    .city-name { font-size: 9px; }
+    .flight-type { font-size: 8px; text-align: center; }
+    .header-text { text-align: left; width: 100%; }
+    .heading { font-size: 40px; }
+    .pass-card.ripping .pass-right { transform: translateY(8px) rotate(.35deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pass-card, .pass-left, .pass-right, .pass-perforation { transition: none; }
   }
 </style>

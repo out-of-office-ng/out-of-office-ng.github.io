@@ -1,49 +1,31 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
-  import { createDialKit } from "dialkit/svelte";
-
+  import { onMount } from 'svelte';
+  export let animate = true;
   let node;
-  let visible = false;
-  let observer;
-
-  // Register Dialkit animation config for scroll transitions
-  const scrollReveal = createDialKit('scroll-reveal', {
-    revealDistance: [40, 10, 100],
-    revealDuration: [0.8, 0.2, 2.0],
-  });
-
+  let visible = true;
   onMount(() => {
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          visible = true;
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
-    );
-    
-    if (node) observer.observe(node);
-  });
-
-  onDestroy(() => {
-    if (observer) observer.disconnect();
+    const preference = matchMedia('(prefers-reduced-motion: reduce)');
+    if (preference.matches || !('IntersectionObserver' in window)) return;
+    visible = false;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        visible = true;
+        observer.disconnect();
+      }
+    }, { threshold: 0, rootMargin: '0px 0px -24px 0px' });
+    observer.observe(node);
+    const update = () => { if (preference.matches) { visible = true; observer.disconnect(); } };
+    preference.addEventListener('change', update);
+    return () => { observer.disconnect(); preference.removeEventListener('change', update); };
   });
 </script>
 
-<div bind:this={node} class="reveal-wrapper" class:visible>
+<div bind:this={node} class="reveal-wrapper" class:animate class:visible on:focusin={() => visible = true}>
   <slot {visible} />
 </div>
 
 <style>
-  .reveal-wrapper {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity var(--dur-slow) var(--ease-out-expo),
-                transform var(--dur-slow) var(--ease-out-expo);
-  }
-  .reveal-wrapper.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .reveal-wrapper.animate { opacity: 0; transform: translateY(14px); transition: opacity 550ms var(--ease-out-expo), transform 550ms var(--ease-out-expo); }
+  .reveal-wrapper.animate.visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal-wrapper.animate { opacity: 1; transform: none; transition: none; } }
 </style>

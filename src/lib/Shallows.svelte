@@ -1,10 +1,11 @@
 <script>
   import { onMount, onDestroy, tick } from 'svelte';
-  import { muted } from './ambientSound.js';
+  import { muted, toggleMute } from './ambientSound.js';
+  import { NEXT_EVENT, SALES_MODE } from './sales.js';
 
-  export let onOpenDrawer = () => {};
   export let onOpenOooGen = () => {};
   export let onScrollToContent = () => {};
+  export let onScrollToShowcase = () => {};
 
   let section;
   let stage;
@@ -15,6 +16,7 @@
   let message = '';
   let destroyed = false;
   let viewMode = 'preview';
+  let stillWater = false;
 
   async function showView(nextMode) {
     viewMode = nextMode;
@@ -49,7 +51,8 @@
     status = 'loading';
     try {
       const { createShallows } = await import('./shallows/createShallows.js');
-      if (destroyed) return;
+      if (destroyed || stillWater) { status = 'idle'; return; }
+      if (scene) return;
       scene = createShallows(stage, {
         sound: !isMuted,
         initialMode: viewMode,
@@ -65,13 +68,26 @@
 
   let nearObserver;
   onMount(() => {
+    const preference = matchMedia('(prefers-reduced-motion: reduce)');
+    const updateMotion = () => {
+      stillWater = preference.matches;
+      if (stillWater) {
+        scene?.dispose();
+        scene = null;
+        status = 'idle';
+        viewMode = 'preview';
+      } else mountScene();
+    };
+    stillWater = preference.matches;
+    preference.addEventListener('change', updateMotion);
     nearObserver = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
         nearObserver.disconnect();
-        mountScene();
+        if (!stillWater) mountScene();
       }
     }, { rootMargin: '100% 0px' });
     nearObserver.observe(section);
+    return () => preference.removeEventListener('change', updateMotion);
   });
 
   onDestroy(() => {
@@ -97,10 +113,10 @@
     <div class="preview-wash" aria-hidden="true"></div>
     <div class="hero-copy">
       <p class="eyebrow">OUT OF OFFICE</p>
-      <h1>Away from<br />the everyday.</h1>
-      <p class="description">A little space to slow down.<br />Leave the rush on the other side.</p>
-      <p class="event-status">0x04 <span aria-hidden="true">·</span> November <span aria-hidden="true">·</span> date TBA</p>
-      <button type="button" class="primary-button" on:click={onOpenDrawer}>Get your pass</button>
+      <h1 tabindex="-1">Away from<br />the everyday.</h1>
+      <p class="description">Lagos hangouts for music, art,<br />games, and a little time off.</p>
+      <p class="event-status">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}<br /><span class="date-tba">Date and venue TBA</span></p>
+      <button type="button" class="primary-button ui-action" on:click={onScrollToShowcase}>Explore the last escape</button>
     </div>
 
     <aside class="auto-reply" aria-label="An Out of Office auto-reply">
@@ -112,9 +128,11 @@
     </aside>
 
     <button type="button" class="scroll-cue" aria-label="Scroll to the rest of the page" on:click={onScrollToContent}>↓</button>
-    <button type="button" class="wander-button" bind:this={wanderButton} disabled={status === 'failed' || status === 'context-lost'} on:click={() => showView('explore')}>
+    {#if !stillWater}
+    <button type="button" class="wander-button ui-action" bind:this={wanderButton} disabled={stillWater || status !== 'ready'} on:click={() => showView('explore')}>
       Wander the water
     </button>
+    {/if}
   {:else}
     <div class="explore-card" tabindex="-1" bind:this={exploreCard}>
       <p class="explore-hint">Drag to wander. Tap to ripple.</p>
@@ -176,6 +194,7 @@
   .description { margin: 0; max-width: 380px; font-size: 17px; line-height: 1.7; }
   .event-status { margin: 26px 0 28px; font-size: 16px; font-weight: 500; }
   .event-status span { margin: 0 .12em; }
+  .event-status .date-tba { display: inline-block; margin: 5px 0 0; color: var(--hero-muted); font-size: 12px; font-weight: 400; }
   button { cursor: pointer; font: inherit; }
   button:focus-visible, .explore-card:focus-visible { outline: 3px solid var(--hero-ink); outline-offset: 4px; }
   .primary-button { height: 50px; padding: 0 28px; border: 2px solid var(--hero-deep); border-radius: 99px; background: var(--hero-deep); color: var(--hero-card); font-size: 16px; font-weight: 500; white-space: nowrap; }
@@ -189,7 +208,7 @@
   .postmark { position: absolute; right: -14px; bottom: -24px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 104px; height: 104px; transform: rotate(-11deg); border: 3px double var(--hero-deep); border-radius: 50%; background: color-mix(in srgb, var(--hero-card) 85%, transparent); color: var(--hero-deep); font-family: var(--bungee); text-align: center; line-height: 1.1; }
   .postmark > span { font-size: 9px; letter-spacing: .08em; }
   .postmark strong { margin-top: 4px; font-size: 26px; font-weight: 400; }
-  .wander-button { position: absolute; z-index: 3; right: clamp(16px, 4.45vw, 64px); bottom: max(40px, env(safe-area-inset-bottom)); height: 46px; padding: 0 22px; border: 2px solid var(--hero-ink); border-radius: 99px; background: color-mix(in srgb, var(--hero-card) 94%, transparent); color: var(--hero-ink); font-size: 15px; font-weight: 500; white-space: nowrap; }
+  .wander-button { position: absolute; z-index: 3; right: clamp(16px, 4.45vw, 64px); bottom: max(40px, env(safe-area-inset-bottom)); height: 46px; padding: 0 16px; border: 2px solid var(--hero-ink); border-radius: 99px; background: color-mix(in srgb, var(--hero-card) 94%, transparent); color: var(--hero-ink); font-size: 13px; font-weight: 500; white-space: nowrap; }
   .wander-button:hover { background: var(--hero-card); }
   .wander-button:disabled { opacity: .5; cursor: not-allowed; }
   .scroll-cue { position: absolute; z-index: 2; bottom: 30px; left: 50%; width: 44px; height: 44px; transform: translateX(-50%); border: 0; background: transparent; color: var(--hero-ink); font-size: 26px; }
@@ -201,15 +220,26 @@
   .explore-actions button:hover { background: var(--hero-ink); color: var(--hero-card); }
   .scene-status { position: absolute; z-index: 4; top: 102px; right: 30px; max-width: 220px; margin: 0; padding: 7px 11px; border-radius: 5px; background: var(--hero-card); font-size: .75rem; }
   .loading-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  @media (max-width: 1100px) { .auto-reply { display: none; } }
+  @media (max-width: 1100px) {
+    .auto-reply { top: auto; right: 24px; bottom: 92px; width: min(360px, 42vw); padding: 20px; }
+    .mail-body { font-size: 19px; }
+    .postmark { width: 78px; height: 78px; right: -10px; bottom: -18px; }
+    .postmark > span { font-size: 7px; }
+    .postmark strong { font-size: 19px; }
+  }
   @media (max-width: 700px) {
-    .hero { min-height: 600px; }
+    .hero { min-height: 720px; }
     .water-still img { object-position: center; }
-    .preview-wash { background: linear-gradient(180deg, color-mix(in srgb, var(--hero-paper) 95%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 93%, transparent) 62%, transparent 86%); }
-    .hero-copy { top: 96px; left: 20px; width: calc(100% - 40px); }
+    .preview-wash { background: linear-gradient(180deg, color-mix(in srgb, var(--hero-paper) 94%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 72%, transparent) 42%, color-mix(in srgb, var(--hero-paper) 20%, transparent) 68%, transparent 88%); }
+    .hero-copy { top: 155px; left: 20px; width: calc(100% - 40px); }
     h1 { margin: 10px 0 18px; font-size: clamp(42px, 13.33vw, 52px); }
-    .description { display: none; }
+    .description { display: block; font-size: 14px; line-height: 1.7; margin: 0 0 18px; }
     .event-status { margin: 0 0 24px; font-size: 15px; }
+    .auto-reply { left: 20px; right: 20px; bottom: 82px; width: auto; padding: 16px; transform: rotate(1deg); }
+    .auto-reply .mail-body { max-width: 28ch; font-size: 16px; }
+    .auto-reply .subject { margin-bottom: 8px; padding-bottom: 8px; font-size: 13px; }
+    .auto-reply .write-link { margin-top: 10px; font-size: 12px; }
+    .auto-reply .postmark { display: none; }
     .scroll-cue { display: none; }
     .wander-button { right: 16px; bottom: max(28px, env(safe-area-inset-bottom)); }
     .scene-status { top: auto; right: auto; left: 20px; bottom: 82px; }

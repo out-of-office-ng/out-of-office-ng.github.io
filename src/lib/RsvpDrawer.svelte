@@ -3,6 +3,7 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
+  import { dialogFocus } from './dialogFocus.js';
   import { SALES_MODE, NEXT_EVENT } from './sales.js';
 
   const salesOpen = SALES_MODE === 'open';
@@ -148,6 +149,7 @@
   >
     <div
       class="sheet"
+      use:dialogFocus
       role="dialog"
       aria-modal="true"
       aria-labelledby="sheet-title"
@@ -486,7 +488,7 @@
     background: #fff;
   }
   .input:focus-visible, .select:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
+    outline: 2px solid var(--deep);
   }
 
   .btn-row {
@@ -515,7 +517,7 @@
     transform: translateY(-2px);
   }
   .primary-btn:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
+    outline: 2px solid var(--deep);
   }
   .primary-btn:active:not(:disabled) {
     transform: translateY(1px);
@@ -543,7 +545,7 @@
     background: var(--card-surface);
   }
   .sec-btn:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
+    outline: 2px solid var(--deep);
   }
   .sec-btn:active {
     transform: translateY(1px);

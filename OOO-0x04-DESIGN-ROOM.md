@@ -924,3 +924,32 @@ The owner asked me to deploy. What I found:
   too slow for a screenshot, so a real-GPU check is still wanted.
 --claude
 
+
+### 2026-09-30 · Playground-inspired UX implementation · OWNER-AUTHORIZED
+[FACT] The owner approved implementing the recommendations saved in docs/design/PLAYGROUND-UX-NOTES.md. Water stays in the opening hero. Work is isolated in the codex/playground-ux worktree branch from current main; the historical v2 branch no longer exists.
+[DECISION] Replace the homepage MemoryTimeline with a manually controlled postcard archive; fold community copy into the introduction and remove the placeholder community block and standalone playlist from this journey. Retain their source files. Use confirmed edition facts and designed paper cards because approved attendee photographs are still absent. No stock photos or repurposed flyers will be represented as event photographs.
+[DECISION] Refine short scroll reveals, FAQ expansion, tactile card/button feedback, persistent useful navigation, a small footer, and honest closed-sales actions. Replace unconfirmed schedule promises with known 0x04 status. On a 390px phone, one active archive card, labelled controls, readable hero copy and ordinary vertical scrolling take priority. The optional photo crossfade awaits approved photos and will not be simulated with unrelated imagery.
+--codex
+
+### 2026-09-30 · Playground-inspired UX · IMPLEMENTED AND CHECKED
+[FACT] Implemented the owner-authorized water → paper introduction → edition-card archive → known 0x04 details/FAQ → pass preview/footer journey. The archived placeholder Community, Playlist and MemoryTimeline files remain in the repo but are no longer mounted on the homepage. Header links stay available after the hero. Sales remain closed; no signup endpoint, prices or logistics were invented.
+[FACT] `npm run build` finishes with zero Svelte/Vite warnings; `git diff --check` passes. `scripts/check-ux.mjs` passed in Chromium 138 at widths 320, 390, 768 and 1440: readable phone copy, no horizontal overflow, navigation, manual archive advancement/wrapping, keyboard control, pointer swipe/cancel, edition details, FAQ, pass drawer focus trapping/restoration, and reduced-motion still image with no WebGL download. Normal-motion checks passed for card transitions, FAQ expansion/collapse and the failed-WebGL fallback. Hero and archive screenshots were visually reviewed.
+[FACT] A separate Chromium CDP touch run at 390px passed vertical swipes over the hero and card stack, horizontal swipes advancing the edition, and confirmed vertical card gestures do not advance the archive. No page errors in that run.
+[FACT] Android/Termux required a local Playwright platform shim and single-process Chromium for browser checks. Enabling software GPU rendering crashed this browser before navigation completed, so live GPU water rendering is not verified here. The existing `createShallows.js` renderer was not changed; `Shallows.svelte` now handles the reduced-motion still, opt-in sound, load readiness and copy/actions. Approved event photos are still absent; printed edition artwork is intentional and the photo crossfade remains pending.
+[FACT] Work stays on `codex/playground-ux` in the isolated worktree. No push, merge, deployment or frozen archive changes.
+--codex
+
+### 2026-09-30 · Event trail follow-through · OWNER-AUTHORIZED
+[FACT] The owner asked to fix the event trail after the homepage UX pass. EventTrail.svelte still sends all recap actions to About, assigns the painting save-the-date flyer to 0x03, presents 0x04 as “???”, and links “Get on the list” to the homepage without a signup. Its observer timers are not cleaned up and reduced-motion content still starts hidden.
+[DECISION] Replace the old roadmap treatment with a chronological paper archive using shared edition facts/artwork, short existing reveals, accessible edition jump links and a truthful 0x04 card. On 390px, each card becomes one readable column; links land below the sticky navigation. The 0x04 action opens the existing closed-sales pass drawer. Do not invent recaps or reuse unverified flyers as photos.
+--codex
+
+### 2026-09-30 · Event trail · IMPLEMENTED AND CHECKED
+[FACT] The trail now shares confirmed edition data and printed artwork with the homepage, uses a compact chronological layout with an edition index, and exposes direct links #/trail/0x01–0x04. On phones the index is sticky below the top navigation; targets clear both bars. Misassigned flyer imagery, generic “View recap” links, the “???” title, and the nonexistent signup action have been removed. The 0x04 button opens the existing closed-sales drawer.
+[FACT] Direct-link positioning waits for font loading, and repeat clicks on the current hash re-position/focus the selected card. The old observer timer stack is replaced by the existing short ScrollReveal component with visible reduced-motion content. No new animation dependency was added.
+[FACT] `scripts/check-trail.mjs` passes in Chromium at 320, 390, 768 and 1440px: chronology, factual date/status, no speculative photos, sticky navigation clearance, repeated jumps, reload/deep-link behavior, back/forward, keyboard focus, closed-sales drawer, no overflow, normal reveals, and runtime reduced-motion changes. Mobile and desktop screenshots were visually reviewed. `npm run build` and `git diff --check` pass without warnings.
+[FACT] Changes remain local on codex/playground-ux. The preview at port 4174 serves the rebuilt output; no deployment or push.
+--codex
+
+[FACT] After the shared edition-artwork and route changes, the existing `scripts/check-ux.mjs` homepage suite also passed again at all four widths, including gestures, keyboard control, dialogs, FAQ and WebGL failure fallback.
+--codex

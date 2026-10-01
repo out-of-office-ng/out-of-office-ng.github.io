@@ -130,17 +130,30 @@ html, body {
   }
 }
 
-/* Gamified Interactivity */
-button, a {
-  transition: transform 0.2s var(--ease-out-expo), box-shadow 0.2s var(--ease-out-expo);
+/* Small feedback on explicit actions; links and layout anchors do not jump. */
+.ui-action {
+  transition: translate 180ms var(--ease-out-expo), scale 180ms var(--ease-out-expo), background-color 180ms, box-shadow 180ms;
 }
-
-button:hover, a:hover {
-  transform: translateY(-2px) scale(1.02);
+@media (hover: hover) and (pointer: fine) {
+  .ui-action:not(:disabled):hover { translate: 0 -2px; }
 }
-
-button:active, a:active {
-  transform: translateY(1px) scale(0.98);
+.ui-action:not(:disabled):active { translate: 0 0; scale: .98; }
+:where(a, button, [tabindex]):focus-visible { outline: 3px solid var(--deep); outline-offset: 5px; }
+:where(a, button, input, select, textarea, [tabindex], [role="button"]) { -webkit-tap-highlight-color: transparent; }
+:where(a, button, [tabindex]):focus:not(:focus-visible) { outline: none; }
+button:disabled { cursor: not-allowed; }
+.chapter { padding: clamp(72px, 9vw, 120px) clamp(24px, 6vw, 72px); }
+.chapter h2 { margin: 0; font: 400 clamp(38px, 4.8vw, 62px)/1.08 var(--serif); letter-spacing: -.04em; }
+.eyebrow { margin: 0 0 18px; color: var(--pink-deep); font: 500 10px/1.5 var(--sans); letter-spacing: .17em; }
+.text-link { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--deep); font: 500 13px/1.5 var(--sans); text-decoration: underline; text-underline-offset: 5px; cursor: pointer; }
+.text-link:hover { color: var(--ink); }
+:where(section[id], #content-start) { scroll-margin-top: 104px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-link { position: fixed; top: 8px; left: 16px; translate: 0 -200%; z-index: 2000; padding: 12px 20px; background: var(--ink); color: var(--bg); }
+.skip-link:focus { translate: none; }
+@media (max-width: 580px) { :where(section[id], #content-start) { scroll-margin-top: 140px; } }
+@media (prefers-reduced-motion: reduce) {
+  .ui-action:not(:disabled):hover, .ui-action:not(:disabled):active { translate: none; scale: 1; }
 }
 
 .interactive-card {
@@ -182,6 +195,50 @@ button:active, a:active {
   --border-dashed: color-mix(in srgb, var(--ink) 40%, transparent);
 }
 html, body { overflow-x: clip; }
+:root { color-scheme: light; }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1c201e;
+  --ink: #f1ecdf;
+  --deep: #acd0be;
+  --muted: #b7bbb2;
+  --pink-deep: #eeacc5;
+  --card-surface: #2b322d;
+  --cream: #303630;
+  --blue: #acd0be;
+  --accent: #acd0be;
+}
+/* Explicit surface overrides keep photographs untouched and text readable. */
+html[data-theme="dark"] .site-header,
+html[data-theme="dark"] .trail-nav { background: #202722a8; border-color: #d9e5d32e; box-shadow: 0 8px 24px #0003, inset 0 1px 0 #ffffff18; }
+html[data-theme="dark"] .archive { background: #252e28; }
+html[data-theme="dark"] .showcase { background: #242721; }
+html[data-theme="dark"] .edition-card,
+html[data-theme="dark"] .showcase-card,
+html[data-theme="dark"] .trail-card,
+html[data-theme="dark"] .lightbox-dialog,
+html[data-theme="dark"] .embed-wrapper,
+html[data-theme="dark"] .pass-card,
+html[data-theme="dark"] .pass-details { background: #303730; border-color: #697568; }
+html[data-theme="dark"] .photo-slot,
+html[data-theme="dark"] .lightbox-image { background: repeating-linear-gradient(135deg, #343e35 0 12px, #2e382f 12px 24px); color: #d4dbc9; }
+html[data-theme="dark"] .step { background: #303730; }
+html[data-theme="dark"] .pass-button,
+html[data-theme="dark"] .claim-btn,
+html[data-theme="dark"] .seat-badge,
+html[data-theme="dark"] .edition-badge,
+html[data-theme="dark"] .lightbox-close { background: #acd0be; color: #1c2921; }
+html[data-theme="dark"] .next-card { --deep: #304f42; }
+html[data-theme="dark"] .city-box.yellow { color: #243e3c; }
+html[data-theme="dark"] .city-name { background: #17251d; }
+html[data-theme="dark"] .edition-index a:is(:hover, [aria-current]) { background: #354136; }
+@media (max-width: 580px) {
+  .site-header .header-left { gap: 6px; }
+  .site-header .brand { max-width: 76px; white-space: normal; font-size: 10px; line-height: 1.15; }
+  .site-header .header-actions { gap: 0; }
+  .site-header .pass-button { padding-inline: 10px; font-size: 10px; gap: 4px; }
+  .site-header { gap: 4px; }
+}
 @media (prefers-reduced-motion: reduce) {
   html, body { scroll-behavior: auto; }
 }
