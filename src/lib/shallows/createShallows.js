@@ -963,7 +963,6 @@ const vertexShader = `
   uniform float uTime;
   uniform float uWaveStrength;
   uniform float uWaveEnvelope;
-  uniform float uLowQuality;
   uniform vec2 uSurfFront;
   uniform vec2 uSurfDirection;
   uniform float uSurfHeight;
@@ -1065,6 +1064,7 @@ const fragmentShader = `
   uniform float uTime;
   uniform float uWaveStrength;
   uniform float uWaveEnvelope;
+  uniform float uLowQuality;
   uniform sampler2D tRefraction;
   uniform sampler2D tDepth;
   uniform sampler2D tFoam;
