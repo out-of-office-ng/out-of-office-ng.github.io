@@ -17,6 +17,8 @@
   let destroyed = false;
   let viewMode = 'preview';
   let stillWater = false;
+  let waterQuality = 'rich';
+  let preferredQuality = 'auto';
 
   async function showView(nextMode) {
     viewMode = nextMode;
@@ -41,6 +43,7 @@
 
   function handleStatus(next) {
     if (next.kind === 'sound-failed') return;
+    if (next.kind === 'quality') { waterQuality = next.quality; return; }
     status = next.kind;
     message = next.message || '';
     if ((status === 'failed' || status === 'context-lost') && viewMode === 'explore') showView('preview');
@@ -56,9 +59,11 @@
       scene = createShallows(stage, {
         sound: !isMuted,
         initialMode: viewMode,
+        initialQuality: preferredQuality,
         onStatus: handleStatus,
         onBoatEgg: onOpenOooGen,
       });
+      waterQuality = scene.getQuality?.() || 'rich';
     } catch (error) {
       console.error('[shallows]', error);
       status = 'failed';
@@ -66,8 +71,19 @@
     }
   }
 
+  function toggleWaterQuality() {
+    const next = waterQuality === 'rich' ? 'low' : 'rich';
+    waterQuality = next;
+    scene?.setQuality(next);
+    try { localStorage.setItem('ooo-water-quality', next); } catch {}
+  }
+
   let nearObserver;
   onMount(() => {
+    try {
+      const savedQuality = localStorage.getItem('ooo-water-quality');
+      if (savedQuality === 'rich' || savedQuality === 'low') preferredQuality = savedQuality;
+    } catch {}
     const preference = matchMedia('(prefers-reduced-motion: reduce)');
     const updateMotion = () => {
       stillWater = preference.matches;
@@ -139,6 +155,7 @@
       <div class="explore-actions">
         <button type="button" class="back-button" on:click={() => showView('preview')}>Back to the page</button>
         <button type="button" on:click={() => scene?.resetView()}>Reset view</button>
+        <button type="button" class="quality-button" aria-pressed={waterQuality === 'low'} on:click={toggleWaterQuality}>Water: {waterQuality === 'rich' ? 'Rich' : 'Low'}</button>
       </div>
     </div>
   {/if}

@@ -19,7 +19,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createAsset as createPolyforkSailboat } from '../vendor/polyfork-sailboat.mjs';
 
-export function createShallows(container, { sound = true, initialMode = 'preview', onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
+export function createShallows(container, { sound = true, initialMode = 'preview', initialQuality = 'auto', onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
 const viewW = () => Math.max(1, container.clientWidth);
 const viewH = () => Math.max(1, container.clientHeight);
 
@@ -127,6 +127,7 @@ scene.add(hemi);
    ========================================================================== */
 const timeU = { value: 0 };
 const nightU = { value: 0 };
+const lowQualityU = { value: 0 };
 const waterLevelU = { value: SETTINGS.waterLevel };
 const waveStrengthU = { value: SETTINGS.waveStrength };
 // Envelope in [0, 1]. 0 = flat calm, 1 = full set. Multiplied by the shader
@@ -962,6 +963,7 @@ const vertexShader = `
   uniform float uTime;
   uniform float uWaveStrength;
   uniform float uWaveEnvelope;
+  uniform float uLowQuality;
   uniform vec2 uSurfFront;
   uniform vec2 uSurfDirection;
   uniform float uSurfHeight;
@@ -1100,6 +1102,17 @@ const fragmentShader = `
   void main() {
     vec2 p = vWorldPos.xz;
     float t = uTime;
+
+    // Low mode keeps the same scene composition and boats, but avoids the
+    // expensive refraction, foam, and reflection sampling on weak GPUs.
+    if (uLowQuality > 0.5) {
+      float light = 0.55 + 0.45 * max(dot(normalize(vNormalW), normalize(uSunDir)), 0.0);
+      vec3 lowWater = mix(vec3(0.10, 0.34, 0.38), vec3(0.34, 0.62, 0.60), light);
+      lowWater = mix(lowWater, vec3(0.025, 0.13, 0.18), uNight * 0.55);
+      float glint = pow(max(dot(normalize(vNormalW), normalize(uSunDir)), 0.0), 18.0);
+      gl_FragColor = vec4(lowWater + vec3(0.72, 0.86, 0.78) * glint * 0.12, 1.0);
+      return;
+    }
 
     vec3 foamTex = texture2D(tFoam, p * .12 + vec2(t * .009, -t * .013)).rgb;
     vec3 foamFine = texture2D(tFoam, p * .35 + vec2(-t * .015, t * .011)).rgb;
@@ -1264,6 +1277,7 @@ const waterMat = new THREE.ShaderMaterial({
     uWake: wakeU,
     uWaveStrength: waveStrengthU,
     uWaveEnvelope: waveEnvelopeU,
+    uLowQuality: lowQualityU,
     uSurfFront: surfFrontU,
     uSurfDirection: surfDirectionU,
     uSurfHeight: surfHeightU,
@@ -1295,6 +1309,36 @@ const water = new THREE.Mesh(makeWaterGeometry(qualitySettings.segments), waterM
 water.position.y = waterLevelU.value;
 water.layers.set(1);
 scene.add(water);
+
+const lowWaterMat = new THREE.ShaderMaterial({
+  uniforms: waterMat.uniforms,
+  vertexShader,
+  fragmentShader,
+  side: THREE.DoubleSide,
+});
+const lowWater = new THREE.Mesh(makeWaterGeometry(28), lowWaterMat);
+lowWater.name = 'Low-poly water surface';
+lowWater.position.y = waterLevelU.value;
+lowWater.layers.set(1);
+lowWater.visible = false;
+scene.add(lowWater);
+
+function deviceNeedsLowWater() {
+  const memory = Number(navigator.deviceMemory || 0);
+  const cores = Number(navigator.hardwareConcurrency || 0);
+  return renderer.capabilities.maxTextureSize < 4096 || (memory > 0 && memory <= 2) || (cores > 0 && cores <= 2);
+}
+
+let qualityMode = initialQuality === 'low' || (initialQuality === 'auto' && deviceNeedsLowWater()) ? 'low' : 'rich';
+function setQuality(next = qualityMode) {
+  qualityMode = next === 'low' ? 'low' : 'rich';
+  lowQualityU.value = qualityMode === 'low' ? 1 : 0;
+  water.visible = qualityMode === 'rich';
+  lowWater.visible = qualityMode === 'low';
+  onStatus({ kind: 'quality', quality: qualityMode });
+  onResize();
+  requestRender();
+}
 
 /* ==========================================================================
    Day / night art direction
@@ -1587,6 +1631,7 @@ listen(window, 'pagehide', event => {
 });
 listen(window, 'pageshow', event => { if (event.persisted) syncAnimation(); });
 
+setQuality(qualityMode);
 setMode();
 renderFrame();
 onStatus({ kind: 'ready' });
@@ -1609,6 +1654,8 @@ if (navigator.userActivation?.hasBeenActive) armAudio();
 
 return {
   setMode,
+  setQuality,
+  getQuality: () => qualityMode,
   resetView: resetCamera,
   setSound(enabled) {
     soundEnabled = !!enabled;
