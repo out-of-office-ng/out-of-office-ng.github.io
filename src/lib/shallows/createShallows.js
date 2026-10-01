@@ -119,12 +119,14 @@ const sunDir = new THREE.Vector3(0.5, 0.8, 0.3).normalize();
 const sun = new THREE.DirectionalLight(0xffedd3, 2.3);
 sun.position.copy(sunDir).multiplyScalar(20);
 scene.add(sun);
-scene.add(new THREE.HemisphereLight(0xbfd9ff, 0x6b5f4f, 1.15));
+const hemi = new THREE.HemisphereLight(0xbfd9ff, 0x6b5f4f, 1.15);
+scene.add(hemi);
 
 /* ==========================================================================
    Shared uniforms
    ========================================================================== */
 const timeU = { value: 0 };
+const nightU = { value: 0 };
 const waterLevelU = { value: SETTINGS.waterLevel };
 const waveStrengthU = { value: SETTINGS.waveStrength };
 // Envelope in [0, 1]. 0 = flat calm, 1 = full set. Multiplied by the shader
@@ -171,6 +173,7 @@ const skyMat = new THREE.ShaderMaterial({
   uniforms: {
     uSunDir: { value: sunDir },
     uHorizonColor: { value: horizonColor },
+    uNight: nightU,
   },
   vertexShader: `
     varying vec3 vDir;
@@ -186,13 +189,14 @@ const skyMat = new THREE.ShaderMaterial({
     void main() {
       vec3 d = normalize(vDir);
       float t = clamp(d.y, 0.0, 1.0);
-      vec3 col = mix(uHorizonColor, vec3(0.22, 0.52, 0.76), pow(t, 0.7)) * 1.15;
+      vec3 skyTop = mix(vec3(0.22, 0.52, 0.76), vec3(0.025, 0.075, 0.13), uNight);
+      vec3 col = mix(uHorizonColor, skyTop, pow(t, 0.7)) * mix(1.15, .88, uNight);
       // A restrained warm band gives the water the late-day atmosphere of the
       // reference scenes without replacing Out of Office's cool palette.
       float horizonGlow = pow(1.0 - t, 7.0) * 0.14;
-      col += vec3(1.0, 0.55, 0.30) * horizonGlow;
-      col += vec3(1.0, 0.96, 0.88) * pow(max(dot(d, uSunDir), 0.0), 380.0) * 1.2;
-      col += vec3(1.0, 0.90, 0.78) * pow(max(dot(d, uSunDir), 0.0), 12.0) * 0.18;
+      col += vec3(1.0, 0.55, 0.30) * horizonGlow * (1.0 - uNight);
+      col += vec3(1.0, 0.96, 0.88) * pow(max(dot(d, uSunDir), 0.0), 380.0) * mix(1.2, .12, uNight);
+      col += vec3(1.0, 0.90, 0.78) * pow(max(dot(d, uSunDir), 0.0), 12.0) * mix(.18, .03, uNight);
       gl_FragColor = vec4(col, 1.0);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
@@ -1069,6 +1073,7 @@ const fragmentShader = `
   uniform vec3 uDeepColor;
   uniform vec3 uSssColor;
   uniform vec3 uHorizonColor;
+  uniform float uNight;
   uniform vec2 uTexel;
   uniform float uSurfHeight;
   varying float vCrest;
@@ -1083,11 +1088,12 @@ const fragmentShader = `
 
   vec3 skyColor(vec3 d) {
     float t = clamp(d.y, 0.0, 1.0);
-    vec3 col = mix(uHorizonColor, vec3(0.22, 0.52, 0.76), pow(t, 0.7)) * 1.15;
+    vec3 skyTop = mix(vec3(0.22, 0.52, 0.76), vec3(0.025, 0.075, 0.13), uNight);
+    vec3 col = mix(uHorizonColor, skyTop, pow(t, 0.7)) * mix(1.15, .88, uNight);
     float horizonGlow = pow(1.0 - t, 7.0) * 0.14;
-    col += vec3(1.0, 0.55, 0.30) * horizonGlow;
-    col += vec3(1.0, 0.96, 0.88) * pow(max(dot(d, uSunDir), 0.0), 380.0) * 1.2;
-    col += vec3(1.0, 0.90, 0.78) * pow(max(dot(d, uSunDir), 0.0), 12.0) * 0.18;
+    col += vec3(1.0, 0.55, 0.30) * horizonGlow * (1.0 - uNight);
+    col += vec3(1.0, 0.96, 0.88) * pow(max(dot(d, uSunDir), 0.0), 380.0) * mix(1.2, .12, uNight);
+    col += vec3(1.0, 0.90, 0.78) * pow(max(dot(d, uSunDir), 0.0), 12.0) * mix(.18, .03, uNight);
     return col;
   }
 
@@ -1272,6 +1278,7 @@ const waterMat = new THREE.ShaderMaterial({
     uDeepColor: { value: new THREE.Color(...SETTINGS.deepColor) },
     uSssColor: { value: new THREE.Color(...SETTINGS.sssColor) },
     uHorizonColor: { value: horizonColor },
+    uNight: nightU,
     uTexel: { value: new THREE.Vector2(1, 1) },
   },
   vertexShader,
@@ -1288,6 +1295,35 @@ const water = new THREE.Mesh(makeWaterGeometry(qualitySettings.segments), waterM
 water.position.y = waterLevelU.value;
 water.layers.set(1);
 scene.add(water);
+
+/* ==========================================================================
+   Day / night art direction
+   ========================================================================== */
+const dayHorizon = new THREE.Color(0.68, 0.82, 0.86);
+const nightHorizon = new THREE.Color(0.035, 0.075, 0.12);
+const dayDeep = new THREE.Color(...SETTINGS.deepColor);
+const nightDeep = new THREE.Color(0.025, 0.13, 0.18);
+const daySss = new THREE.Color(...SETTINGS.sssColor);
+const nightSss = new THREE.Color(0.10, 0.23, 0.27);
+
+function applyWaterTheme() {
+  const night = document.documentElement.dataset.theme === 'dark';
+  nightU.value = night ? 1 : 0;
+  horizonColor.copy(night ? nightHorizon : dayHorizon);
+  scene.background = horizonColor;
+  scene.fog.color.copy(horizonColor);
+  waterMat.uniforms.uDeepColor.value.copy(night ? nightDeep : dayDeep);
+  waterMat.uniforms.uSssColor.value.copy(night ? nightSss : daySss);
+  sun.color.set(night ? 0x8ea9d0 : 0xffedd3);
+  sun.intensity = night ? .62 : 2.3;
+  hemi.color.set(night ? 0x233b62 : 0xbfd9ff);
+  hemi.groundColor.set(night ? 0x111a24 : 0x6b5f4f);
+  hemi.intensity = night ? .72 : 1.15;
+}
+
+const themeObserver = new MutationObserver(applyWaterTheme);
+themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+applyWaterTheme();
 
 /* ==========================================================================
    Resolution / dynamic scaling
@@ -1525,6 +1561,7 @@ function dispose() {
   cancelAnimationFrame(renderRequest);
   observer.disconnect();
   resizeObserver.disconnect();
+  themeObserver.disconnect();
   listeners.abort();
   controls.removeEventListener('change', requestRender);
   controls.dispose();
