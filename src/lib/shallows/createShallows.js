@@ -1110,7 +1110,14 @@ const fragmentShader = `
       vec3 lowWater = mix(vec3(0.10, 0.34, 0.38), vec3(0.34, 0.62, 0.60), light);
       lowWater = mix(lowWater, vec3(0.025, 0.13, 0.18), uNight * 0.55);
       float glint = pow(max(dot(normalize(vNormalW), normalize(uSunDir)), 0.0), 18.0);
-      gl_FragColor = vec4(lowWater + vec3(0.72, 0.86, 0.78) * glint * 0.12, 1.0);
+      // Keep the low-cost surface, but retain the scene underneath it so the
+      // paper boat, Polyfork boat, fish, rocks, and seabed do not disappear.
+      vec2 lowUv = clamp(vClipPos.xy / vClipPos.w * 0.5 + 0.5, uTexel, 1.0 - uTexel);
+      vec3 sceneUnder = texture2D(tRefraction, lowUv).rgb;
+      vec3 lowCol = mix(sceneUnder, lowWater, 0.42) + vec3(0.72, 0.86, 0.78) * glint * 0.12;
+      gl_FragColor = vec4(lowCol, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
       return;
     }
 
