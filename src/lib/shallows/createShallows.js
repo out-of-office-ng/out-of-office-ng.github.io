@@ -670,6 +670,14 @@ for (let i = 0; i < fishCount; i++) {
     trail: Math.floor(member / 3) * .72,
     spread: (member % 3 - 1) * .48 + (random() - .5) * .10,
     scale: .85 + random() * .35,
+    // Most fish follow the authored school path. A randomized subset gets a
+    // gentle boid layer so the scene feels alive without losing composition.
+    boid: random() < .72,
+    anchor: new THREE.Vector3(),
+    position: new THREE.Vector3(),
+    velocity: new THREE.Vector3(),
+    force: new THREE.Vector3(),
+    initialized: false,
   });
   fish.setColorAt(i, new THREE.Color(i % 9 === 0 ? 0xf4d59a : 0xffffff));
 }
@@ -679,6 +687,11 @@ const touchU = { value: new THREE.Vector4(0, 0, -100, 0) };
 const wakeU = { value: new THREE.Vector4(0, 0, 1, 0) };
 
 const fishNow = new THREE.Vector3(), fishNext = new THREE.Vector3();
+const fishDelta = new THREE.Vector3();
+const fishCenter = new THREE.Vector3();
+const fishAlign = new THREE.Vector3();
+const fishSeparation = new THREE.Vector3();
+let fishLastTime = -1;
 
 function fishPath(state, t, out) {
   const q = t * (.10 + state.school * .018) + state.school * 2.1 + state.phase;
@@ -735,10 +748,67 @@ function fishPathDerivative(state, t, out) {
 }
 
 function updateFish() {
+  const dt = fishLastTime < 0 ? .016 : THREE.MathUtils.clamp(timeU.value - fishLastTime, .008, .04);
+  fishLastTime = timeU.value;
+
+  // First find each fish's authored anchor. Steering around these anchors
+  // keeps the flock local to its original cove instead of drifting away.
   for (let i = 0; i < fishCount; i++) {
     const state = fishState[i];
-    fishPath(state, timeU.value, fishNow);
+    fishPath(state, timeU.value, state.anchor);
+    if (!state.initialized) {
+      state.position.copy(state.anchor);
+      state.velocity.set(.08, 0, .02);
+      state.initialized = true;
+    }
+  }
+
+  for (let i = 0; i < fishCount; i++) {
+    const state = fishState[i];
+    fishNow.copy(state.anchor);
+
+    if (state.boid) {
+      const sepRadius = 1.05;
+      const flockRadius = 2.1;
+      let nearby = 0;
+      fishCenter.set(0, 0, 0);
+      fishAlign.set(0, 0, 0);
+      fishSeparation.set(0, 0, 0);
+      state.force.subVectors(state.anchor, state.position).multiplyScalar(1.65);
+
+      for (let j = 0; j < fishCount; j++) {
+        if (i === j || fishState[j].school !== state.school) continue;
+        const other = fishState[j];
+        fishDelta.subVectors(state.position, other.position);
+        const d2 = fishDelta.lengthSq();
+        if (d2 < .0001 || d2 > flockRadius * flockRadius) continue;
+        nearby++;
+        fishCenter.add(other.position);
+        fishAlign.add(other.velocity);
+        if (d2 < sepRadius * sepRadius) fishSeparation.addScaledVector(fishDelta, 1 / d2);
+      }
+
+      if (nearby > 0) {
+        fishCenter.multiplyScalar(1 / nearby).sub(state.position).multiplyScalar(.18);
+        fishAlign.multiplyScalar(1 / nearby).sub(state.velocity).multiplyScalar(.12);
+        state.force.add(fishCenter).add(fishAlign).addScaledVector(fishSeparation, .08);
+      }
+      fishDelta.set(
+        Math.sin(timeU.value * 1.7 + state.phase * 31.0),
+        Math.sin(timeU.value * 2.3 + state.phase * 17.0) * .35,
+        Math.cos(timeU.value * 1.9 + state.phase * 23.0),
+      ).multiplyScalar(.045);
+      state.force.add(fishDelta);
+      state.velocity.addScaledVector(state.force, dt).multiplyScalar(.992).clampLength(.055, .52);
+      state.position.addScaledVector(state.velocity, dt);
+      fishNow.copy(state.position);
+    } else {
+      state.position.copy(state.anchor);
+    }
+
     fishPathDerivative(state, timeU.value, fishNext);
+    fishNext.x += state.boid ? state.velocity.x * .4 : 0;
+    fishNext.z += state.boid ? state.velocity.z * .4 : 0;
     fishDummy.position.copy(fishNow);
     fishDummy.rotation.set(0, -Math.atan2(fishNext.z, fishNext.x), 0);
     fishDummy.scale.setScalar(state.scale);
