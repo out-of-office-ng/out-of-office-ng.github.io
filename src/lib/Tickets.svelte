@@ -97,7 +97,7 @@
           <div class="stub-header">PREVIEW · NOT AN ISSUED PASS</div>
           <div class="seat-badge">0x04 · NOVEMBER</div>
           <p class="closed-copy">The date and venue are still to be announced. Passes are not on sale yet.</p>
-          <button class="claim-btn ui-action" on:click={openPass}>Pass update &rarr;</button>
+          <button class="claim-btn ui-action" on:click={openPass}>See 0x04 status &rarr;</button>
         {/if}
       </div>
     </div>

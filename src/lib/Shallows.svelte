@@ -3,6 +3,7 @@
   import { muted, toggleMute } from './ambientSound.js';
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
 
+  const siteBase = import.meta.env.BASE_URL;
   export let onOpenOooGen = () => {};
   export let onScrollToContent = () => {};
   export let onScrollToShowcase = () => {};
@@ -120,8 +121,8 @@
 <section id="shallows" class="hero" class:exploring={viewMode === 'explore'} class:scene-unavailable={status === 'failed' || status === 'context-lost'} bind:this={section} aria-label="Out of Office water">
   <div class="stage" bind:this={stage}>
     <picture class="water-still" aria-hidden="true">
-      <source media="(max-width: 700px)" srcset="/hero-water-mobile.jpg" />
-      <img src="/hero-water-desktop.jpg" alt="" fetchpriority="high" decoding="async" />
+      <source media="(max-width: 700px)" srcset={`${siteBase}hero-water-mobile.jpg`} />
+      <img src={`${siteBase}hero-water-desktop.jpg`} alt="" fetchpriority="high" decoding="async" />
     </picture>
   </div>
 
@@ -130,9 +131,9 @@
     <div class="hero-copy">
       <p class="eyebrow">OUT OF OFFICE</p>
       <h1 tabindex="-1">Away from<br />the everyday.</h1>
-      <p class="description">Lagos hangouts for music, art,<br />games, and a little time off.</p>
+      <p class="description">A Lagos hangout for music, art, games,<br />and a little time off together.</p>
       <p class="event-status">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}<br /><span class="date-tba">Date and venue TBA</span></p>
-      <button type="button" class="primary-button ui-action" on:click={onScrollToShowcase}>Explore the last escape</button>
+      <button type="button" class="primary-button ui-action" on:click={onScrollToShowcase}>See the places in our story</button>
     </div>
 
     <aside class="auto-reply" aria-label="An Out of Office auto-reply">

@@ -67,6 +67,8 @@ try {
 }
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.08;
+// Keep the scene's shader output aligned with the page's sRGB brand assets.
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, qualitySettings.dpr));
 renderer.setSize(viewW(), viewH());
 renderer.domElement.setAttribute('aria-label', 'A sunlit coastal pool with swimming fish, sea stars, shells and a pink paper boat. Tap for ripples, drag sideways to look around, or use the arrow keys.');
@@ -1013,17 +1015,53 @@ function updateBoat() {
   boatShadow.position.set(x - .5, bedHeight(x - .5, z - .3) + .028, z - .3);
   boatShadow.rotation.y = Math.atan2(_boatForward.x, _boatForward.z);
 
-  // The Polyfork boat follows a separate, slower path so the two silhouettes
-  // do not overlap. It shares the same swell envelope and stays lightweight.
-  const px = -2.6 + Math.sin(t * .045 + 1.8) * 1.05;
-  const pz = -1.85 + Math.cos(t * .045 + 1.8) * .82;
-  const pWave = .16 * Math.sin(t * .82 + px * .8) + .08 * Math.sin(t * 1.35 + pz * .65);
-  polyforkBoat.position.set(px, waterLevelU.value + pWave + .12, pz);
-  polyforkBoat.rotation.set(
-    .025 * Math.sin(t * .62),
-    Math.atan2(Math.cos(t * .045 + 1.8), -Math.sin(t * .045 + 1.8)) + .32,
-    .035 * Math.cos(t * .54 + .7),
-  );
+  // The Polyfork follows the incoming current instead of tracing an unrelated
+  // circle. Its heading, wake and buoyancy all use the same flow and wave field.
+  {
+  const flowPhase = t * .065 + 1.8;
+  const px = -2.6 + dx * Math.sin(flowPhase) * 1.05 + ax * Math.cos(flowPhase) * .28;
+  const pz = -1.85 + dz * Math.sin(flowPhase) * 1.05 + az * Math.cos(flowPhase) * .28;
+  let ph = 0, pgx = 0, pgz = 0;
+  for (const w of BOAT_WAVES) {
+    const phase = (px * w.nx + pz * w.nz) * w.f + t * w.speed;
+    const s = Math.sin(phase), c = Math.cos(phase);
+    ph += w.amp * gains.chop * s;
+    pgx += w.nx * w.f * w.amp * gains.chop * c;
+    pgz += w.nz * w.f * w.amp * gains.chop * c;
+  }
+  const waveFade = waveStrengthU.value * (1 - THREE.MathUtils.smoothstep(Math.hypot(px, pz), 18, 65));
+  ph *= waveFade; pgx *= waveFade; pgz *= waveFade;
+  const capNear = 1 - THREE.MathUtils.smoothstep(Math.hypot(px, pz), 3, 12);
+  const capMul = .6 + 1.2 * waveEnvelopeU.value;
+  const capWaves = [[.9,.7,11,.003,5.4],[-.6,.9,16,.002,6.8],[.3,-.95,23,.0012,8.6]];
+  for (const [a, b, f, amp, speed] of capWaves) {
+    const len = Math.hypot(a, b), nx = a / len, nz = b / len;
+    const phase = (px * nx + pz * nz) * f + t * speed;
+    ph += amp * capMul * Math.sin(phase) * capNear;
+    const slope = amp * capMul * f * Math.cos(phase) * capNear;
+    pgx += nx * slope; pgz += nz * slope;
+  }
+  const along = px * dx + pz * dz, cross = px * ax + pz * az;
+  const bend = .32 * Math.sin(cross * .48);
+  const slopeDirX = dx + ax * .1536 * Math.cos(cross * .48);
+  const slopeDirZ = dz + az * .1536 * Math.cos(cross * .48);
+  const swellGain = gains.swell, width2 = SETTINGS.surf.width ** 2;
+  const shoreFade = 1 - THREE.MathUtils.smoothstep(Math.abs(along), 13, 23);
+  const swellH = surfHeightU.value * swellGain * shoreFade;
+  for (let i = 0; i < 2; i++) {
+    const weight = SWELL_WEIGHTS[i], d = along + bend - (i ? surfFrontU.value.y : surfFrontU.value.x);
+    const tail = d + 2, peak = Math.exp(-d * d / width2), trough = Math.exp(-tail * tail / (3 * width2));
+    ph += weight * (peak - .24 * trough) * swellH;
+    const slope = weight * (-2 * d / width2 * peak + .16 * tail / width2 * trough) * swellH;
+    pgx += slope * slopeDirX; pgz += slope * slopeDirZ;
+  }
+  const polyNormal = _boatNormal.set(-pgx, 1, -pgz).normalize();
+  _boatForward.set(dx, 0, dz).addScaledVector(polyNormal, -_boatForward.dot(polyNormal)).normalize();
+  polyforkBoat.position.set(px, waterLevelU.value + ph + .12, pz);
+  _boatRight.crossVectors(polyNormal, _boatForward);
+  _boatBasis.makeBasis(_boatRight, polyNormal, _boatForward);
+  polyforkBoat.quaternion.setFromRotationMatrix(_boatBasis);
+  }
 }
 
 /* ==========================================================================
@@ -1382,6 +1420,17 @@ function makeWaterGeometry(segments) {
   stretchEdges(geometry);
   return geometry;
 }
+// A quiet, oversized backing surface keeps touch orbiting from exposing a
+// black clear-color wedge if the detailed water mesh moves out of frame.
+const waterBacking = new THREE.Mesh(
+  new THREE.PlaneGeometry(1200, 1200),
+  new THREE.MeshBasicMaterial({ color: new THREE.Color(.12, .29, .32), toneMapped: false }),
+);
+waterBacking.name = 'Ocean edge fill';
+waterBacking.rotation.x = -Math.PI / 2;
+waterBacking.position.y = waterLevelU.value - 1.2;
+waterBacking.layers.set(1);
+scene.add(waterBacking);
 const water = new THREE.Mesh(makeWaterGeometry(qualitySettings.segments), waterMat);
 water.position.y = waterLevelU.value;
 water.layers.set(1);

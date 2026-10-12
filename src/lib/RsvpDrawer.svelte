@@ -160,7 +160,7 @@
       <div class="sheet-header">
         <div>
           <span class="badge">OOO 0x04 · NOVEMBER</span>
-          <h2 id="sheet-title" class="sheet-title">{salesOpen ? 'Claim Event Pass' : 'Pass update'}</h2>
+          <h2 id="sheet-title" class="sheet-title">{salesOpen ? 'Claim Event Pass' : '0x04 status'}</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
       </div>

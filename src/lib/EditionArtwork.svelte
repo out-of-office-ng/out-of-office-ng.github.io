@@ -5,7 +5,8 @@
 
 <div class="artwork" style:--art-tone={edition.tone}>
   {#if edition.image && failedImage !== edition.image}
-    <img src={edition.image} alt={`${edition.title}, a past Out of Office gathering`} loading="lazy" draggable="false" on:error={() => failedImage = edition.image} />
+    <img src={edition.image} alt={`${edition.location} venue reference, not a photograph of ${edition.title}`} loading="lazy" draggable="false" on:error={() => failedImage = edition.image} />
+    <span class="image-note">VENUE REFERENCE · NOT EVENT PHOTO</span>
   {:else}
     <span class="art-label">OUT OF OFFICE<br />LAGOS, WITH LOVE</span>
     <span class="edition-word">{edition.word}</span>
@@ -18,6 +19,7 @@
   .artwork { position: relative; min-height: 240px; aspect-ratio: 1.48; padding: 20px; background: var(--art-tone); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; color: var(--ink); }
   .artwork::after { content: ''; position: absolute; inset: 12px; border: 1px solid #243e3c25; pointer-events: none; }
   img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .image-note { position: absolute; z-index: 2; right: 20px; bottom: 20px; padding: 7px 9px; background: #181818d9; color: #fff; font-size: 8px; font-weight: 700; letter-spacing: .08em; }
   .art-label, .art-footer { position: relative; z-index: 1; font-size: 9px; letter-spacing: .15em; font-weight: 600; }
   .edition-word { font: italic 400 clamp(45px, 5vw, 72px)/1 var(--serif); letter-spacing: -.06em; }
   .postmark { position: absolute; right: 18px; top: 18px; width: 76px; height: 76px; border: 3px double var(--deep); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 6px; letter-spacing: .06em; transform: rotate(12deg); }

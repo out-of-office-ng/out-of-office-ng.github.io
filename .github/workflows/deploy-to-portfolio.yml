@@ -26,6 +26,14 @@ jobs:
           VITE_PAYSTACK_PUBLIC_KEY: ${{ secrets.VITE_PAYSTACK_PUBLIC_KEY }}
         run: npx vite build --base=/out-of-office/
 
+      - name: Build archived v1 into portfolio bundle 🗄️
+        run: |
+          git fetch --depth=1 origin v1
+          git worktree add "$RUNNER_TEMP/v1" FETCH_HEAD
+          cd "$RUNNER_TEMP/v1"
+          npm ci || npm install
+          npx vite build --base=/out-of-office/v1/ --outDir "$GITHUB_WORKSPACE/dist/v1" --emptyOutDir
+
       - name: Checkout Portfolio Repository 🚀
         uses: actions/checkout@v4
         with:

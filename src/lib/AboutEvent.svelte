@@ -1,5 +1,6 @@
 <script>
   import AsciiFire from './AsciiFire.svelte';
+  const v1ArchiveUrl = `${import.meta.env.BASE_URL}v1/`;
 </script>
 
 <div class="about-page">
@@ -24,7 +25,7 @@
       <p class="manifesto signature">
         Gone to touch grass. Back soon.
       </p>
-      <a class="archive-link" href="/v1/">See where it started: Out of Office v1 &rarr;</a>
+      <a class="archive-link" href={v1ArchiveUrl}>See where it started: Out of Office v1 &rarr;</a>
     </div>
     
     <div class="fire-col">

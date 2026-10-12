@@ -3,6 +3,7 @@
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
   import EditionArtwork from './EditionArtwork.svelte';
   import ScrollReveal from './ScrollReveal.svelte';
+  const v1ArchiveUrl = `${import.meta.env.BASE_URL}v1/`;
 
   export let onOpenDrawer = () => {};
   export let activeEdition = null;
@@ -85,7 +86,10 @@
 
     <footer class="trail-footer">
       <p>Lagos, with love.</p>
-      <a class="text-link" href="#/">Back to the water <span aria-hidden="true">↗</span></a>
+      <div class="footer-links">
+        <a class="text-link" href={v1ArchiveUrl}>Open the v1 archive <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href="#/">Back to the water <span aria-hidden="true">↗</span></a>
+      </div>
     </footer>
   </main>
 </div>
@@ -140,6 +144,7 @@
   .next-card :global(:focus-visible) { outline-color: #faf8f2; }
   .next-card:focus-visible { outline-color: var(--ink); }
   .trail-footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 64px; padding: 32px 0; border-top: 1px solid var(--border-soft-deep); }
+  .footer-links { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
   .trail-footer p { font: 400 14px var(--marker); color: var(--pink-deep); }
   @media (hover: hover) and (pointer: fine) { .trail-card:hover .paper-image { transform: rotate(0deg); } }
   @media (max-width: 980px) {
@@ -172,6 +177,7 @@
     .next-stamp { width: 140px; height: 140px; right: -55px; top: 16px; opacity: .6; }
     .next-stamp strong { font-size: 44px; }
     .trail-footer { align-items: flex-start; flex-direction: column; gap: 8px; margin-top: 40px; }
+    .footer-links { gap: 8px 24px; }
   }
   @media (prefers-reduced-motion: reduce) { .paper-image, .trail > li:nth-child(2) .paper-image, .trail-card:hover .paper-image { transform: none; transition: none; } }
 </style>

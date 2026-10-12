@@ -7,7 +7,8 @@ blue Lagos* (Tarkwa Bay).
 
 - **Live:** https://out-of-office-ng.github.io/
 - **v1 archive:** https://out-of-office-ng.github.io/v1/ (the original cube
-  site, frozen, with ticket sales closed)
+  site, frozen, with ticket sales closed). The portfolio copy is at
+  https://joethesaint.github.io/out-of-office/v1/.
 
 ## Where things are
 
@@ -54,7 +55,8 @@ npm run preview
 Every push to **`main`** deploys the live site
 (`.github/workflows/deploy-pages.yml`). The same run also builds the `v1`
 branch into `/v1/`. A second workflow syncs `main` into the owner's
-portfolio repo under `/out-of-office/`.
+portfolio repo under `/out-of-office/` and builds the same archive under
+`/out-of-office/v1/`.
 
 Because of that:
 - Work on a branch in its own git worktree.

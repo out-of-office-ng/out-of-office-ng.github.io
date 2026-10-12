@@ -1,6 +1,7 @@
 <script>
   export let visible = false;
   let recordOut = false;
+  const siteBase = import.meta.env.BASE_URL;
   const playlistUrl = 'https://open.spotify.com/embed/playlist/5uJnnaFGzzaBcunJz6HA0h?utm_source=generator&theme=0';
 </script>
 
@@ -15,7 +16,7 @@
     <div class="art-panel">
     <button class="record-sleeve" class:revealed={visible} class:record-out={recordOut} type="button" aria-label="Slide the vinyl out of its sleeve" aria-pressed={recordOut} on:click={() => recordOut = !recordOut}>
       <span class="vinyl" aria-hidden="true"><span>OOO</span></span>
-      <img class="cover-art" src="/images/mixtape-cover.png" width="1024" height="1024" loading="lazy" alt="Out of Office — The Mixtape. A pink paper boat on green water, printed on a worn cream record sleeve. Made for time away." />
+      <img class="cover-art" src={`${siteBase}images/mixtape-cover.png`} width="1024" height="1024" loading="lazy" alt="Out of Office — The Mixtape. A pink paper boat on green water, printed on a worn cream record sleeve. Made for time away." />
     </button>
   </div>
 

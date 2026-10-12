@@ -1,30 +1,28 @@
+<script>
+  import { locationPhotos } from './locationPhotos.js';
+</script>
+
 <section class="community-section">
   <div class="text-content">
-    <p class="eyebrow">COMMUNITY &gt; CALENDAR INVITES</p>
-    <h2 class="heading">The best memories are slightly blurry.</h2>
+    <p class="eyebrow">A LITTLE ROOM TO BREATHE</p>
+    <h2 class="heading">Make room for real life.</h2>
     <p class="manifesto">
-      Not status-heavy nightlife. A small rebellion: music, art, board games, 
-      shared snacks and the conversation you remember on Monday.
+      A Lagos hangout series built around music, art, games, shared snacks,
+      and time away from the usual rush. The photos are venue references, not event coverage.
     </p>
     <div class="actions">
-      <button class="primary-btn">Join the community</button>
-      <a href="#volunteer" class="secondary-link">Volunteer &amp; sponsor</a>
+      <a class="primary-btn" href="#passes">See 0x04 status</a>
+      <a href="#past-editions" class="secondary-link">Past editions</a>
     </div>
   </div>
 
   <div class="polaroids">
-    <div class="polaroid p1">
-      <div class="photo">PHOTO GOES HERE</div>
-      <div class="caption">no hierarchy, just vibes</div>
-    </div>
-    <div class="polaroid p2">
-      <div class="photo">PHOTO GOES HERE</div>
-      <div class="caption">make a mess. make friends.</div>
-    </div>
-    <div class="polaroid p3">
-      <div class="photo">PHOTO GOES HERE</div>
-      <div class="caption">play is the plan</div>
-    </div>
+    {#each [locationPhotos[0], locationPhotos[2], locationPhotos[3]] as photo, i}
+      <figure class={`polaroid p${i + 1}`}>
+        <img class="photo" src={photo.src} alt={photo.alt} loading="lazy" width="640" height="480" />
+        <figcaption class="caption">{photo.place} · venue reference</figcaption>
+      </figure>
+    {/each}
   </div>
 </section>
 
@@ -88,6 +86,7 @@
   }
 
   .primary-btn {
+    display: inline-flex; align-items: center; justify-content: center; text-decoration: none;
     background: var(--deep, #376a65);
     color: #fff;
     border: none;
@@ -128,6 +127,8 @@
   .photo {
     background: #e2e1d7;
     height: 200px;
+    width: 100%;
+    object-fit: cover;
     display: flex;
     align-items: center;
     justify-content: center;
