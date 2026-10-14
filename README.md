@@ -69,12 +69,12 @@ Because of that:
 The Playground-inspired implementation notes are in
 [`docs/design/PLAYGROUND-UX-NOTES.md`](docs/design/PLAYGROUND-UX-NOTES.md).
 The homepage now keeps the water first, followed by a brief introduction,
-a manually controlled archive of three past editions, the known 0x04 details
-and FAQ, and the closed-sales pass preview. The mixtape follows as an optional
-extra. The archive images are labelled venue references, not event coverage.
-The floating venue photos and separate photo showcase remain in the codebase
-but are not mounted on the homepage. The rationale and visitor questions for
-this copy pass are in [`docs/design/scientific-advertising-pass.md`](docs/design/scientific-advertising-pass.md).
+a floating venue-photo section, a manually controlled archive of three past
+editions, a photo showcase, the known 0x04 details and FAQ, and the closed-sales
+pass preview. The mixtape follows as an optional extra. These images are
+labelled venue references, not event coverage; replacement photos are planned.
+The rationale and visitor questions for this copy pass are in
+[`docs/design/scientific-advertising-pass.md`](docs/design/scientific-advertising-pass.md).
 
 For browser checks, start the local preview on port 5174, then run:
 

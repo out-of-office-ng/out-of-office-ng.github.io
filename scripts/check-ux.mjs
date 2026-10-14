@@ -27,7 +27,8 @@ try {
     assert.equal(await page.locator('.water-still img').evaluate(image => image.complete && image.naturalWidth > 0), true);
     assert.equal(await page.locator('.description').isVisible(), true, 'The introduction remains visible on phones');
     assert.equal(await page.locator('.scene-status').count(), 0);
-    assert.equal(await page.locator('#photo-showcase, .rising-photos').count(), 0, 'Homepage has one clear past-editions path');
+    assert.equal(await page.locator('.rising-photos').count(), 1, 'Floating photo section is present');
+    assert.equal(await page.locator('#photo-showcase').count(), 1, 'Photo showcase is present');
     await page.screenshot({ path: `.dump/ux-review/hero-${width}.png` });
 
     await page.locator('#past-editions').scrollIntoViewIfNeeded();

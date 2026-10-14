@@ -11,7 +11,7 @@ This applies the useful parts of Claude C. Hopkins's *Scientific Advertising* (1
 - The hero now says what a visitor gets and sends them to real past editions. The removed destination displayed venue reference photos, not event coverage.
 - The introduction and edition archive give the reason to believe: three named gatherings with recorded dates and locations. The venue-reference images are labelled as references, not event coverage.
 - The 0x04 status and pass preview state the limits up front: November is planned; the exact date, venue, programme and pass details are pending; no passes are for sale.
-- The homepage no longer repeats the same venue-reference photos in a floating field and a carousel. Both components remain in the repository for another use.
+- The owner chose to keep both the floating venue-photo field and photo showcase for their transitions. Both appear on the homepage; their current images remain labelled as references until replacement photos are approved.
 - The mixtape now follows the essential event information as an optional part of the invitation.
 
 ## Questions to test with visitors

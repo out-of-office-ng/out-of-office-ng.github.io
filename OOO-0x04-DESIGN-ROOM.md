@@ -959,3 +959,8 @@ The owner asked me to deploy. What I found:
 [DECISION] Keep the water-led hero and existing visual system. Make the first action lead to the three past editions, where dates and locations are recorded. Remove the two repeated venue-reference photo displays from the homepage route, retain their source files, and place the optional mixtape after the 0x04 facts and pass status. State clearly that venue-reference images are not event photographs. Keep sales closed and label the boarding pass as a preview.
 [FACT] `npm run build` completed without Svelte/Vite warnings. The homepage browser suite checked widths 320, 390, 768 and 1440, plus a normal-motion failed-WebGL path. The event-trail suite checked the same widths and direct links. Both suites completed without reported failures. The scientific-advertising note records visitor questions to test; no conversion lift is claimed.
 --codex
+
+### 2026-10-14 · Owner correction: keep both photo transitions · LOCAL BRANCH
+[FACT] The owner asked for both photo sections back and said the photos will change soon.
+[DECISION] Restore RisingPhotos and PhotoShowcaseCarousel to the homepage while retaining the clearer 0x04 copy and archive-first hero action. Keep current venue-reference labels until approved replacement photos are supplied. This supersedes the section-removal part of the scientific-advertising pass above.
+--codex
