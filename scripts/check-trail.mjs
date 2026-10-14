@@ -23,7 +23,8 @@ for (const width of [320, 390, 768, 1440]) {
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('.trail > li').count(), 4);
     assert.equal(await page.getByRole('link', { name: /View recap|Get on the list/ }).count(), 0);
-    assert.equal(await page.locator('.trail-card img').count(), 0, 'Do not show unverified flyers as event photographs');
+    assert.equal(await page.locator('.trail-card img').count(), 3, 'Each past edition has a labelled venue reference');
+    assert.equal(await page.locator('.trail-card .image-note').count(), 3, 'Venue references are not presented as event photographs');
     assert.equal(await page.locator('#edition-0x03 time').getAttribute('datetime'), '2026-08-15');
     assert.match(await page.locator('#edition-0x04').innerText(), /November 2026/);
     assert.match(await page.locator('#edition-0x04').innerText(), /not on sale yet/);
@@ -45,7 +46,7 @@ for (const width of [320, 390, 768, 1440]) {
     await page.waitForFunction(() => scrollY > 200 && document.getElementById('edition-0x04').getBoundingClientRect().top < innerHeight / 2);
     const trigger = page.getByRole('button', { name: 'See the pass update' });
     await trigger.click();
-    const dialog = page.getByRole('dialog', { name: 'Pass update' });
+    const dialog = page.getByRole('dialog', { name: '0x04 status' });
     await dialog.waitFor();
     assert.match(await dialog.innerText(), /nothing to pay today/);
     await page.getByRole('button', { name: 'Got it' }).focus();
@@ -61,13 +62,13 @@ for (const width of [320, 390, 768, 1440]) {
     assert.match(await page.locator('h1').innerText(), /trail of memories/);
     assert.equal(await index.getByRole('link', { name: /^0x02:/ }).getAttribute('aria-current'), 'location');
     await page.getByRole('link', { name: 'Back to home', exact: true }).click();
-    await page.getByRole('heading', { name: 'Away from the everyday.' }).waitFor();
+    await page.getByRole('heading', { name: 'Make room for a day off.' }).waitFor();
     await page.waitForFunction(() => scrollY === 0);
     await page.getByRole('link', { name: 'Explore the event trail' }).click();
     await page.getByRole('heading', { level: 1 }).waitFor();
     await page.waitForFunction(() => document.activeElement === document.querySelector('h1'));
     await page.goBack();
-    await page.getByRole('heading', { name: 'Away from the everyday.' }).waitFor();
+    await page.getByRole('heading', { name: 'Make room for a day off.' }).waitFor();
     await page.goForward();
     await page.waitForURL('**/#/trail');
     await page.waitForFunction(() => document.querySelectorAll('.trail-card').length === 3);

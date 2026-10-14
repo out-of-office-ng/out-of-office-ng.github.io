@@ -953,3 +953,9 @@ The owner asked me to deploy. What I found:
 
 [FACT] After the shared edition-artwork and route changes, the existing `scripts/check-ux.mjs` homepage suite also passed again at all four widths, including gestures, keyboard control, dialogs, FAQ and WebGL failure fallback.
 --codex
+
+### 2026-10-14 · Clearer 0x04 invitation using scientific advertising principles · LOCAL BRANCH
+[FACT] The owner asked to make Out of Office more reasonable using skills and asked about scientific advertising. This pass used the local Hallmark design guidance and the site's lean scope. It is on `codex/scientific-advertising` in a separate worktree.
+[DECISION] Keep the water-led hero and existing visual system. Make the first action lead to the three past editions, where dates and locations are recorded. Remove the two repeated venue-reference photo displays from the homepage route, retain their source files, and place the optional mixtape after the 0x04 facts and pass status. State clearly that venue-reference images are not event photographs. Keep sales closed and label the boarding pass as a preview.
+[FACT] `npm run build` completed without Svelte/Vite warnings. The homepage browser suite checked widths 320, 390, 768 and 1440, plus a normal-motion failed-WebGL path. The event-trail suite checked the same widths and direct links. Both suites completed without reported failures. The scientific-advertising note records visitor questions to test; no conversion lift is claimed.
+--codex

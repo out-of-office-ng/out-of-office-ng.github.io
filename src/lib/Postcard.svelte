@@ -7,10 +7,10 @@
 <section id="about" class="chapter introduction" aria-labelledby="intro-title" class:visible>
   <div class="text-content">
     <p class="eyebrow">WISH YOU WERE HERE</p>
-    <h2 id="intro-title">Less rush.<br />More real life.</h2>
-    <p class="intro">Out of Office is a Lagos hangout series for music, art, games, and time off.</p>
-    <p class="body-copy">A small rebellion against the everyday. Shared snacks, strangers becoming friends, and the conversation you remember on Monday.</p>
-    <a class="text-link" href="#past-editions">A few of our previous escapes <span aria-hidden="true">↓</span></a>
+    <h2 id="intro-title">Leave the rush.<br />Find your people.</h2>
+    <p class="intro">Out of Office brings Lagos people together for music, art, games and a little time away from the usual pace.</p>
+    <p class="body-copy">It has taken shape as a beach hangout, a garden gathering and another day by the water. The next edition is planned for November; its exact place and date are still to come.</p>
+    <a class="text-link" href="#past-editions">See the three past editions <span aria-hidden="true">↓</span></a>
   </div>
   <div class="collage" aria-label="Out of Office postcards">
     <figure class="postcard">

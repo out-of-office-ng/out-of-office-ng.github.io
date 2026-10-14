@@ -23,9 +23,9 @@
 
 <section id="passes" class="tickets-section">
   <div class="header-text" class:visible>
-    <p class="eyebrow">YOUR NEXT ESCAPE</p>
-    <h2 class="heading">Your ticket out.</h2>
-    <p class="subheading">A little anticipation. No reservations just yet.</p>
+    <p class="eyebrow">OOO 0x04 · PASS STATUS</p>
+    <h2 class="heading">Passes aren't on sale yet.</h2>
+    <p class="subheading">This is a preview. Come back here for the confirmed date, venue and pass details.</p>
   </div>
 
   <div class="pass-container" class:visible>

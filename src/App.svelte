@@ -3,9 +3,7 @@
   import HeaderBar from './lib/HeaderBar.svelte';
   import Shallows from './lib/Shallows.svelte';
   import Postcard from './lib/Postcard.svelte';
-  import RisingPhotos from './lib/RisingPhotos.svelte';
   import EditionArchive from './lib/EditionArchive.svelte';
-  import PhotoShowcaseCarousel from './lib/PhotoShowcaseCarousel.svelte';
   import Playlist from './lib/Playlist.svelte';
   import PageFooter from './lib/PageFooter.svelte';
   import Tickets from './lib/Tickets.svelte';
@@ -76,16 +74,14 @@
   <HeaderBar onOpenDrawer={openDrawer} />
   
   <main id="top">
-    <Shallows onOpenOooGen={openOooGen} onScrollToContent={scrollToContent} onScrollToShowcase={() => document.getElementById('photo-showcase')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })} />
+    <Shallows onOpenOooGen={openOooGen} onScrollToContent={scrollToContent} onScrollToArchive={() => document.getElementById('past-editions')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })} />
 
     <div id="content-start" tabindex="-1">
       <ScrollReveal animate={false} let:visible><Postcard {visible} /></ScrollReveal>
-      <RisingPhotos />
       <ScrollReveal><EditionArchive /></ScrollReveal>
-      <ScrollReveal><PhotoShowcaseCarousel /></ScrollReveal>
-      <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
       <ScheduleFAQ />
       <ScrollReveal let:visible><Tickets {visible} onOpenDrawer={openDrawer} /></ScrollReveal>
+      <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
     </div>
   </main>
   <PageFooter />

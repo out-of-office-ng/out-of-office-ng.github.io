@@ -69,10 +69,12 @@ Because of that:
 The Playground-inspired implementation notes are in
 [`docs/design/PLAYGROUND-UX-NOTES.md`](docs/design/PLAYGROUND-UX-NOTES.md).
 The homepage now keeps the water first, followed by a brief introduction,
-a manually controlled edition-card archive, confirmed event details and FAQ,
-and the closed-sales pass preview. Approved event photos can be assigned in
-`src/lib/editions.js`; until then, the cards use printed edition
-artwork rather than stock photos or flyers.
+a manually controlled archive of three past editions, the known 0x04 details
+and FAQ, and the closed-sales pass preview. The mixtape follows as an optional
+extra. The archive images are labelled venue references, not event coverage.
+The floating venue photos and separate photo showcase remain in the codebase
+but are not mounted on the homepage. The rationale and visitor questions for
+this copy pass are in [`docs/design/scientific-advertising-pass.md`](docs/design/scientific-advertising-pass.md).
 
 For browser checks, start the local preview on port 5174, then run:
 

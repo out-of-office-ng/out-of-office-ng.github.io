@@ -15,11 +15,11 @@
 <section id="next-event" class="chapter next-event" aria-labelledby="next-event-title">
   <div class="next-inner">
     <div class="next-intro">
-      <p class="eyebrow">SOMETHING TO LOOK FORWARD TO</p>
-      <h2 id="next-event-title">A little room<br />for what's next.</h2>
+      <p class="eyebrow">WHAT WE KNOW ABOUT 0x04</p>
+      <h2 id="next-event-title">November is the plan.<br />The details are coming.</h2>
       <p class="event-date">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}</p>
-      <p class="intro">The next escape is taking shape. We'll share the date, place and plan here when they're ready.</p>
-      <p class="status-note"><span aria-hidden="true"></span> Date and venue to be announced</p>
+      <p class="intro">The exact date, venue, programme and pass details have not been announced. Check this page for confirmed updates.</p>
+      <p class="status-note"><span aria-hidden="true"></span> Passes are not on sale</p>
     </div>
     <div class="faq">
       <h3>Before you switch off.</h3>

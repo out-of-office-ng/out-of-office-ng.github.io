@@ -6,7 +6,7 @@
   const siteBase = import.meta.env.BASE_URL;
   export let onOpenOooGen = () => {};
   export let onScrollToContent = () => {};
-  export let onScrollToShowcase = () => {};
+  export let onScrollToArchive = () => {};
 
   let section;
   let stage;
@@ -130,10 +130,10 @@
     <div class="preview-wash" aria-hidden="true"></div>
     <div class="hero-copy">
       <p class="eyebrow">OUT OF OFFICE</p>
-      <h1 tabindex="-1">Away from<br />the everyday.</h1>
-      <p class="description">A Lagos hangout for music, art, games,<br />and a little time off together.</p>
-      <p class="event-status">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}<br /><span class="date-tba">Date and venue TBA</span></p>
-      <button type="button" class="primary-button ui-action" on:click={onScrollToShowcase}>See the places in our story</button>
+      <h1 tabindex="-1">Make room for<br />a day off.</h1>
+      <p class="description">Music, art and games with people in Lagos.<br />See where Out of Office has been.</p>
+      <p class="event-status">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}<br /><span class="date-tba">Exact date and venue to be announced · Passes not on sale</span></p>
+      <button type="button" class="primary-button ui-action" on:click={onScrollToArchive}>See past editions</button>
     </div>
 
     <aside class="auto-reply" aria-label="An Out of Office auto-reply">

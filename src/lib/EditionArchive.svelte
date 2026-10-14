@@ -58,8 +58,8 @@
   <div class="archive-inner">
     <div class="archive-intro">
       <p class="eyebrow">THE THINGS WE KEEP</p>
-      <h2 id="archive-title">Every escape<br />gets a stamp.</h2>
-      <p class="intro">A beach, a garden, a little room to breathe. Three editions of stepping away from the everyday.</p>
+      <h2 id="archive-title">Three editions.<br />A little more room.</h2>
+      <p class="intro">The first three editions: what happened, when and where. The images show venue references, not event photographs.</p>
       <p class="handwritten">A little time away, kept on paper.</p>
       <a class="text-link" href="#/trail">Explore the event trail <span aria-hidden="true">↗</span></a>
     </div>

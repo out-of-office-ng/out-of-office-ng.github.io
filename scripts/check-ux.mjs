@@ -21,12 +21,13 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     page.on('request', request => requests.push(request.url()));
     await page.goto(base, { waitUntil: 'domcontentloaded' });
-    await page.getByRole('heading', { name: 'Away from the everyday.' }).waitFor();
+    await page.getByRole('heading', { name: 'Make room for a day off.' }).waitFor();
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('.shallows-canvas').count(), 0, 'Reduced motion should use the water still');
     assert.equal(await page.locator('.water-still img').evaluate(image => image.complete && image.naturalWidth > 0), true);
     assert.equal(await page.locator('.description').isVisible(), true, 'The introduction remains visible on phones');
     assert.equal(await page.locator('.scene-status').count(), 0);
+    assert.equal(await page.locator('#photo-showcase, .rising-photos').count(), 0, 'Homepage has one clear past-editions path');
     await page.screenshot({ path: `.dump/ux-review/hero-${width}.png` });
 
     await page.locator('#past-editions').scrollIntoViewIfNeeded();
@@ -76,9 +77,9 @@ try {
     assert.equal(await page.locator('.playlist-section iframe').count(), 1, 'Mixtape embed is present');
     await page.screenshot({ path: `.dump/ux-review/faq-${width}.png` });
 
-    const trigger = page.locator('.site-header').getByRole('button', { name: 'Pass update' });
+    const trigger = page.locator('.site-header').getByRole('button', { name: '0x04 status' });
     await trigger.click();
-    const dialog = page.getByRole('dialog', { name: 'Pass update' });
+    const dialog = page.getByRole('dialog', { name: '0x04 status' });
     await dialog.waitFor();
     assert.match(await dialog.innerText(), /nothing to pay today/);
     assert.equal(await dialog.locator('input').count(), 0);
