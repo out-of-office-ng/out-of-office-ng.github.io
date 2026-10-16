@@ -103,7 +103,9 @@
     color: rgba(230, 230, 220, 0.85);
   }
   .signature {
-    color: var(--pink-deep, #fc9ce0);
+    /* This page is always dark, so use the dark-theme pink in both themes;
+       the light-theme --pink-deep was 2.8:1 on #0a0b0c. */
+    color: #eeacc5;
     font-size: 1.5rem;
     margin-top: 2rem;
     transform: rotate(-2deg);
