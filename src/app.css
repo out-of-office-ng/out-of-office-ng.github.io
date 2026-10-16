@@ -195,6 +195,9 @@ button:disabled { cursor: not-allowed; }
   --border-dashed: color-mix(in srgb, var(--ink) 40%, transparent);
 }
 html, body { overflow-x: clip; }
+/* Stop iOS Safari inflating text (it does this in desktop-site mode), which
+   broke the header and columns on an iPhone 8. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 :root { color-scheme: light; }
 :root[data-theme="dark"] {
   color-scheme: dark;

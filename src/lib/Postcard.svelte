@@ -10,7 +10,6 @@
     <h2 id="intro-title">Leave the rush.<br />Find your people.</h2>
     <p class="intro">Out Of Office is a community and experience-driven initiative creating spaces for people to clock out of the everyday and reconnect with themselves, others, and the things that make life feel good.</p>
     <p class="body-copy">We believe life should be about more than routines, responsibilities, and simply getting through the day. There should be room to create, explore, meet new people, try new things, let loose, and just be.</p>
-    <p class="body-copy">Out of Office is for anyone who wants to step outside their usual routine, discover new interests, build genuine connections, express themselves freely, or enjoy life beyond the everyday.</p>
     <a class="text-link" href="#past-editions">See the three past editions <span aria-hidden="true">↓</span></a>
   </div>
   <div class="collage" aria-label="Out of Office postcards">

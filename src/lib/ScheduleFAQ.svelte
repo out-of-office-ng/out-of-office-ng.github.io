@@ -5,7 +5,7 @@
   import { NEXT_EVENT } from './sales.js';
   let open = null;
   const questions = [
-    { question: 'What is Out of Office?', answer: 'A Lagos hangout series. Music, art, games, shared snacks and conversations you remember on Monday. A little space away from the everyday.' },
+    { question: 'What is Out of Office?', answer: 'Out of Office is for anyone who wants to step outside their usual routine, discover new interests, build genuine connections, express themselves freely, or enjoy life beyond the everyday.' },
     { question: 'When and where is the next one?', answer: `The next edition is planned for ${NEXT_EVENT.when}. The exact date and venue are still to be announced.` },
     { question: 'Can I buy a pass yet?', answer: 'Passes for 0x04 are not on sale yet. Ticket details and prices will be shared when they are confirmed.' },
     { question: 'What should I bring, and how do I get there?', answer: 'The programme, what to bring and any transport details will be shared once the venue is confirmed. Previous editions do not confirm the plans for 0x04.' },
