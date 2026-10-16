@@ -146,7 +146,9 @@
 {/if}
 
 <style>
-  .showcase { background: #f2eee2; overflow: clip; }
+  /* hidden for Safari < 16, which ignores `clip` and would zoom the whole page out to fit the overflow. */
+  .showcase { background: #f2eee2; overflow: hidden; }
+  @supports (overflow: clip) { .showcase { overflow: clip; } }
   .showcase-heading { max-width: 720px; margin: 0 auto 34px; text-align: center; }
   .showcase-heading h2 { margin: 6px 0 10px; font: 400 clamp(36px, 5vw, 58px)/1.05 var(--serif); letter-spacing: -.04em; text-wrap: balance; }
   .showcase-intro { margin: 0 auto; color: var(--muted); font-size: 15px; }

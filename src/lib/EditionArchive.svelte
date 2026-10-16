@@ -4,18 +4,15 @@
   import { editions } from './editions.js';
   import EditionArtwork from './EditionArtwork.svelte';
   import { editionPosters, openCanvasVideos } from './eventPhotos.js';
+  import VideoDialog from './VideoDialog.svelte';
 
   // The deck shows each edition's poster (the trail keeps the event photos).
   const deck = editions.map((e) => editionPosters[e.code] ? { ...e, image: editionPosters[e.code].src, imageAlt: editionPosters[e.code].alt, imageRatio: editionPosters[e.code].ratio, imageKind: 'event' } : e);
 
   // Videos only exist for Open Canvas (0x02) so far.
   const videosByEdition = { '0x02': openCanvasVideos };
-  let videoDialog;
-  let clip = 0;
-  let videoOpen = false; // the <video> only exists while the dialog is open, so nothing downloads or plays in the background
-  function openVideos() { clip = 0; videoOpen = true; videoDialog.showModal(); }
-  function closeVideos() { videoDialog.close(); }
-  function nextClip(clips) { if (clip < clips.length - 1) clip += 1; }
+  let player;
+  const openVideos = () => player.open();
 
   let active = 0;
   let pointer = null;
@@ -118,52 +115,16 @@
   </div>
 </section>
 
-<dialog class="video-dialog" bind:this={videoDialog} aria-labelledby="video-title" aria-describedby="video-desc" on:click={(event) => event.target === videoDialog && closeVideos()} on:close={() => videoOpen = false}>
-  {#if videosByEdition['0x02']}
-    {@const clips = videosByEdition['0x02']}
-    <div class="video-head">
-      <div>
-        <h2 id="video-title">Open Canvas</h2>
-        <p class="video-meta">30 May 2026 · Jaekel House Garden</p>
-      </div>
-      <button class="video-close" type="button" aria-label="Close video" on:click={closeVideos}>×</button>
-    </div>
-    {#if videoOpen}
-      {#key clip}
-        <!-- Starts muted on open (the visitor asked to watch); reduced motion waits for play. -->
-        <!-- svelte-ignore a11y-media-has-caption -->
-        <video src={clips[clip].src} poster={clips[clip].poster} controls muted playsinline preload="metadata" autoplay={!reducedMotion} aria-label={`${clips[clip].label}, ${clips[clip].seconds} seconds`} on:ended={() => nextClip(clips)}></video>
-      {/key}
-    {/if}
-    <p class="clip-desc" id="video-desc"><strong>{clips[clip].label}</strong> · {clips[clip].description}</p>
-    <div class="clip-picks" role="group" aria-label="Choose a clip">
-      {#each clips as c, i}
-        <button type="button" class:current={i === clip} aria-pressed={i === clip} on:click={() => clip = i}><img src={c.poster} alt="" /><span>{c.label} · {c.seconds}s</span></button>
-      {/each}
-    </div>
-  {/if}
-</dialog>
+<VideoDialog bind:this={player} clips={openCanvasVideos} title="Open Canvas" meta="30 May 2026 · Jaekel House Garden" slug="open-canvas" />
 
 <style>
   .watch-button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin: 4px 0 14px; padding: 10px 20px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 14px var(--sans); cursor: pointer; }
-  .video-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 16px; border: 1px solid var(--border-soft-deep); border-radius: 14px; background: var(--card-surface); color: var(--ink); overflow: auto; }
-  .video-dialog::backdrop { background: #10181799; backdrop-filter: blur(4px); }
-  .video-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .video-head h2 { margin: 0; font: 400 26px/1.1 var(--serif); }
-  .video-meta { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-  .clip-desc { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
-  .clip-desc strong { color: var(--ink); font-weight: 600; }
   .has-video { margin-left: 3px; font-size: 9px; color: var(--pink-deep); vertical-align: 2px; }
   .card-play { position: absolute; z-index: 3; top: 22px; right: 22px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 14px; border: 0; border-radius: 999px; background: #181818d9; color: #fff; font: 600 12px var(--sans); cursor: pointer; }
   .card-play:focus-visible { outline: 2px solid var(--pink-deep); outline-offset: 2px; }
-  .video-close { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 28px; cursor: pointer; }
-  .video-close:hover { background: var(--border-soft); }
-  video { display: block; width: 100%; max-height: calc(100dvh - 340px); aspect-ratio: 9 / 16; object-fit: contain; border-radius: 8px; background: #000; }
-  .clip-picks { display: flex; gap: 10px; margin-top: 12px; }
-  .clip-picks button { flex: 1; display: grid; gap: 4px; padding: 4px; border: 2px solid transparent; border-radius: 8px; background: none; color: var(--muted); font: 500 12px var(--sans); cursor: pointer; }
-  .clip-picks button.current { border-color: var(--deep); color: var(--ink); }
-  .clip-picks img { width: 100%; height: 56px; object-fit: cover; border-radius: 4px; }
-  .archive { background: #e4e9e1; overflow: clip; }
+  /* hidden for Safari < 16, which ignores `clip` and would zoom the whole page out to fit the overflow. */
+  .archive { background: #e4e9e1; overflow: hidden; }
+  @supports (overflow: clip) { .archive { overflow: clip; } }
   .archive-inner { max-width: 1140px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
   h2 { max-width: 520px; }
   .intro { max-width: 380px; margin: 24px 0; color: var(--muted); line-height: 1.8; }

@@ -30,14 +30,13 @@ export const releaseUnwindPhotos = [
 // Open Canvas clips, re-encoded from the iPhone .MOV originals to H.264 MP4
 // (720p-ish, 30fps, metadata stripped). Poster = a frame from each clip.
 const video = (path) => `${import.meta.env.BASE_URL}videos/${path}`;
-// Ordered best-evidence first: the clip with people painting leads, the
-// set-up clips follow. Each has a text description (clips 2 and 3 in this
-// order are silent, so the text is their only non-visual alternative).
+// Ordered best-evidence first: guests painting leads, the set-up follows (the
+// two set-up shots were merged into one clip). Each has a text description;
+// the set-up clip is silent, so its text is the only non-visual alternative.
 export const openCanvasVideos = [
-  { n: 3, label: 'Painting together', seconds: 13, description: 'Guests paint at long tables on the lawn, holding up finished canvases: a house portrait, a green frog, bright abstracts. Chatter and music in the background.' },
-  { n: 1, label: 'Before guests arrived', seconds: 4, description: 'The lawn at Jaekel House Garden, set with long tables, white chairs, blank canvases and purple cups. No sound.' },
-  { n: 2, label: 'Canvases waiting', seconds: 3, description: 'Close-up along the table: blank canvases, brushes and colourful palettes at every seat. No sound.' },
-].map(({ n, ...clip }) => ({ ...clip, src: video(`open-canvas-${n}.mp4`), poster: video(`open-canvas-${n}.jpg`) }));
+  { id: 'painting', file: 'open-canvas-painting', label: 'Painting together', seconds: 13, description: 'Guests paint at long tables on the lawn, holding up finished canvases: a house portrait, a green frog, bright abstracts. Chatter and music in the background.' },
+  { id: 'setup', file: 'open-canvas-setup', label: 'Before guests arrived', seconds: 7, description: 'The lawn at Jaekel House Garden, set with long tables and white chairs, then a close-up of blank canvases, brushes and colourful palettes at every seat. No sound.' },
+].map(({ file, ...clip }) => ({ ...clip, src: video(`${file}.mp4`), poster: video(`${file}.jpg`) }));
 
 // Three prints per edition for the trail collage (0x01 is set below, once the
 // flyers are defined).

@@ -4,7 +4,9 @@
   import EditionArtwork from './EditionArtwork.svelte';
   import TrailCollage from './TrailCollage.svelte';
   import PaintedSignoff from './PaintedSignoff.svelte';
-  import { trailPhotos } from './eventPhotos.js';
+  import { openCanvasVideos, trailPhotos } from './eventPhotos.js';
+  import VideoDialog from './VideoDialog.svelte';
+  let player;
   import ScrollReveal from './ScrollReveal.svelte';
   const v1ArchiveUrl = `${import.meta.env.BASE_URL}v1/`;
 
@@ -64,6 +66,9 @@
                     <div><dt>WHEN</dt><dd><time datetime={edition.dateTime}>{edition.date}</time></dd></div>
                     <div><dt>WHERE</dt><dd>{edition.location}</dd></div>
                   </dl>
+                  {#if edition.code === '0x02'}
+                    <button class="watch-button ui-action" type="button" on:click={() => player.open()}><span aria-hidden="true">▶</span> Watch Open Canvas · {openCanvasVideos.length} clips</button>
+                  {/if}
                 </div>
               </article>
             </ScrollReveal>
@@ -97,7 +102,10 @@
   </main>
 </div>
 
+<VideoDialog bind:this={player} clips={openCanvasVideos} title="Open Canvas" meta="30 May 2026 · Jaekel House Garden" slug="open-canvas" />
+
 <style>
+  .watch-button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 18px; padding: 10px 20px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 14px var(--sans); cursor: pointer; }
   .trail-page { min-height: 100vh; background: var(--bg); color: var(--ink); }
   .trail-nav { position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; gap: 20px; min-height: 76px; padding: 12px max(24px, calc((100vw - 1160px) / 2)); border-bottom: 1px solid var(--border-soft); background: #f2f0e9f5; backdrop-filter: blur(12px); }
   .back-link { display: inline-flex; align-items: center; min-height: 44px; gap: 12px; color: var(--ink); font: 600 13px var(--sans); text-decoration: none; }

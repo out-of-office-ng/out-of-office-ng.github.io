@@ -83,7 +83,9 @@
 </section>
 
 <style>
-  .rising-photos { overflow: clip; padding-bottom: 32px; }
+  /* hidden for Safari < 16, which ignores `clip` and would zoom the whole page out to fit the overflow. */
+  .rising-photos { overflow: hidden; padding-bottom: 32px; }
+  @supports (overflow: clip) { .rising-photos { overflow: clip; } }
   header { text-align: center; max-width: 480px; margin: 0 auto 24px; }
   header > p:not(.eyebrow) { color: var(--muted); }
   .hint { font-size: 12px; }
