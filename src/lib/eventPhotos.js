@@ -5,8 +5,8 @@
 const asset = (path) => `${import.meta.env.BASE_URL}images/events/${path}`;
 
 export const editionCovers = {
-  '0x02': { src: asset('open-canvas-cover.jpg'), alt: 'Guests painting at long tables on the lawn at Open Canvas' },
-  '0x03': { src: asset('release-and-unwind-cover.jpg'), alt: 'Collage of friends laughing in the waves at Release and Unwind' },
+  '0x02': { src: asset('open-canvas-cover.jpg'), ratio: 787 / 1400, alt: 'Guests painting at long tables on the lawn at Open Canvas' },
+  '0x03': { src: asset('release-and-unwind-cover.jpg'), ratio: 1080 / 1350, alt: 'Collage of friends laughing in the waves at Release and Unwind' },
 };
 
 export const openCanvasPhotos = [

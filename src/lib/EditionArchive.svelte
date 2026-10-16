@@ -66,8 +66,8 @@
       <div class="deck" role="group" aria-label="Swipe sideways to change edition" class:dragging on:pointerdown={pointerDown} on:pointermove={pointerMove} on:pointerup={pointerUp} on:pointercancel={cancelDrag} on:lostpointercapture={cancelDrag}>
         {#each editions as edition, i (edition.code)}
           {@const depth = (i - active + editions.length) % editions.length}
-          <article class="edition-card" class:front={depth === 0} aria-hidden={depth !== 0} inert={depth !== 0} style={`--depth:${depth}; --rotation:${depth === 0 ? -1.5 : depth === 1 ? 4 : -5}deg; --tone:${edition.tone}; --drag:${depth === 0 && !reducedMotion ? dragX : 0}px; z-index:${editions.length - depth}`}>
-            <EditionArtwork {edition} />
+          <article class="edition-card" class:front={depth === 0} aria-hidden={depth !== 0} inert={depth !== 0} style={`--depth:${depth}; --rotation:${depth === 0 ? -1.5 : depth === 1 ? 4 : -5}deg; --tone:${edition.tone}; --card-w:${edition.imageKind === 'event' && edition.imageRatio < 1 ? `min(100%, calc(430px * ${edition.imageRatio} + 24px))` : '100%'}; --drag:${depth === 0 && !reducedMotion ? dragX : 0}px; z-index:${editions.length - depth}`}>
+            <EditionArtwork {edition} natural />
             <div class="card-copy">
               <p class="edition-meta">{edition.code} <span aria-hidden="true">/</span> {edition.date}</p>
               <h3>{edition.title}</h3>
@@ -108,7 +108,7 @@
   .carousel { min-width: 0; width: 100%; max-width: 470px; justify-self: center; }
   .deck { position: relative; display: grid; margin: 22px 18px 42px; touch-action: pan-y pinch-zoom; user-select: none; cursor: grab; }
   .deck.dragging { cursor: grabbing; }
-  .edition-card { grid-area: 1 / 1; min-width: 0; align-self: stretch; padding: 12px; border: 1px solid #d1d2c6; border-radius: 5px; background: #faf8f2; box-shadow: 0 15px 32px -16px #243e3c45; transform: translate(var(--drag), calc(var(--depth) * 14px)) rotate(var(--rotation)) scale(calc(1 - var(--depth) * .025)); transform-origin: 50% 85%; transition: transform 550ms var(--ease-out-expo), box-shadow 250ms ease; }
+  .edition-card { grid-area: 1 / 1; min-width: 0; width: var(--card-w); justify-self: center; align-self: end; padding: 12px; border: 1px solid #d1d2c6; border-radius: 5px; background: #faf8f2; box-shadow: 0 15px 32px -16px #243e3c45; transform: translate(var(--drag), calc(var(--depth) * 14px)) rotate(var(--rotation)) scale(calc(1 - var(--depth) * .025)); transform-origin: 50% 85%; transition: transform 550ms var(--ease-out-expo), box-shadow 250ms ease; }
   .dragging .front { transition: box-shadow 250ms ease; }
   .card-copy { padding: 20px 10px 14px; }
   .edition-meta { margin: 0 0 12px; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
