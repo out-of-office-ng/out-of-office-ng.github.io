@@ -42,7 +42,25 @@
             <div class="city-name">LAGOS</div>
           </div>
           <div class="flight-path">
-            <svg class="boat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14l8-4 8 4M2 18h20l-2 4H4l-2-4z"/></svg>
+            <!-- Danfo (Lagos yellow minibus) on the route line. Decorative: the
+                 body bounces on its suspension and the wheels turn. -->
+            <svg class="danfo" viewBox="0 0 96 56" aria-hidden="true" focusable="false">
+              <g class="danfo-body">
+                <rect x="30" y="2" width="30" height="8" rx="2" fill="#181818" />
+                <rect x="33" y="4" width="24" height="3" rx="1" fill="#f6f4f1" />
+                <rect x="4" y="9" width="88" height="31" rx="8" fill="#ffcc00" stroke="#181818" stroke-width="3" />
+                <rect x="12" y="14" width="64" height="13" rx="3" fill="#181818" />
+                <rect x="15" y="16" width="17" height="9" rx="1.5" fill="#6d7a84" />
+                <rect x="36" y="16" width="17" height="9" rx="1.5" fill="#6d7a84" />
+                <rect x="57" y="16" width="16" height="9" rx="1.5" fill="#6d7a84" />
+                <path d="M80 14h7a3 3 0 0 1 3 3v9h-10z" fill="#9fd3e6" stroke="#181818" stroke-width="2" />
+                <rect x="4" y="30" width="88" height="3" fill="#181818" />
+                <rect x="4" y="35" width="88" height="2.5" fill="#181818" />
+                <rect x="87" y="31" width="5" height="4" rx="1" fill="#fff4b0" />
+              </g>
+              <g class="wheel" style="transform-origin: 24px 44px"><circle cx="24" cy="44" r="8" fill="#181818" /><circle cx="24" cy="44" r="3.5" fill="#d8d8d8" /><rect x="23" y="37.5" width="2" height="4" fill="#d8d8d8" /></g>
+              <g class="wheel" style="transform-origin: 72px 44px"><circle cx="72" cy="44" r="8" fill="#181818" /><circle cx="72" cy="44" r="3.5" fill="#d8d8d8" /><rect x="71" y="37.5" width="2" height="4" fill="#d8d8d8" /></g>
+            </svg>
             <div class="flight-type">NON-STOP ESCAPE</div>
           </div>
           <div class="city-box white">
@@ -235,15 +253,25 @@
     background: var(--deep, #376a65);
     z-index: 0;
   }
-  .boat-icon {
-    width: 24px;
-    height: 24px;
+  .danfo {
+    width: clamp(64px, 8vw, 92px);
+    height: auto;
+    padding: 0 8px;
     background: var(--bg, #f6f4f1);
-    padding: 0 10px;
     z-index: 1;
-    color: var(--deep, #376a65);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
+    overflow: visible;
   }
+  /* Bouncy ride: body bobs on the suspension, wheels roll. The global
+     reduced-motion rule in app.css stops both. */
+  .danfo-body { animation: danfo-bounce 0.9s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+  .wheel { animation: danfo-roll 0.8s linear infinite; }
+  @keyframes danfo-bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    30% { transform: translateY(-3px) rotate(-1.5deg); }
+    60% { transform: translateY(-1px) rotate(1deg); }
+  }
+  @keyframes danfo-roll { to { transform: rotate(360deg); } }
   .flight-type {
     font-size: 0.7rem;
     font-weight: 700;
