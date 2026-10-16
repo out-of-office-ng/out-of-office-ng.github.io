@@ -1,8 +1,7 @@
 // Privacy-first measurement: GoatCounter (goatcounter.com) — no cookies, no
 // personal data, no cross-site tracking, so no consent banner is needed.
-// Off until ENDPOINT is set. To turn on: create a free GoatCounter site, e.g.
-// "outofoffice", then set ENDPOINT to 'https://outofoffice.goatcounter.com/count'.
-const ENDPOINT = '';
+// Dashboard: https://out-of-office.goatcounter.com
+const ENDPOINT = 'https://out-of-office.goatcounter.com/count';
 
 // Respect visitors who ask not to be counted.
 const optedOut = () => typeof navigator !== 'undefined' && (navigator.doNotTrack === '1' || navigator.globalPrivacyControl === true);
