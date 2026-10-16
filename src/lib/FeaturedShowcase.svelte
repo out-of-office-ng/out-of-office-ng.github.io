@@ -9,14 +9,14 @@
     {
       title: 'OOO 0x01',
       meta: 'The First Hangout',
-      description: 'Tarkwa Bay Beach · Apr 11, 2025 · 12pm till daybreak',
+      description: 'Tarkwa Bay Beach · Apr 11, 2026 · 12pm till daybreak',
       number: '01',
       tone: 'var(--water-sky)',
     },
     {
       title: 'OOO 0x02',
       meta: 'Open Canvas',
-      description: 'Jaekel House Garden · May 30, 2025',
+      description: 'Jaekel House Garden · May 30, 2026',
       number: '02',
       tone: 'var(--warm-sand)',
     },
