@@ -3,7 +3,10 @@
 
   import { editions } from './editions.js';
   import EditionArtwork from './EditionArtwork.svelte';
-  import { openCanvasVideos } from './eventPhotos.js';
+  import { editionPosters, openCanvasVideos } from './eventPhotos.js';
+
+  // The deck shows each edition's poster (the trail keeps the event photos).
+  const deck = editions.map((e) => editionPosters[e.code] ? { ...e, image: editionPosters[e.code].src, imageAlt: editionPosters[e.code].alt, imageRatio: editionPosters[e.code].ratio, imageKind: 'event' } : e);
 
   // Videos only exist for Open Canvas (0x02) so far.
   const videosByEdition = { '0x02': openCanvasVideos };
@@ -72,7 +75,7 @@
 
     <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Past editions">
       <div class="deck" role="group" aria-label="Swipe sideways to change edition" class:dragging on:pointerdown={pointerDown} on:pointermove={pointerMove} on:pointerup={pointerUp} on:pointercancel={cancelDrag} on:lostpointercapture={cancelDrag}>
-        {#each editions as edition, i (edition.code)}
+        {#each deck as edition, i (edition.code)}
           {@const depth = (i - active + editions.length) % editions.length}
           <article class="edition-card" class:front={depth === 0} aria-hidden={depth !== 0} inert={depth !== 0} style={`--depth:${depth}; --rotation:${depth === 0 ? -1.5 : depth === 1 ? 4 : -5}deg; --tone:${edition.tone}; --card-w:${edition.imageKind === 'event' && edition.imageRatio < 1 ? `min(100%, calc(430px * ${edition.imageRatio} + 24px))` : '100%'}; --drag:${depth === 0 && !reducedMotion ? dragX : 0}px; z-index:${editions.length - depth}`}>
             <EditionArtwork {edition} natural />

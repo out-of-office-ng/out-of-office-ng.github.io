@@ -36,9 +36,21 @@ export const openCanvasVideos = [1, 2, 3].map((n) => ({
   label: `Clip ${n}`,
 }));
 
-// Three prints per edition for the trail collage. 0x01 has one photo, so the
-// trail shows it on its own until more arrive.
+// Three prints per edition for the trail collage (0x01 is set below, once the
+// flyers are defined).
 export const trailPhotos = {
   '0x02': [openCanvasPhotos[0], { ...editionCovers['0x02'], edition: 'Open Canvas' }, openCanvasPhotos[1]],
   '0x03': [releaseUnwindPhotos[2], releaseUnwindPhotos[0], releaseUnwindPhotos[4]],
 };
+
+// Original flyers, kept as part of each edition's story. The First Hangout
+// ran as "The Post-NYSC Hangout"; its flyers show that name.
+export const flyers = {
+  firstHangout1: { ratio: 990 / 1400, src: asset('flyer-first-hangout-1.jpg'), alt: 'Flyer for The Post-NYSC Hangout at Tarkwa Bay Beach: a man on a rearing horse on the beach', edition: 'The First Hangout' },
+  firstHangout2: { ratio: 990 / 1400, src: asset('flyer-first-hangout-2.jpg'), alt: 'Flyer for The Post-NYSC Hangout at Tarkwa Bay Beach: a guest under a flame tree by the water', edition: 'The First Hangout' },
+  openCanvas: { ratio: 1080 / 1350, src: asset('flyer-open-canvas.jpg'), alt: 'Flyer for Open Canvas at Jaekel House Garden, with a sweep of teal paint', edition: 'Open Canvas' },
+  releaseUnwind: { ratio: 990 / 1400, src: asset('flyer-release-and-unwind.jpg'), alt: 'Flyer for Release and Unwind at Tarkwa Bay: a beach retreat to release, rest and reconnect', edition: 'Release and Unwind' },
+};
+// The homepage deck shows each edition's poster.
+export const editionPosters = { '0x01': flyers.firstHangout1, '0x02': flyers.openCanvas, '0x03': flyers.releaseUnwind };
+trailPhotos['0x01'] = [flyers.firstHangout1, { ...editionCovers['0x01'], edition: 'The First Hangout' }, flyers.firstHangout2];

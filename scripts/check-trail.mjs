@@ -23,9 +23,8 @@ for (const width of [320, 390, 768, 1440]) {
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('.trail > li').count(), 4);
     assert.equal(await page.getByRole('link', { name: /View recap|Get on the list/ }).count(), 0);
-    assert.equal(await page.locator('.trail-card .collage img').count(), 6, 'Open Canvas and Release and Unwind each show three event photos');
+    assert.equal(await page.locator('.trail-card .collage img').count(), 9, 'Every past edition shows three pasted prints');
     assert.equal(await page.locator('.trail-card .image-note').count(), 0, 'No venue references remain on the trail');
-    assert.equal(await page.locator('#edition-0x01 img.whole').count(), 1, 'The First Hangout shows its single photo whole');
     assert.equal(await page.locator('#edition-0x03 time').getAttribute('datetime'), '2026-08-15');
     assert.match(await page.locator('#edition-0x04').innerText(), /November 2026/);
     assert.match(await page.locator('#edition-0x04').innerText(), /not on sale yet/);
@@ -75,7 +74,9 @@ for (const width of [320, 390, 768, 1440]) {
     await page.waitForFunction(() => document.querySelectorAll('.trail-card').length === 3);
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
     await page.screenshot({ path: `.dump/trail-review/trail-${width}.png`, fullPage: true });
-    assert.equal(requests.some(url => /flyer-|save-the-date|paystack/.test(url)), false, 'No unverified flyers or payments load');
+    // Edition flyers supplied by the OOO team (images/events/flyer-*) are allowed;
+    // the older unverified repo flyers and any payment script are not.
+    assert.equal(requests.some(url => (/flyer-|save-the-date/.test(url) && !/\/images\/events\/flyer-/.test(url)) || /paystack/.test(url)), false, 'No unverified flyers or payments load');
     assert.deepEqual(errors, []);
     results.push({ width, passed: true });
   } finally { await browser.close(); }

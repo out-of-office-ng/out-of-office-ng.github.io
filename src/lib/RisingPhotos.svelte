@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { editionCovers, openCanvasPhotos, releaseUnwindPhotos } from './eventPhotos.js';
+  import { editionCovers, flyers, openCanvasPhotos, releaseUnwindPhotos } from './eventPhotos.js';
   let field;
   let selected = null;
   let hovered = null;
@@ -15,7 +15,12 @@
   const ru = [...releaseUnwindPhotos, cover('0x03', 'Release and Unwind')];
   const mix = [cover('0x01', 'The First Hangout')];
   for (let i = 0; i < Math.max(oc.length, ru.length); i++) mix.push(...[oc[i], ru[i]].filter(Boolean));
-  const LANES = 6, MOBILE_LANES = 3, MOBILE_COUNT = 9;
+  // Flyers spread through the mix; two land in the first nine that phones show.
+  mix.splice(3, 0, flyers.firstHangout1);
+  mix.splice(7, 0, flyers.openCanvas);
+  mix.splice(12, 0, flyers.releaseUnwind);
+  mix.splice(16, 0, flyers.firstHangout2);
+  const LANES = 7, MOBILE_LANES = 3, MOBILE_COUNT = 9;
   const perLane = (lane, lanes, count) => Math.ceil((count - lane) / lanes);
   const photos = mix.map((photo, i) => {
     const lane = i % LANES, duration = 30 + lane * 1.3;
@@ -89,7 +94,7 @@
   .info-popup p { margin: 0 0 10px; }
   .apply-button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 28px; border: 0; border-radius: 28px; background: var(--ink); color: var(--bg); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
   .photo-field { position: relative; --field-height: 900px; height: var(--field-height); max-width: 1200px; margin: auto; overflow: hidden; }
-  .floating-photo { position: absolute; top: 100%; left: calc(var(--lane) * 15.6%); width: 22%; animation: photo-float var(--duration) linear var(--delay) infinite; }
+  .floating-photo { position: absolute; top: 100%; left: calc(var(--lane) * 13.4%); width: 19.6%; animation: photo-float var(--duration) linear var(--delay) infinite; }
   @keyframes photo-float {
     0% { transform: translateY(0); opacity: 0; }
     12%, 85% { opacity: 1; }
