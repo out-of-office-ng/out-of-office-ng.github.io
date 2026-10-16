@@ -250,14 +250,15 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: var(--deep, #376a65);
+    /* The line breaks around the danfo instead of the danfo covering it, so
+       there is no background patch to clash with either theme. */
+    --gap: calc(clamp(64px, 8vw, 92px) / 2 + 12px);
+    background: linear-gradient(to right, var(--deep, #376a65) 0 calc(50% - var(--gap)), transparent calc(50% - var(--gap)) calc(50% + var(--gap)), var(--deep, #376a65) calc(50% + var(--gap)));
     z-index: 0;
   }
   .danfo {
     width: clamp(64px, 8vw, 92px);
     height: auto;
-    padding: 0 8px;
-    background: var(--bg, #f6f4f1);
     z-index: 1;
     margin-bottom: 0.35rem;
     overflow: visible;
