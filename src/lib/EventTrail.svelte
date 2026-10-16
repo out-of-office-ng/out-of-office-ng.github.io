@@ -3,6 +3,7 @@
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
   import EditionArtwork from './EditionArtwork.svelte';
   import TrailCollage from './TrailCollage.svelte';
+  import PaintedSignoff from './PaintedSignoff.svelte';
   import { trailPhotos } from './eventPhotos.js';
   import ScrollReveal from './ScrollReveal.svelte';
   const v1ArchiveUrl = `${import.meta.env.BASE_URL}v1/`;
@@ -87,7 +88,7 @@
     </div>
 
     <footer class="trail-footer">
-      <p>Lagos, with love.</p>
+      <p><PaintedSignoff /></p>
       <div class="footer-links">
         <a class="text-link" href={v1ArchiveUrl}>Open the v1 archive <span aria-hidden="true">↗</span></a>
         <a class="text-link" href="#/">Back to the water <span aria-hidden="true">↗</span></a>

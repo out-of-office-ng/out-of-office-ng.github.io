@@ -1,4 +1,5 @@
 <script>
+  import PaintedSignoff from './PaintedSignoff.svelte';
   const siteBase = import.meta.env.BASE_URL;
 </script>
 
@@ -14,7 +15,7 @@
     <a href={`${siteBase}photo-credits.html`}>Photo credits</a>
     <a href={`${siteBase}v1/`}>v1 archive</a>
   </nav>
-  <span class="location">Lagos, with love.</span>
+  <span class="location"><PaintedSignoff /></span>
 </footer>
 
 <style>
