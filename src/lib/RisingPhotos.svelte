@@ -7,15 +7,30 @@
   let infoOpen = false;
   let inView = false;
   let pageVisible = true;
-  // A mix from every edition.
-  const firstHangout = { src: editionCovers['0x01'].src, alt: editionCovers['0x01'].alt, edition: 'The First Hangout' };
-  const mix = [openCanvasPhotos[0], releaseUnwindPhotos[2], firstHangout, releaseUnwindPhotos[4], openCanvasPhotos[1], releaseUnwindPhotos[0]];
-  const photos = mix.map((photo, i) => ({
-    ...photo,
-    label: photo.edition,
-    angle: [-7,5,-3,6,-5,3][i], duration: [30,34,28,32,29,31][i],
-    delay: [-5,-17,-10,-24,-2,-20][i]
-  }));
+  // Every event photo, interleaved so editions mix. Each lane's photos are
+  // evenly spaced in time (negative delays), so the field is already full the
+  // moment it scrolls into view and prints in one lane never collide.
+  const cover = (code, edition) => ({ src: editionCovers[code].src, alt: editionCovers[code].alt, edition });
+  const oc = [...openCanvasPhotos, cover('0x02', 'Open Canvas')];
+  const ru = [...releaseUnwindPhotos, cover('0x03', 'Release and Unwind')];
+  const mix = [cover('0x01', 'The First Hangout')];
+  for (let i = 0; i < Math.max(oc.length, ru.length); i++) mix.push(...[oc[i], ru[i]].filter(Boolean));
+  const LANES = 6, MOBILE_LANES = 3, MOBILE_COUNT = 9;
+  const perLane = (lane, lanes, count) => Math.ceil((count - lane) / lanes);
+  const photos = mix.map((photo, i) => {
+    const lane = i % LANES, duration = 30 + lane * 1.3;
+    const mobileLane = i % MOBILE_LANES, mobileDuration = 36 + mobileLane * 2;
+    return {
+      ...photo,
+      label: photo.edition,
+      angle: [-7, 5, -3, 6, -5, 3, -4, 7][i % 8],
+      lane, duration,
+      delay: -((duration * Math.floor(i / LANES)) / perLane(lane, LANES, mix.length) + lane * 3.7) % duration,
+      mobileLane, mobileDuration,
+      mobileDelay: -((mobileDuration * Math.floor(i / MOBILE_LANES)) / perLane(mobileLane, MOBILE_LANES, MOBILE_COUNT) + mobileLane * 5) % mobileDuration,
+      mobileHidden: i >= MOBILE_COUNT,
+    };
+  });
   function outside(event) {
     if (!event.target.closest?.('.floating-photo')) selected = null;
     if (!event.target.closest?.('.motion-info')) infoOpen = false;
@@ -48,8 +63,8 @@
   </header>
   <div class="photo-field" bind:this={field} class:stopped={!inView || !pageVisible}>
     {#each photos as photo, i}
-      <div class="floating-photo" class:held={selected === i || hovered === i}
-        style={`--angle:${photo.angle}deg; --lane:${i}; --mobile-lane:${i % 3}; --duration:${photo.duration}s; --delay:${photo.delay}s`}>
+      <div class="floating-photo" class:held={selected === i || hovered === i} class:mobile-hidden={photo.mobileHidden}
+        style={`--angle:${photo.angle}deg; --lane:${photo.lane}; --mobile-lane:${photo.mobileLane}; --duration:${photo.duration}s; --delay:${photo.delay.toFixed(2)}s; --m-duration:${photo.mobileDuration}s; --m-delay:${photo.mobileDelay.toFixed(2)}s`}>
         <button class="photo-print" type="button" aria-label={`Hold ${photo.label} photo`} aria-pressed={selected === i}
           on:pointerenter={(event) => { if (event.pointerType === 'mouse') hovered = i; }}
           on:pointerleave={() => hovered = null}
@@ -73,8 +88,8 @@
   .info-popup { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: min(260px, calc(100vw - 48px)); padding: 16px; border: 1px solid var(--border-soft-deep); border-radius: 12px; background: var(--card-surface); color: var(--ink); box-shadow: 0 12px 30px #0003; }
   .info-popup p { margin: 0 0 10px; }
   .apply-button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 28px; border: 0; border-radius: 28px; background: var(--ink); color: var(--bg); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
-  .photo-field { position: relative; --field-height: 680px; height: var(--field-height); max-width: 1200px; margin: auto; overflow: hidden; }
-  .floating-photo { position: absolute; top: 100%; left: calc(var(--lane) * 15%); width: 24%; animation: photo-float var(--duration) linear var(--delay) infinite; }
+  .photo-field { position: relative; --field-height: 900px; height: var(--field-height); max-width: 1200px; margin: auto; overflow: hidden; }
+  .floating-photo { position: absolute; top: 100%; left: calc(var(--lane) * 15.6%); width: 22%; animation: photo-float var(--duration) linear var(--delay) infinite; }
   @keyframes photo-float {
     0% { transform: translateY(0); opacity: 0; }
     12%, 85% { opacity: 1; }
@@ -87,14 +102,16 @@
   .photo-print img { display: block; width: 100%; aspect-ratio: 5 / 6; height: auto; object-fit: cover; background: var(--border-soft); }
   .caption { display: block; padding: 14px 4px; font: 13px var(--marker); }
   @media (max-width: 650px) {
-    .photo-field { --field-height: 520px; margin-inline: -12px; }
-    .floating-photo { width: 39%; left: calc(var(--mobile-lane) * 30%); }
+    .photo-field { --field-height: 620px; margin-inline: -12px; }
+    .floating-photo { width: 39%; left: calc(var(--mobile-lane) * 30%); animation-duration: var(--m-duration); animation-delay: var(--m-delay); }
+    .floating-photo.mobile-hidden { display: none; }
     .photo-print { padding: 6px 6px 0; }
     .caption { font-size: 11px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .motion-info { display: none; }
-    .photo-field { height: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; padding: 20px; }
+    .photo-field { height: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 28px; padding: 20px; }
+    .floating-photo.mobile-hidden { display: block; }
     .floating-photo { animation: none; position: static; width: 100%; }
     .photo-print { transition: none; }
     .held .photo-print, .photo-print:focus-visible { transform: rotate(var(--angle)); }
