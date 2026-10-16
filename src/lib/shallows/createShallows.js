@@ -188,6 +188,7 @@ const skyMat = new THREE.ShaderMaterial({
   fragmentShader: `
     uniform vec3 uSunDir;
     uniform vec3 uHorizonColor;
+    uniform float uNight;
     varying vec3 vDir;
     void main() {
       vec3 d = normalize(vDir);
