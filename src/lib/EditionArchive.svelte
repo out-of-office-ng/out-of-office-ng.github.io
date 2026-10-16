@@ -12,8 +12,10 @@
   const videosByEdition = { '0x02': openCanvasVideos };
   let videoDialog;
   let clip = 0;
-  function openVideos() { clip = 0; videoDialog.showModal(); }
-  function closeVideos() { videoDialog.querySelector('video')?.pause(); videoDialog.close(); }
+  let videoOpen = false; // the <video> only exists while the dialog is open, so nothing downloads or plays in the background
+  function openVideos() { clip = 0; videoOpen = true; videoDialog.showModal(); }
+  function closeVideos() { videoDialog.close(); }
+  function nextClip(clips) { if (clip < clips.length - 1) clip += 1; }
 
   let active = 0;
   let pointer = null;
@@ -79,6 +81,9 @@
           {@const depth = (i - active + editions.length) % editions.length}
           <article class="edition-card" class:front={depth === 0} aria-hidden={depth !== 0} inert={depth !== 0} style={`--depth:${depth}; --rotation:${depth === 0 ? -1.5 : depth === 1 ? 4 : -5}deg; --tone:${edition.tone}; --card-w:${edition.imageKind === 'event' && edition.imageRatio < 1 ? `min(100%, calc(430px * ${edition.imageRatio} + 24px))` : '100%'}; --drag:${depth === 0 && !reducedMotion ? dragX : 0}px; z-index:${editions.length - depth}`}>
             <EditionArtwork {edition} natural />
+            {#if videosByEdition[edition.code]}
+              <button class="card-play" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> {videosByEdition[edition.code].length} clips</button>
+            {/if}
             <div class="card-copy">
               <p class="edition-meta">{edition.code} <span aria-hidden="true">/</span> {edition.date}</p>
               <h3>{edition.title}</h3>
@@ -92,7 +97,7 @@
         <button class="step ui-action" type="button" aria-label="Previous edition" on:keydown={onKeydown} on:click={() => goTo(active - 1)}><span aria-hidden="true">←</span></button>
         <div class="picks">
           {#each editions as edition, i}
-            <button class="pick" class:selected={i === active} type="button" aria-label={`Show ${edition.title}`} aria-pressed={i === active} on:keydown={onKeydown} on:click={() => goTo(i)}><span aria-hidden="true">{String(i + 1).padStart(2, '0')}</span></button>
+            <button class="pick" class:selected={i === active} type="button" aria-label={`Show ${edition.title}${videosByEdition[edition.code] ? ' (has video)' : ''}`} aria-pressed={i === active} on:keydown={onKeydown} on:click={() => goTo(i)}><span aria-hidden="true">{String(i + 1).padStart(2, '0')}{#if videosByEdition[edition.code]}<span class="has-video">▶</span>{/if}</span></button>
           {/each}
         </div>
         <button class="step ui-action" type="button" aria-label="Next edition" on:keydown={onKeydown} on:click={() => goTo(active + 1)}><span aria-hidden="true">→</span></button>
@@ -104,7 +109,7 @@
           <p>{paragraph}</p>
         {/each}
         {#if videosByEdition[current.code]}
-          <button class="watch-button ui-action" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> Watch {current.title}</button>
+          <button class="watch-button ui-action" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> Watch {current.title} · {videosByEdition[current.code].length} clips</button>
         {/if}
         <a class="text-link" href={`#/trail/${current.code}`}>View this edition in the trail <span aria-hidden="true">↗</span></a>
       </div>
@@ -113,20 +118,27 @@
   </div>
 </section>
 
-<dialog class="video-dialog" bind:this={videoDialog} aria-labelledby="video-title" on:click={(event) => event.target === videoDialog && closeVideos()} on:cancel={() => videoDialog.querySelector('video')?.pause()}>
+<dialog class="video-dialog" bind:this={videoDialog} aria-labelledby="video-title" aria-describedby="video-desc" on:click={(event) => event.target === videoDialog && closeVideos()} on:close={() => videoOpen = false}>
   {#if videosByEdition['0x02']}
     {@const clips = videosByEdition['0x02']}
     <div class="video-head">
-      <h2 id="video-title">Open Canvas</h2>
+      <div>
+        <h2 id="video-title">Open Canvas</h2>
+        <p class="video-meta">30 May 2026 · Jaekel House Garden</p>
+      </div>
       <button class="video-close" type="button" aria-label="Close video" on:click={closeVideos}>×</button>
     </div>
-    {#key clip}
-      <!-- svelte-ignore a11y-media-has-caption -->
-      <video src={clips[clip].src} poster={clips[clip].poster} controls muted playsinline preload="metadata"></video>
-    {/key}
+    {#if videoOpen}
+      {#key clip}
+        <!-- Starts muted on open (the visitor asked to watch); reduced motion waits for play. -->
+        <!-- svelte-ignore a11y-media-has-caption -->
+        <video src={clips[clip].src} poster={clips[clip].poster} controls muted playsinline preload="metadata" autoplay={!reducedMotion} aria-label={`${clips[clip].label}, ${clips[clip].seconds} seconds`} on:ended={() => nextClip(clips)}></video>
+      {/key}
+    {/if}
+    <p class="clip-desc" id="video-desc"><strong>{clips[clip].label}</strong> · {clips[clip].description}</p>
     <div class="clip-picks" role="group" aria-label="Choose a clip">
       {#each clips as c, i}
-        <button type="button" class:current={i === clip} aria-pressed={i === clip} on:click={() => clip = i}><img src={c.poster} alt="" /><span>{c.label}</span></button>
+        <button type="button" class:current={i === clip} aria-pressed={i === clip} on:click={() => clip = i}><img src={c.poster} alt="" /><span>{c.label} · {c.seconds}s</span></button>
       {/each}
     </div>
   {/if}
@@ -138,9 +150,15 @@
   .video-dialog::backdrop { background: #10181799; backdrop-filter: blur(4px); }
   .video-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .video-head h2 { margin: 0; font: 400 26px/1.1 var(--serif); }
+  .video-meta { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .clip-desc { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .clip-desc strong { color: var(--ink); font-weight: 600; }
+  .has-video { margin-left: 3px; font-size: 9px; color: var(--pink-deep); vertical-align: 2px; }
+  .card-play { position: absolute; z-index: 3; top: 22px; right: 22px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 14px; border: 0; border-radius: 999px; background: #181818d9; color: #fff; font: 600 12px var(--sans); cursor: pointer; }
+  .card-play:focus-visible { outline: 2px solid var(--pink-deep); outline-offset: 2px; }
   .video-close { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 28px; cursor: pointer; }
   .video-close:hover { background: var(--border-soft); }
-  video { display: block; width: 100%; max-height: calc(100dvh - 230px); aspect-ratio: 9 / 16; object-fit: contain; border-radius: 8px; background: #000; }
+  video { display: block; width: 100%; max-height: calc(100dvh - 340px); aspect-ratio: 9 / 16; object-fit: contain; border-radius: 8px; background: #000; }
   .clip-picks { display: flex; gap: 10px; margin-top: 12px; }
   .clip-picks button { flex: 1; display: grid; gap: 4px; padding: 4px; border: 2px solid transparent; border-radius: 8px; background: none; color: var(--muted); font: 500 12px var(--sans); cursor: pointer; }
   .clip-picks button.current { border-color: var(--deep); color: var(--ink); }

@@ -57,7 +57,10 @@ try {
     await page.getByRole('button', { name: 'Watch Open Canvas' }).click();
     const videoDialog = page.getByRole('dialog', { name: 'Open Canvas' });
     assert.equal(await videoDialog.isVisible(), true);
-    assert.equal(await videoDialog.locator('video').evaluate(video => video.muted && !video.autoplay), true, 'Clips start muted and never autoplay');
+    assert.equal(await videoDialog.locator('video').evaluate(video => video.muted), true, 'Clips start muted');
+    assert.match(await videoDialog.innerText(), /Painting together/, 'The clip with people leads');
+    assert.match(await videoDialog.innerText(), /30 May 2026/, 'The player says when and where');
+    assert.equal(await page.locator('#video-desc').count(), 1, 'Each clip has a text description');
     await page.keyboard.press('Escape');
     assert.equal(await videoDialog.isVisible(), false);
     await page.getByRole('button', { name: 'Previous edition', exact: true }).click();
