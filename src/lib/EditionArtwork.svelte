@@ -5,8 +5,12 @@
 
 <div class="artwork" style:--art-tone={edition.tone}>
   {#if edition.image && failedImage !== edition.image}
-    <img src={edition.image} alt={`${edition.location} venue reference, not a photograph of ${edition.title}`} loading="lazy" draggable="false" on:error={() => failedImage = edition.image} />
-    <span class="image-note">VENUE REFERENCE · NOT EVENT PHOTO</span>
+    {#if edition.imageKind === 'event'}
+      <img src={edition.image} alt={edition.imageAlt} loading="lazy" draggable="false" on:error={() => failedImage = edition.image} />
+    {:else}
+      <img src={edition.image} alt={`${edition.location} venue reference, not a photograph of ${edition.title}`} loading="lazy" draggable="false" on:error={() => failedImage = edition.image} />
+      <span class="image-note">VENUE REFERENCE · NOT EVENT PHOTO</span>
+    {/if}
   {:else}
     <span class="art-label">OUT OF OFFICE<br />LAGOS, WITH LOVE</span>
     <span class="edition-word">{edition.word}</span>

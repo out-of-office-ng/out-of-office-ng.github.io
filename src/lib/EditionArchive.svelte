@@ -57,7 +57,7 @@
     <div class="archive-intro">
       <p class="eyebrow">THE THINGS WE KEEP</p>
       <h2 id="archive-title">Three editions.<br />A little more room.</h2>
-      <p class="intro">The first three editions: what happened, when and where. The images show venue references, not event photographs.</p>
+      <p class="intro">The first three editions: what happened, when and where. Open Canvas and Release and Unwind show photos from the day; The First Hangout shows its venue.</p>
       <p class="handwritten">A little time away, kept on paper.</p>
       <a class="text-link" href="#/trail">Explore the event trail <span aria-hidden="true">↗</span></a>
     </div>

@@ -1,12 +1,8 @@
 <script>
   import { onDestroy, onMount, tick } from 'svelte';
-  import { locationPhotos } from './locationPhotos.js';
-  const photoCreditsUrl = `${import.meta.env.BASE_URL}photo-credits.html`;
+  import { releaseUnwindPhotos } from './eventPhotos.js';
 
-  const slides = Array.from({ length: 6 }, (_, index) => {
-    const photo = locationPhotos[index % locationPhotos.length];
-    return { ...photo, label: `Place ${String(index + 1).padStart(2, '0')}`, title: photo.place, caption: 'Venue reference · not event coverage' };
-  });
+  const slides = releaseUnwindPhotos.map((photo, index) => ({ ...photo, label: `Photo ${String(index + 1).padStart(2, '0')}`, caption: '0x03 · Tarkwa Bay Beach · August 2026' }));
 
   let active = 0;
   let reducedMotion = false;
@@ -98,13 +94,12 @@
 
 <section class="showcase chapter" id="photo-showcase" aria-labelledby="showcase-title">
   <div class="showcase-heading">
-    <p class="eyebrow">LAGOS PLACE NOTES</p>
-    <h2 id="showcase-title">Places from the story</h2>
-    <p class="showcase-intro">Reference photos of places used for previous editions. They are not photographs of Out of Office events. 0x04 venue details are still to come.</p>
-    <a class="credits-link" href={photoCreditsUrl}>Photo credits and licenses</a>
+    <p class="eyebrow">OUR COMMUNITY</p>
+    <h2 id="showcase-title">Different people. Shared experiences. Room for everyone.</h2>
+    <p class="showcase-intro">Moments from Release and Unwind at Tarkwa Bay.</p>
   </div>
 
-  <div class="showcase-carousel" role="region" aria-roledescription="carousel" aria-label="Lagos location reference photos">
+  <div class="showcase-carousel" role="region" aria-roledescription="carousel" aria-label="Photos from Release and Unwind">
     <div class="showcase-stage" role="group" aria-label="Swipe to change photo. Use the arrow keys when focused." tabindex="-1" class:dragging on:pointerdown={pointerDown} on:pointermove={pointerMove} on:pointerup={pointerUp} on:pointercancel={cancelDrag} on:lostpointercapture={cancelDrag}>
       {#each slides as slide, index (slide.label)}
         {@const offset = (index - active + slides.length) % slides.length}
@@ -116,9 +111,9 @@
             </div>
           </button>
           <div class="showcase-copy">
-            <p class="edition-badge">PLACE REFERENCE</p>
+            <p class="edition-badge">RELEASE AND UNWIND</p>
             <h3>{slide.title}</h3>
-            <p>{slide.caption} · Photo by <a href={slide.sourceUrl} target="_blank" rel="noreferrer">{slide.source} on Wikimedia Commons</a> (CC BY-SA 4.0).</p>
+            <p>{slide.caption}</p>
           </div>
         </article>
       {/each}
@@ -145,7 +140,7 @@
         <img src={slides[active].src} alt={slides[active].alt} />
       </div>
       <h2 id="lightbox-title">{slides[active].title}</h2>
-      <p>{slides[active].caption} · Photo by <a href={slides[active].sourceUrl} target="_blank" rel="noreferrer">{slides[active].source}</a>, Wikimedia Commons, CC BY-SA 4.0.</p>
+      <p>{slides[active].caption}</p>
     </div>
   </div>
 {/if}
@@ -153,9 +148,8 @@
 <style>
   .showcase { background: #f2eee2; overflow: clip; }
   .showcase-heading { max-width: 720px; margin: 0 auto 34px; text-align: center; }
-  .showcase-heading h2 { margin: 6px 0 10px; font: 400 clamp(42px, 6vw, 68px)/1 var(--serif); letter-spacing: -.04em; }
+  .showcase-heading h2 { margin: 6px 0 10px; font: 400 clamp(36px, 5vw, 58px)/1.05 var(--serif); letter-spacing: -.04em; text-wrap: balance; }
   .showcase-intro { margin: 0 auto; color: var(--muted); font-size: 15px; }
-  .credits-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 5px; color: var(--deep); font-size: 13px; text-underline-offset: 4px; }
   .showcase-carousel { max-width: 980px; margin: 0 auto; }
   .showcase-stage { position: relative; height: 448px; outline: none; perspective: 1200px; touch-action: pan-y pinch-zoom; user-select: none; cursor: grab; }
   .showcase-stage.dragging { cursor: grabbing; }
@@ -164,8 +158,8 @@
   .showcase-card:not(.active) { pointer-events: none; }
   .photo-open { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: zoom-in; }
   .photo-open:focus-visible { outline: 2px solid var(--pink-deep); outline-offset: -5px; }
-  .photo-slot { height: 232px; display: grid; place-items: center; align-content: center; gap: 8px; padding: 20px; border-bottom: 1px dashed #b4b1a0; background: repeating-linear-gradient(135deg, #e6e2d3 0 12px, #ded9c8 12px 24px); color: #586a67; text-align: center; }
-  .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-slot { height: 270px; padding: 0; overflow: hidden; grid-template-rows: 100%; display: grid; place-items: center; align-content: center; gap: 8px; padding: 20px; border-bottom: 1px dashed #b4b1a0; background: repeating-linear-gradient(135deg, #e6e2d3 0 12px, #ded9c8 12px 24px); color: #586a67; text-align: center; }
+  .photo-slot img { width: 100%; height: 100%; min-height: 0; object-fit: cover; }
   .showcase-copy { position: relative; padding: 22px 24px; }
   .edition-badge { display: inline-flex; align-items: center; height: 28px; margin: 0 0 18px; padding: 0 11px; border-radius: 999px; background: var(--deep); color: #faf8f2; font-size: 11px; letter-spacing: .08em; }
   .showcase-copy h3 { margin: 0 0 8px; font: 400 28px/1.1 var(--serif); letter-spacing: -.025em; }

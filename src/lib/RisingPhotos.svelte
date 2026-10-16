@@ -1,15 +1,17 @@
 <script>
   import { onMount } from 'svelte';
-  import { locationPhotos } from './locationPhotos.js';
+  import { openCanvasPhotos, releaseUnwindPhotos } from './eventPhotos.js';
   let field;
   let selected = null;
   let hovered = null;
   let infoOpen = false;
   let inView = false;
   let pageVisible = true;
-  const photos = Array.from({ length: 6 }, (_, i) => ({
-    ...locationPhotos[i % locationPhotos.length],
-    label: locationPhotos[i % locationPhotos.length].place,
+  // A mix from every edition with photos (none exist from 0x01).
+  const mix = [openCanvasPhotos[0], releaseUnwindPhotos[2], openCanvasPhotos[1], releaseUnwindPhotos[4], openCanvasPhotos[3], releaseUnwindPhotos[0]];
+  const photos = mix.map((photo, i) => ({
+    ...photo,
+    label: photo.edition,
     angle: [-7,5,-3,6,-5,3][i], duration: [30,34,28,32,29,31][i],
     delay: [-5,-17,-10,-24,-2,-20][i]
   }));
@@ -30,17 +32,16 @@
 <svelte:window on:pointerdown={outside} on:keydown={(event) => { if (event.key === 'Escape') { selected = null; infoOpen = false; } }} />
 <section class="rising-photos chapter" aria-labelledby="memories-title">
   <header>
-    <p class="eyebrow">THE PLACE, NOT THE PROOF</p>
+    <p class="eyebrow">FROM OUR EDITIONS</p>
     <h2 id="memories-title">We're creating more than events.</h2>
     <p>Through thoughtfully curated hangouts, creative experiences, outdoor retreats, and community gatherings, we create spaces where everyone has room to participate, express themselves, feel included, and make meaningful connections.</p>
     <p>We're creating room to live, feel, connect, and experience life differently.</p>
-    <p class="hint">These are venue reference photos, not photographs from our past events.</p>
     <a class="apply-button ui-action" href="#passes">See 0x04 status</a>
     <p class="hint">November 2026 · exact date and venue to be announced.</p>
     <div class="motion-info" role="group" aria-label="Photo motion controls" on:pointerenter={(event) => { if (event.pointerType === 'mouse') infoOpen = true; }} on:pointerleave={() => infoOpen = false} on:focusin={() => infoOpen = true} on:focusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) infoOpen = false; }}>
       <button class="info-button" type="button" aria-label="Photo motion help" aria-expanded={infoOpen} aria-controls="motion-help" on:click={() => infoOpen = true}>i</button>
       <div class="info-popup" id="motion-help" hidden={!infoOpen}>
-        <p class="hint">Tap a place to hold it. Tap outside to let it float.</p>
+        <p class="hint">Tap a photo to hold it. Tap outside to let it float.</p>
       </div>
     </div>
   </header>
@@ -48,7 +49,7 @@
     {#each photos as photo, i}
       <div class="floating-photo" class:held={selected === i || hovered === i}
         style={`--angle:${photo.angle}deg; --lane:${i}; --mobile-lane:${i % 3}; --duration:${photo.duration}s; --delay:${photo.delay}s`}>
-        <button class="photo-print" type="button" aria-label={`Hold ${photo.label} venue photo`} aria-pressed={selected === i}
+        <button class="photo-print" type="button" aria-label={`Hold ${photo.label} photo`} aria-pressed={selected === i}
           on:pointerenter={(event) => { if (event.pointerType === 'mouse') hovered = i; }}
           on:pointerleave={() => hovered = null}
           on:click={() => selected = selected === i ? null : i}>

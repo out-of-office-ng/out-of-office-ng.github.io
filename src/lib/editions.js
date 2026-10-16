@@ -1,11 +1,12 @@
-// Confirmed history shared by the homepage and trail. Images are venue
-// references, not documentation of the events. --codex
+// Confirmed history shared by the homepage and trail. 0x01 has no event
+// photos, so it keeps a venue reference; 0x02 and 0x03 use event photos.
 import { locationPhotos } from './locationPhotos.js';
+import { editionCovers } from './eventPhotos.js';
 
 export const editions = [
-  { code: '0x01', title: 'The First Hangout', location: 'Tarkwa Bay Beach', date: '11 April 2025', dateTime: '2025-04-11', note: 'Where we first exhaled.', word: 'Exhale.', tone: '#dce7df', image: locationPhotos[0].src },
-  { code: '0x02', title: 'Open Canvas', location: 'Jaekel House Garden', date: '30 May 2025', dateTime: '2025-05-30', note: 'An open mind. A little room to create.', word: 'Create.', tone: '#e8d7ca', image: locationPhotos[2].src },
-  { code: '0x03', title: 'Release and Unwind', location: 'Tarkwa Bay Beach', date: '15 August 2026', dateTime: '2026-08-15', note: 'A little time away from the Lagos palava.', word: 'Unwind.', tone: '#d5e2e1', image: locationPhotos[1].src },
+  { code: '0x01', title: 'The First Hangout', location: 'Tarkwa Bay Beach', date: '11 April 2025', dateTime: '2025-04-11', note: 'Where we first exhaled.', word: 'Exhale.', tone: '#dce7df', image: locationPhotos[0].src, imageKind: 'venue' },
+  { code: '0x02', title: 'Open Canvas', location: 'Jaekel House Garden', date: '30 May 2025', dateTime: '2025-05-30', note: 'An open mind. A little room to create.', word: 'Create.', tone: '#e8d7ca', image: editionCovers['0x02'].src, imageAlt: editionCovers['0x02'].alt, imageKind: 'event' },
+  { code: '0x03', title: 'Release and Unwind', location: 'Tarkwa Bay Beach', date: '15 August 2026', dateTime: '2026-08-15', note: 'A little time away from the Lagos palava.', word: 'Unwind.', tone: '#d5e2e1', image: editionCovers['0x03'].src, imageAlt: editionCovers['0x03'].alt, imageKind: 'event' },
 ];
 
 // Write-ups from the OOO team (Charisa, 16 Oct 2026), shown under the
