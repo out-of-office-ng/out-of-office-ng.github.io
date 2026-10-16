@@ -14,7 +14,7 @@
   const MEMORIES = [
     {
       stamp: 'OOO 0x01',
-      title: 'The Post-NYSC Hangout',
+      title: 'The First Hangout',
       meta: 'Tarkwa Bay Beach · Apr 11 · 12pm till daybreak',
       note: 'The calming embrace of ocean waves. The soothing breeze. The tranquility of nature.',
       color: 'var(--sunset-orange)',

@@ -31,8 +31,10 @@
 <section class="rising-photos chapter" aria-labelledby="memories-title">
   <header>
     <p class="eyebrow">THE PLACE, NOT THE PROOF</p>
-    <h2 id="memories-title">A little room to breathe, together.</h2>
-    <p>Out of Office brings people together around music, art, games, and time away from the usual Lagos rush. These are venue reference photos, not photographs from our past events.</p>
+    <h2 id="memories-title">We're creating more than events.</h2>
+    <p>Through thoughtfully curated hangouts, creative experiences, outdoor retreats, and community gatherings, we create spaces where everyone has room to participate, express themselves, feel included, and make meaningful connections.</p>
+    <p>We're creating room to live, feel, connect, and experience life differently.</p>
+    <p class="hint">These are venue reference photos, not photographs from our past events.</p>
     <a class="apply-button ui-action" href="#passes">See 0x04 status</a>
     <p class="hint">November 2026 · exact date and venue to be announced.</p>
     <div class="motion-info" role="group" aria-label="Photo motion controls" on:pointerenter={(event) => { if (event.pointerType === 'mouse') infoOpen = true; }} on:pointerleave={() => infoOpen = false} on:focusin={() => infoOpen = true} on:focusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) infoOpen = false; }}>

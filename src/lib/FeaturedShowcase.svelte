@@ -8,7 +8,7 @@
   const HISTORY = [
     {
       title: 'OOO 0x01',
-      meta: 'The Post-NYSC Hangout',
+      meta: 'The First Hangout',
       description: 'Tarkwa Bay Beach · Apr 11, 2025 · 12pm till daybreak',
       number: '01',
       tone: 'var(--water-sky)',

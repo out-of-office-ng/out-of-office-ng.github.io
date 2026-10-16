@@ -5,7 +5,6 @@
   import EditionArtwork from './EditionArtwork.svelte';
 
   let active = 0;
-  let detailOpen = false;
   let pointer = null;
   let dragX = 0;
   let dragging = false;
@@ -22,7 +21,6 @@
 
   function goTo(index) {
     active = (index + editions.length) % editions.length;
-    detailOpen = false;
     dragX = 0;
   }
   function onKeydown(event) {
@@ -89,10 +87,11 @@
         <button class="step ui-action" type="button" aria-label="Next edition" on:keydown={onKeydown} on:click={() => goTo(active + 1)}><span aria-hidden="true">→</span></button>
       </div>
       <p class="swipe-hint">Swipe the cards, or use the arrows.</p>
-      <button class="text-link edition-detail" type="button" aria-expanded={detailOpen} aria-controls="edition-details" on:click={() => detailOpen = !detailOpen}>{detailOpen ? 'Close edition details' : 'See this edition'} <span aria-hidden="true">{detailOpen ? '−' : '+'}</span></button>
-      <div id="edition-details" class="details" hidden={!detailOpen}>
-        <p><strong>{current.title}</strong><br />{current.location} · {current.date}</p>
-        <p>{current.note}</p>
+      <div id="edition-details" class="details">
+        <p class="story-meta"><strong>{current.title}</strong><br />{current.location} · {current.date}</p>
+        {#each current.story as paragraph}
+          <p>{paragraph}</p>
+        {/each}
         <a class="text-link" href={`#/trail/${current.code}`}>View this edition in the trail <span aria-hidden="true">↗</span></a>
       </div>
       <p class="sr-only" role="status" aria-atomic="true">Edition {active + 1} of {editions.length}: {current.title}, {current.location}, {current.date}.</p>
@@ -123,7 +122,8 @@
   .pick { width: 44px; min-height: 44px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--muted); font: 500 12px var(--sans); cursor: pointer; transition: color 180ms, border-color 180ms; }
   .pick.selected { color: var(--ink); border-color: var(--deep); }
   .swipe-hint { text-align: center; color: var(--muted); font-size: 12px; margin: 14px 0 6px; }
-  .edition-detail { display: flex; margin: 0 auto; }
+  .details .story-meta { font-size: 13px; color: var(--muted); }
+  .details p:not(.story-meta) { line-height: 1.75; }
   .details { margin-top: 16px; padding: 20px; border: 1px dashed var(--border-soft-deep); border-radius: 4px; font-size: 14px; }
   .details p { margin: 0 0 12px; }
   @media (hover: hover) and (pointer: fine) { .deck:not(.dragging):hover .front { transform: translateY(-4px) rotate(0deg); box-shadow: 0 22px 38px -18px #243e3c55; } }
