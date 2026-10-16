@@ -23,8 +23,9 @@ for (const width of [320, 390, 768, 1440]) {
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('.trail > li').count(), 4);
     assert.equal(await page.getByRole('link', { name: /View recap|Get on the list/ }).count(), 0);
-    assert.equal(await page.locator('.trail-card img').count(), 3, 'Each past edition has a labelled venue reference');
-    assert.equal(await page.locator('.trail-card .image-note').count(), 3, 'Venue references are not presented as event photographs');
+    assert.equal(await page.locator('.trail-card .collage img').count(), 6, 'Open Canvas and Release and Unwind each show three event photos');
+    assert.equal(await page.locator('.trail-card .image-note').count(), 0, 'No venue references remain on the trail');
+    assert.equal(await page.locator('#edition-0x01 img.whole').count(), 1, 'The First Hangout shows its single photo whole');
     assert.equal(await page.locator('#edition-0x03 time').getAttribute('datetime'), '2026-08-15');
     assert.match(await page.locator('#edition-0x04').innerText(), /November 2026/);
     assert.match(await page.locator('#edition-0x04').innerText(), /not on sale yet/);

@@ -34,15 +34,16 @@
   .text-content > :nth-child(3) { transition-delay: 120ms; }
   .text-content > :nth-child(4) { transition-delay: 180ms; }
   .text-content > :nth-child(5) { transition-delay: 240ms; }
-  .collage { position: relative; width: 100%; min-height: 390px; }
+  .collage { position: relative; width: 100%; }
   figure { position: absolute; margin: 0; background: #faf8f2; padding: 8px; border: 1px solid #243e3c15; box-shadow: 0 14px 30px -12px #243e3c35; }
   .postcard { top: 0; left: 0; width: 73%; max-width: 380px; transform: rotate(-5deg); z-index: 2; }
   .stamp-photo { top: 90px; right: 0; width: 46%; max-width: 240px; transform: rotate(7deg); z-index: 3; }
   img { width: 100%; height: auto; display: block; }
-  .paper-note { position: absolute; left: 18px; bottom: 0; margin: 0; font: 400 16px/1.6 var(--marker); color: var(--pink-deep); transform: rotate(-3deg); }
+  /* Sits in flow under both prints; % margins scale with the column width like the prints do. */
+  .paper-note { position: relative; margin: min(calc(58% + 120px), 450px) 0 0 18px; font: 400 16px/1.6 var(--marker); color: var(--pink-deep); transform: rotate(-3deg); }
   @media (max-width: 760px) {
     .introduction { grid-template-columns: minmax(0, 1fr); gap: 42px; }
-    .collage { max-width: 440px; justify-self: center; min-height: 330px; }
+    .collage { max-width: 440px; justify-self: center; }
   }
   @media (prefers-reduced-motion: reduce) { .text-content > * { opacity: 1; translate: none; transition: none; } }
 </style>

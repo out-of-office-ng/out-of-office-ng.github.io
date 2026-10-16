@@ -1,5 +1,6 @@
 <script>
   import { SALES_MODE } from './sales.js';
+  import ThemeControl from './ThemeControl.svelte';
   import { muted, toggleMute } from './ambientSound.js';
   export let onOpenDrawer = () => {};
 </script>
@@ -10,6 +11,7 @@
     <a class="status-link" href="#/about" aria-label="Away, read about Out of Office"><span class="status-dot" aria-hidden="true"></span>AWAY</a>
   </div>
   <div class="header-actions">
+    <ThemeControl />
     <button class="sound-button" type="button" on:click={toggleMute} aria-label={$muted ? 'Sound is off. Turn on' : 'Sound is on. Turn off'} aria-pressed={!$muted}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z" /><path class="sound-wave" d="M16 9.2a4 4 0 0 1 0 5.6M18.5 6.8a7.5 7.5 0 0 1 0 10.4" /></svg>
     </button>

@@ -3,6 +3,14 @@
 
   import { editions } from './editions.js';
   import EditionArtwork from './EditionArtwork.svelte';
+  import { openCanvasVideos } from './eventPhotos.js';
+
+  // Videos only exist for Open Canvas (0x02) so far.
+  const videosByEdition = { '0x02': openCanvasVideos };
+  let videoDialog;
+  let clip = 0;
+  function openVideos() { clip = 0; videoDialog.showModal(); }
+  function closeVideos() { videoDialog.querySelector('video')?.pause(); videoDialog.close(); }
 
   let active = 0;
   let pointer = null;
@@ -57,7 +65,7 @@
     <div class="archive-intro">
       <p class="eyebrow">THE THINGS WE KEEP</p>
       <h2 id="archive-title">Three editions.<br />A little more room.</h2>
-      <p class="intro">The first three editions: what happened, when and where. Open Canvas and Release and Unwind show photos from the day; The First Hangout shows its venue.</p>
+      <p class="intro">The first three editions: what happened, when and where, in photos from the day.</p>
       <p class="handwritten">A little time away, kept on paper.</p>
       <a class="text-link" href="#/trail">Explore the event trail <span aria-hidden="true">↗</span></a>
     </div>
@@ -92,6 +100,9 @@
         {#each current.story as paragraph}
           <p>{paragraph}</p>
         {/each}
+        {#if videosByEdition[current.code]}
+          <button class="watch-button ui-action" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> Watch {current.title}</button>
+        {/if}
         <a class="text-link" href={`#/trail/${current.code}`}>View this edition in the trail <span aria-hidden="true">↗</span></a>
       </div>
       <p class="sr-only" role="status" aria-atomic="true">Edition {active + 1} of {editions.length}: {current.title}, {current.location}, {current.date}.</p>
@@ -99,7 +110,38 @@
   </div>
 </section>
 
+<dialog class="video-dialog" bind:this={videoDialog} aria-labelledby="video-title" on:click={(event) => event.target === videoDialog && closeVideos()} on:cancel={() => videoDialog.querySelector('video')?.pause()}>
+  {#if videosByEdition['0x02']}
+    {@const clips = videosByEdition['0x02']}
+    <div class="video-head">
+      <h2 id="video-title">Open Canvas</h2>
+      <button class="video-close" type="button" aria-label="Close video" on:click={closeVideos}>×</button>
+    </div>
+    {#key clip}
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <video src={clips[clip].src} poster={clips[clip].poster} controls muted playsinline preload="metadata"></video>
+    {/key}
+    <div class="clip-picks" role="group" aria-label="Choose a clip">
+      {#each clips as c, i}
+        <button type="button" class:current={i === clip} aria-pressed={i === clip} on:click={() => clip = i}><img src={c.poster} alt="" /><span>{c.label}</span></button>
+      {/each}
+    </div>
+  {/if}
+</dialog>
+
 <style>
+  .watch-button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin: 4px 0 14px; padding: 10px 20px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 14px var(--sans); cursor: pointer; }
+  .video-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 16px; border: 1px solid var(--border-soft-deep); border-radius: 14px; background: var(--card-surface); color: var(--ink); overflow: auto; }
+  .video-dialog::backdrop { background: #10181799; backdrop-filter: blur(4px); }
+  .video-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .video-head h2 { margin: 0; font: 400 26px/1.1 var(--serif); }
+  .video-close { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 28px; cursor: pointer; }
+  .video-close:hover { background: var(--border-soft); }
+  video { display: block; width: 100%; max-height: calc(100dvh - 230px); aspect-ratio: 9 / 16; object-fit: contain; border-radius: 8px; background: #000; }
+  .clip-picks { display: flex; gap: 10px; margin-top: 12px; }
+  .clip-picks button { flex: 1; display: grid; gap: 4px; padding: 4px; border: 2px solid transparent; border-radius: 8px; background: none; color: var(--muted); font: 500 12px var(--sans); cursor: pointer; }
+  .clip-picks button.current { border-color: var(--deep); color: var(--ink); }
+  .clip-picks img { width: 100%; height: 56px; object-fit: cover; border-radius: 4px; }
   .archive { background: #e4e9e1; overflow: clip; }
   .archive-inner { max-width: 1140px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
   h2 { max-width: 520px; }

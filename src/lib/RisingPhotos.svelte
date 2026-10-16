@@ -1,14 +1,15 @@
 <script>
   import { onMount } from 'svelte';
-  import { openCanvasPhotos, releaseUnwindPhotos } from './eventPhotos.js';
+  import { editionCovers, openCanvasPhotos, releaseUnwindPhotos } from './eventPhotos.js';
   let field;
   let selected = null;
   let hovered = null;
   let infoOpen = false;
   let inView = false;
   let pageVisible = true;
-  // A mix from every edition with photos (none exist from 0x01).
-  const mix = [openCanvasPhotos[0], releaseUnwindPhotos[2], openCanvasPhotos[1], releaseUnwindPhotos[4], openCanvasPhotos[3], releaseUnwindPhotos[0]];
+  // A mix from every edition.
+  const firstHangout = { src: editionCovers['0x01'].src, alt: editionCovers['0x01'].alt, edition: 'The First Hangout' };
+  const mix = [openCanvasPhotos[0], releaseUnwindPhotos[2], firstHangout, releaseUnwindPhotos[4], openCanvasPhotos[1], releaseUnwindPhotos[0]];
   const photos = mix.map((photo, i) => ({
     ...photo,
     label: photo.edition,

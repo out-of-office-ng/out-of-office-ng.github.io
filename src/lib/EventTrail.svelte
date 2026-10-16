@@ -2,6 +2,8 @@
   import { editions } from './editions.js';
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
   import EditionArtwork from './EditionArtwork.svelte';
+  import TrailCollage from './TrailCollage.svelte';
+  import { trailPhotos } from './eventPhotos.js';
   import ScrollReveal from './ScrollReveal.svelte';
   const v1ArchiveUrl = `${import.meta.env.BASE_URL}v1/`;
 
@@ -52,7 +54,7 @@
           <li>
             <ScrollReveal>
               <article class="trail-card" id={`edition-${edition.code}`} tabindex="-1" aria-labelledby={`title-${edition.code}`}>
-                <div class="paper-image"><EditionArtwork {edition} /></div>
+                <div class="paper-image">{#if trailPhotos[edition.code]}<TrailCollage photos={trailPhotos[edition.code]} tone={edition.tone} />{:else}<EditionArtwork {edition} />{/if}</div>
                 <div class="card-copy">
                   <p class="card-kicker"><span>OOO {edition.code}</span><span class="past-label">Past edition</span></p>
                   <h2 id={`title-${edition.code}`}>{edition.title}</h2>

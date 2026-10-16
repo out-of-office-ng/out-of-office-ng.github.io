@@ -1,10 +1,11 @@
 // Photographs from past OOO editions, selected by the OOO team (Charisa,
 // 16 Oct 2026). Unlike locationPhotos.js, these document the events
-// themselves. There are no photos from 0x01 The First Hangout.
+// themselves. 0x01 The First Hangout has one photo so far.
 // Web copies are resized to 1400px with EXIF (including GPS) stripped.
 const asset = (path) => `${import.meta.env.BASE_URL}images/events/${path}`;
 
 export const editionCovers = {
+  '0x01': { src: asset('first-hangout-cover.jpg'), ratio: 719 / 1280, alt: 'A colourful doodled painting in progress on a table, with markers and cups beside it, at The First Hangout' },
   '0x02': { src: asset('open-canvas-cover.jpg'), ratio: 787 / 1400, alt: 'Guests painting at long tables on the lawn at Open Canvas' },
   '0x03': { src: asset('release-and-unwind-cover.jpg'), ratio: 1080 / 1350, alt: 'Collage of friends laughing in the waves at Release and Unwind' },
 };
@@ -26,3 +27,19 @@ export const releaseUnwindPhotos = [
   { src: asset('release-and-unwind-5054.jpg'), title: 'Upside down', alt: 'A guest doing a handstand on the beach at dusk' },
   { src: asset('release-and-unwind-5055.jpg'), title: 'Sea-breeze selfie', alt: 'A guest takes a selfie on the beach under a cloudy sky' },
 ].map((photo) => ({ ...photo, edition: 'Release and Unwind' }));
+
+// Open Canvas clips, re-encoded from the iPhone .MOV originals to H.264 MP4
+// (720p-ish, 30fps, metadata stripped). Poster = a frame from each clip.
+const video = (path) => `${import.meta.env.BASE_URL}videos/${path}`;
+export const openCanvasVideos = [1, 2, 3].map((n) => ({
+  src: video(`open-canvas-${n}.mp4`),
+  poster: video(`open-canvas-${n}.jpg`),
+  label: `Clip ${n}`,
+}));
+
+// Three prints per edition for the trail collage. 0x01 has one photo, so the
+// trail shows it on its own until more arrive.
+export const trailPhotos = {
+  '0x02': [openCanvasPhotos[0], { ...editionCovers['0x02'], edition: 'Open Canvas' }, openCanvasPhotos[1]],
+  '0x03': [releaseUnwindPhotos[2], releaseUnwindPhotos[0], releaseUnwindPhotos[4]],
+};

@@ -36,20 +36,31 @@ try {
     assert.ok(await page.evaluate(() => scrollY > 300), 'Navigation should scroll beyond the hero');
     assert.ok(await page.locator('.site-header').evaluate(element => element.getBoundingClientRect().top >= 0), 'Header remains visible');
     const front = page.locator('.edition-card.front');
-    assert.match(await front.innerText(), /Post-NYSC/);
+    assert.match(await front.innerText(), /The First Hangout/);
     assert.equal(await page.locator('.edition-card[inert]').count(), 2);
     await page.getByRole('button', { name: 'Next edition', exact: true }).click();
     assert.match(await front.innerText(), /Open Canvas/);
     await page.getByRole('button', { name: 'Next edition', exact: true }).press('ArrowRight');
     assert.match(await front.innerText(), /Release and Unwind/);
     await page.getByRole('button', { name: 'Next edition', exact: true }).press('Home');
-    assert.match(await front.innerText(), /Post-NYSC/);
+    assert.match(await front.innerText(), /The First Hangout/);
     await page.getByRole('button', { name: 'Previous edition', exact: true }).click();
     assert.match(await front.innerText(), /Release and Unwind/);
-    await page.getByRole('button', { name: 'See this edition', exact: true }).click();
-    assert.equal(await page.locator('#edition-details').isVisible(), true);
+    // Each edition's write-up is always shown and follows the front card.
+    const details = page.locator('#edition-details');
+    assert.match(await details.innerText(), /beach retreat/);
     await page.getByRole('button', { name: 'Next edition', exact: true }).click();
-    assert.equal(await page.locator('#edition-details').isVisible(), false);
+    assert.match(await details.innerText(), /Every vision starts somewhere/);
+    assert.equal(await page.getByRole('button', { name: 'Watch Open Canvas' }).count(), 0, 'Only Open Canvas has videos');
+    await page.getByRole('button', { name: 'Next edition', exact: true }).click();
+    assert.match(await details.innerText(), /Open Canvas was created/);
+    await page.getByRole('button', { name: 'Watch Open Canvas' }).click();
+    const videoDialog = page.getByRole('dialog', { name: 'Open Canvas' });
+    assert.equal(await videoDialog.isVisible(), true);
+    assert.equal(await videoDialog.locator('video').evaluate(video => video.muted && !video.autoplay), true, 'Clips start muted and never autoplay');
+    await page.keyboard.press('Escape');
+    assert.equal(await videoDialog.isVisible(), false);
+    await page.getByRole('button', { name: 'Previous edition', exact: true }).click();
 
     // Pointer gesture exercises direction, threshold, and pointer-cancel handling.
     const deck = page.locator('.deck');
