@@ -12,7 +12,6 @@
     <a href="#/about">Our story</a>
     <a href="#/trail">Event trail</a>
     <a href="#next-event">Next event</a>
-    <a href={`${siteBase}photo-credits.html`}>Photo credits</a>
     <a href={`${siteBase}v1/`}>v1 archive</a>
     <a href="https://chat.whatsapp.com/IGeVwvbkusyFPIPA2saXKs" target="_blank" rel="noopener noreferrer">Join the community <span class="sr-only">(WhatsApp, opens in a new tab)</span><span aria-hidden="true">↗</span></a>
     <a href="https://www.instagram.com/outofoffice_ng/" target="_blank" rel="noopener noreferrer">Instagram <span class="sr-only">(opens in a new tab)</span><span aria-hidden="true">↗</span></a>

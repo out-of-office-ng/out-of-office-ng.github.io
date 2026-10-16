@@ -1,5 +1,5 @@
-// Confirmed history shared by the homepage and trail. Every edition now uses
-// an event photo (venue references live on in locationPhotos.js).
+// Confirmed history shared by the homepage and trail. Every edition uses an
+// event photo.
 import { editionCovers } from './eventPhotos.js';
 
 export const editions = [

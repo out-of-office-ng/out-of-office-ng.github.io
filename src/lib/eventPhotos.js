@@ -1,6 +1,5 @@
 // Photographs from past OOO editions, selected by the OOO team (Charisa,
-// 16 Oct 2026). Unlike locationPhotos.js, these document the events
-// themselves. 0x01 The First Hangout has one photo so far.
+// 16 Oct 2026). These document the events themselves. 0x01 The First Hangout has one photo so far.
 // Web copies are resized to 1400px with EXIF (including GPS) stripped.
 const asset = (path) => `${import.meta.env.BASE_URL}images/events/${path}`;
 
