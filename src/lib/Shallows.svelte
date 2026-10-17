@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, tick } from 'svelte';
   import { muted, toggleMute } from './ambientSound.js';
+  import { motionPaused } from './motionPause.js';
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
 
   const siteBase = import.meta.env.BASE_URL;
@@ -59,6 +60,7 @@
       if (scene) return;
       scene = createShallows(stage, {
         sound: !isMuted,
+        initialPaused: $motionPaused,
         initialMode: viewMode,
         initialQuality: preferredQuality,
         onStatus: handleStatus,
@@ -78,6 +80,8 @@
     scene?.setQuality(next);
     try { localStorage.setItem('ooo-water-quality', next); } catch {}
   }
+
+  $: scene?.setPaused?.($motionPaused);
 
   let nearObserver;
   onMount(() => {
@@ -176,7 +180,7 @@
     --hero-deep: var(--color-deep, #376a65);
     --hero-paper: var(--color-paper, #f2f0e9);
     --hero-card: #faf8f2;
-    --hero-muted: #586a67;
+    --hero-muted: #455654;
     --hero-line: #cdc9b8;
     --hero-dash: #b4b1a0;
     --hero-tape: rgb(122 174 168 / .6);
@@ -187,8 +191,9 @@
     --hero-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
     position: relative;
     isolation: isolate;
-    height: 100svh;
-    min-height: 590px;
+    /* A floor, not a fixed height: on short windows or with larger text
+       spacing the copy pushes the hero taller instead of being cut off. */
+    min-height: max(590px, 100vh);
     overflow: hidden;
     color: var(--hero-ink);
     background: var(--hero-paper);
@@ -206,7 +211,7 @@
     position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: linear-gradient(90deg, color-mix(in srgb, var(--hero-paper) 95%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 92%, transparent) 38%, transparent 64%);
   }
-  .hero-copy { position: absolute; z-index: 2; top: clamp(160px, 22.8vh, 205px); left: clamp(30px, 8vw, 115px); width: min(700px, calc(100% - 60px)); }
+  .hero-copy { position: relative; z-index: 2; margin-left: clamp(30px, 8vw, 115px); padding: clamp(160px, 22.8vh, 205px) 0 32px; width: min(700px, calc(100% - 60px)); }
   .eyebrow { margin: 0; color: var(--hero-muted); font-family: var(--hero-body); font-size: 12px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
   h1 { margin: 10px 0 22px; font-family: var(--hero-display); font-size: clamp(67px, 7.78vw, 112px); line-height: .95; letter-spacing: -.04em; font-weight: 400; overflow-wrap: anywhere; }
   .description { margin: 0; max-width: 380px; font-size: 17px; line-height: 1.7; }
@@ -246,14 +251,16 @@
     .postmark strong { font-size: 19px; }
   }
   @media (max-width: 700px) {
-    .hero { min-height: 720px; }
+    /* A column: copy from the top, the auto-reply pushed to the bottom. On short
+       phones (iPhone SE/8) the card used to cover the CTA; now the hero grows. */
+    .hero { display: flex; flex-direction: column; box-sizing: border-box; min-height: 720px; padding-bottom: 82px; }
     .water-still img { object-position: center; }
     .preview-wash { background: linear-gradient(180deg, color-mix(in srgb, var(--hero-paper) 94%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 72%, transparent) 42%, color-mix(in srgb, var(--hero-paper) 20%, transparent) 68%, transparent 88%); }
-    .hero-copy { top: 155px; left: 20px; width: calc(100% - 40px); }
+    .hero-copy { margin: 0 20px; padding: 155px 0 24px; width: auto; }
     h1 { margin: 10px 0 18px; font-size: clamp(42px, 13.33vw, 52px); }
     .description { display: block; font-size: 14px; line-height: 1.7; margin: 0 0 18px; }
     .event-status { margin: 0 0 24px; font-size: 15px; }
-    .auto-reply { left: 20px; right: 20px; bottom: 82px; width: auto; padding: 16px; transform: rotate(1deg); }
+    .auto-reply { position: relative; inset: auto; margin: auto 20px 0; width: auto; padding: 16px; transform: rotate(1deg); }
     .auto-reply .mail-body { max-width: 28ch; font-size: 16px; }
     .auto-reply .subject { margin-bottom: 8px; padding-bottom: 8px; font-size: 13px; }
     .auto-reply .write-link { margin-top: 10px; font-size: 12px; }
@@ -263,11 +270,12 @@
     .scene-status { top: auto; right: auto; left: 20px; bottom: 82px; }
   }
   @media (max-width: 350px) {
-    .hero-copy { left: 16px; width: calc(100% - 32px); }
+    .hero-copy { margin-inline: 16px; }
     h1 { font-size: clamp(39px, 13.1vw, 44px); }
     .event-status { font-size: 14px; }
     .explore-card { padding: 18px; }
     .explore-actions button { padding: 0 14px; font-size: 14px; }
   }
+  @supports (min-height: 100svh) { @media (max-width: 700px) { .hero { min-height: max(720px, 100svh); } } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 </style>

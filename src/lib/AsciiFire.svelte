@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { motionPaused } from './motionPause.js';
 
   // Exact pixel data extracted from the reference campfire image: the
   // source photo was downsampled to a 52x57 grid (box filter), then every
@@ -118,6 +119,7 @@
 
     let frameId;
     let lastTime = 0;
+    let paused = false;
     function loop(time) {
       // ~12fps — a flame flickers, it doesn't need 60fps to read as alive.
       // The silhouette below is the exact extracted artwork and never
@@ -186,11 +188,16 @@
         // the light a fire casts flickers too
         glow = 0.3 + Math.sin(time * 0.009) * 0.08 + Math.sin(time * 0.021) * 0.05;
       }
-      frameId = requestAnimationFrame(loop);
+      // Paused: keep the last drawn frame (WCAG 2.2.2).
+      frameId = paused && lastTime ? 0 : requestAnimationFrame(loop);
     }
-    frameId = requestAnimationFrame(loop);
+    const unsubscribe = motionPaused.subscribe(value => {
+      paused = value;
+      if (!paused && !frameId) frameId = requestAnimationFrame(loop);
+    });
+    frameId ||= requestAnimationFrame(loop);
 
-    return () => cancelAnimationFrame(frameId);
+    return () => { unsubscribe(); cancelAnimationFrame(frameId); };
   });
 </script>
 

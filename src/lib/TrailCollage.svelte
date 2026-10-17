@@ -20,7 +20,9 @@
 </div>
 
 <style>
-  .collage { position: relative; aspect-ratio: 1.48; min-height: 240px; background: var(--art-tone); overflow: hidden; }
+  /* A definite width stops aspect-ratio turning min-height into a minimum
+     width, which pushed the collage past its card on screens under ~380px. */
+  .collage { position: relative; width: 100%; aspect-ratio: 1.48; min-height: 240px; background: var(--art-tone); overflow: hidden; }
   .print { position: absolute; margin: 0; aspect-ratio: 3 / 4; padding: 6px 6px 18px; background: #fbf9f3; box-shadow: 0 10px 22px -10px #243e3c80; transform: rotate(var(--r)); }
   .print img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .tape { position: absolute; top: -8px; left: 50%; width: 46px; height: 16px; background: #f3e7c0cc; transform: translateX(-50%) rotate(-4deg); }

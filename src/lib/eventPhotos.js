@@ -35,7 +35,7 @@ const video = (path) => `${import.meta.env.BASE_URL}videos/${path}`;
 // the set-up clip is silent, so its text is the only non-visual alternative.
 export const openCanvasVideos = [
   { id: 'painting', file: 'open-canvas-painting', label: 'Painting together', seconds: 13, description: 'Guests paint at long tables on the lawn, holding up finished canvases: a house portrait, a green frog, bright abstracts. Chatter and music in the background.' },
-  { id: 'setup', file: 'open-canvas-setup', label: 'Before guests arrived', seconds: 7, description: 'The lawn at Jaekel House Garden, set with long tables and white chairs, then a close-up of blank canvases, brushes and colourful palettes at every seat. No sound.' },
+  { id: 'setup', file: 'open-canvas-setup', label: 'Before guests arrived', seconds: 7, description: 'The lawn at Jaekel House Garden, set with long tables and white chairs, then a close-up of blank canvases, brushes and colourful palettes at every seat. Only faint background sound.' },
 ].map(({ file, ...clip }) => ({ ...clip, src: video(`${file}.mp4`), poster: video(`${file}.jpg`) }));
 
 // Three prints per edition for the trail collage (0x01 is set below, once the

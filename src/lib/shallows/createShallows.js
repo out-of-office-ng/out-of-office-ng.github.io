@@ -19,7 +19,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createAsset as createPolyforkSailboat } from '../vendor/polyfork-sailboat.mjs';
 
-export function createShallows(container, { sound = true, initialMode = 'preview', initialQuality = 'auto', onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
+export function createShallows(container, { sound = true, initialPaused = false, initialMode = 'preview', initialQuality = 'auto', onStatus = () => {}, onInteract = () => {}, onBoatEgg = () => {} } = {}) {
 const viewW = () => Math.max(1, container.clientWidth);
 const viewH = () => Math.max(1, container.clientHeight);
 
@@ -51,7 +51,9 @@ let mode = initialMode === 'explore' ? 'explore' : 'preview';
 const quality = 'auto';
 const qualitySettings = SETTINGS.quality[quality];
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-let paused = motionPreference.matches;
+// Paused by the system reduced-motion setting or the page's Pause motion switch.
+let userPaused = initialPaused;
+let paused = motionPreference.matches || userPaused;
 let disposed = false, inView = true, contextLost = false;
 
 /* ==========================================================================
@@ -188,6 +190,7 @@ const skyMat = new THREE.ShaderMaterial({
   fragmentShader: `
     uniform vec3 uSunDir;
     uniform vec3 uHorizonColor;
+    uniform float uNight;
     varying vec3 vDir;
     void main() {
       vec3 d = normalize(vDir);
@@ -1683,7 +1686,7 @@ function listen(target, event, callback, options = {}) {
 const resizeObserver = new ResizeObserver(() => onResize());
 resizeObserver.observe(container);
 listen(document, 'visibilitychange', syncAnimation);
-listen(motionPreference, 'change', () => { paused = motionPreference.matches; syncAnimation(); });
+listen(motionPreference, 'change', () => { paused = motionPreference.matches || userPaused; syncAnimation(); });
 // Only real input fades the hint: resetCamera()'s controls.update() also
 // emits 'change' at startup, which faded it before anyone touched the water.
 controls.addEventListener('change', requestRender);
@@ -1783,6 +1786,11 @@ return {
   setQuality,
   getQuality: () => qualityMode,
   resetView: resetCamera,
+  setPaused(value) {
+    userPaused = !!value;
+    paused = motionPreference.matches || userPaused;
+    syncAnimation();
+  },
   setSound(enabled) {
     soundEnabled = !!enabled;
     if (soundEnabled) armAudio();
