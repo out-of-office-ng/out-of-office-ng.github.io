@@ -176,7 +176,7 @@
     --hero-deep: var(--color-deep, #376a65);
     --hero-paper: var(--color-paper, #f2f0e9);
     --hero-card: #faf8f2;
-    --hero-muted: #586a67;
+    --hero-muted: #455654;
     --hero-line: #cdc9b8;
     --hero-dash: #b4b1a0;
     --hero-tape: rgb(122 174 168 / .6);
@@ -187,8 +187,9 @@
     --hero-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
     position: relative;
     isolation: isolate;
-    height: 100svh;
-    min-height: 590px;
+    /* A floor, not a fixed height: on short windows or with larger text
+       spacing the copy pushes the hero taller instead of being cut off. */
+    min-height: max(590px, 100vh);
     overflow: hidden;
     color: var(--hero-ink);
     background: var(--hero-paper);
@@ -206,7 +207,7 @@
     position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: linear-gradient(90deg, color-mix(in srgb, var(--hero-paper) 95%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 92%, transparent) 38%, transparent 64%);
   }
-  .hero-copy { position: absolute; z-index: 2; top: clamp(160px, 22.8vh, 205px); left: clamp(30px, 8vw, 115px); width: min(700px, calc(100% - 60px)); }
+  .hero-copy { position: relative; z-index: 2; margin-left: clamp(30px, 8vw, 115px); padding: clamp(160px, 22.8vh, 205px) 0 32px; width: min(700px, calc(100% - 60px)); }
   .eyebrow { margin: 0; color: var(--hero-muted); font-family: var(--hero-body); font-size: 12px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
   h1 { margin: 10px 0 22px; font-family: var(--hero-display); font-size: clamp(67px, 7.78vw, 112px); line-height: .95; letter-spacing: -.04em; font-weight: 400; overflow-wrap: anywhere; }
   .description { margin: 0; max-width: 380px; font-size: 17px; line-height: 1.7; }
@@ -246,10 +247,10 @@
     .postmark strong { font-size: 19px; }
   }
   @media (max-width: 700px) {
-    .hero { min-height: 720px; }
+    .hero { height: 100svh; min-height: 720px; }
     .water-still img { object-position: center; }
     .preview-wash { background: linear-gradient(180deg, color-mix(in srgb, var(--hero-paper) 94%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 72%, transparent) 42%, color-mix(in srgb, var(--hero-paper) 20%, transparent) 68%, transparent 88%); }
-    .hero-copy { top: 155px; left: 20px; width: calc(100% - 40px); }
+    .hero-copy { position: absolute; top: 155px; left: 20px; margin: 0; padding: 0; width: calc(100% - 40px); }
     h1 { margin: 10px 0 18px; font-size: clamp(42px, 13.33vw, 52px); }
     .description { display: block; font-size: 14px; line-height: 1.7; margin: 0 0 18px; }
     .event-status { margin: 0 0 24px; font-size: 15px; }
