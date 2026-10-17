@@ -231,6 +231,9 @@ html[data-theme="dark"] .claim-btn,
 html[data-theme="dark"] .seat-badge,
 html[data-theme="dark"] .edition-badge,
 html[data-theme="dark"] .lightbox-close { background: #acd0be; color: #1c2921; }
+/* Header "Pause motion" (motionPause.js, WCAG 2.2.2). Named loops only, so
+   dialog and drawer transitions keep running. */
+html[data-motion="paused"] :is(.floating-photo, .danfo-body, .wheel) { animation-play-state: paused !important; }
 /* White text on --blue/--pink-deep fails once those turn pastel in dark mode. */
 html[data-theme="dark"] .primary-btn,
 html[data-theme="dark"] .copy-btn,
@@ -246,6 +249,7 @@ html[data-theme="dark"] .edition-index a:is(:hover, [aria-current]) { background
   .site-header .pass-button { padding-inline: 10px; font-size: 10px; gap: 4px; }
   .site-header { gap: 4px; }
 }
+
 @media (prefers-reduced-motion: reduce) {
   html, body { scroll-behavior: auto; }
 }
