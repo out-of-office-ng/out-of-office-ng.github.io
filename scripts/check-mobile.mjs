@@ -150,6 +150,22 @@ async function run(engine, launcher, launchOptions) {
         assert.ok(modern.widest <= modern.viewport, `${where}: page is ${modern.widest}px wide in a ${modern.viewport}px viewport`);
         assert.equal(await page.evaluate(() => visualViewport ? visualViewport.scale : 1), 1, `${where}: layout is not scaled down`);
         assert.ok(await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize) >= 16), `${where}: body text is at least 16px`);
+        if (!route) {
+          // Header controls must not sit on top of each other, and the hero CTA must not be covered.
+          const crowded = await page.evaluate(() => {
+            const boxes = [];
+            for (const element of document.querySelectorAll('.site-header .brand, .site-header .status-link, .site-header .pass-button')) {
+              const range = document.createRange(); range.selectNodeContents(element); boxes.push([element.className.split(' ')[0], range.getBoundingClientRect()]);
+            }
+            for (const icon of document.querySelectorAll('.site-header .theme-control > span, .site-header .sound-button svg')) boxes.push([icon.parentElement.className.split(' ')[0], icon.getBoundingClientRect()]);
+            const hits = [];
+            boxes.forEach(([a, ra], i) => boxes.forEach(([b, rb], j) => { if (i < j && ra.left < rb.right - .5 && rb.left < ra.right - .5 && ra.top < rb.bottom && rb.top < ra.bottom) hits.push(`${a} × ${b}`); }));
+            const cta = document.querySelector('.primary-button').getBoundingClientRect(), card = document.querySelector('.auto-reply').getBoundingClientRect();
+            if (cta.left < card.right && card.left < cta.right && cta.top < card.bottom && card.top < cta.bottom) hits.push('hero CTA × auto-reply card');
+            return hits;
+          });
+          assert.deepEqual(crowded, [], `${where}: overlapping controls`);
+        }
         await page.evaluate(emulateOldSafari);
         const old = await widestScroll(page);
         assert.ok(old.widest <= old.viewport, `${where}: without overflow: clip (Safari < 16) the page is ${old.widest}px wide in ${old.viewport}px`);
@@ -158,6 +174,23 @@ async function run(engine, launcher, launchOptions) {
         await context.close();
       }
     }
+
+    // With motion on, the header also carries the Pause motion button.
+    for (const profile of profiles) {
+      const { context, page } = await newPage(browser, profile);
+      await page.goto(base, { waitUntil: 'domcontentloaded' });
+      await page.getByRole('button', { name: 'Pause motion' }).waitFor();
+      await page.evaluate(() => document.fonts.ready);
+      const hits = await page.evaluate(() => {
+        const boxes = [...document.querySelectorAll('.site-header a, .site-header button')].map(element => [(element.getAttribute('aria-label') || element.textContent).trim().slice(0, 20), element.getBoundingClientRect()]);
+        const out = [];
+        boxes.forEach(([a, ra], i) => boxes.forEach(([b, rb], j) => { if (i < j && ra.left < rb.right - .5 && rb.left < ra.right - .5 && ra.top < rb.bottom && rb.top < ra.bottom) out.push(`${a} × ${b}`); }));
+        return out;
+      });
+      assert.deepEqual(hits, [], `${profile.width}px header with Pause motion: overlapping controls`);
+      await context.close();
+    }
+    record(engine, 'Header: no overlapping controls at any profile (with and without Pause motion)', 'PASS');
 
     const phone = profiles[0];
     {

@@ -129,6 +129,32 @@ try {
   }
   pass('2.5.8: target size minimum (with spacing exception)');
 
+  // 2.2.2 Pause, Stop, Hide: one header switch pauses every ambient loop and is remembered.
+  {
+    const { context, page } = await open('', { reducedMotion: 'no-preference' });
+    const toggle = page.getByRole('button', { name: 'Pause motion' });
+    assert.equal(await toggle.getAttribute('aria-pressed'), 'false');
+    await toggle.press('Enter');
+    assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
+    await page.locator('.rising-photos').scrollIntoViewIfNeeded();
+    const states = await page.evaluate(() => [...new Set(document.getAnimations().filter(a => /photo-float|danfo/.test(a.animationName)).map(a => a.playState))]);
+    assert.deepEqual(states, ['paused'], 'Floating photos and danfo pause');
+    await page.reload();
+    assert.equal(await page.getByRole('button', { name: 'Pause motion' }).getAttribute('aria-pressed'), 'true', 'Choice is remembered');
+    await page.evaluate(() => { location.hash = '#/about'; });
+    const fire = page.locator('.fire-container canvas');
+    await fire.waitFor();
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const before = await fire.screenshot();
+    await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 400)));
+    assert.ok(before.equals(await fire.screenshot()), 'About fire is still while paused');
+    await context.close();
+    const reduced = await open('');
+    assert.equal(await reduced.page.getByRole('button', { name: 'Pause motion' }).count(), 0, 'Hidden when the system already reduces motion');
+    await reduced.context.close();
+  }
+  pass('2.2.2: Pause motion stops photos, danfo and fire; remembered; hidden under reduced motion');
+
   // 1.3.1 Headings: one h1 per view, no decorative headings.
   {
     const { context, page } = await open('');
