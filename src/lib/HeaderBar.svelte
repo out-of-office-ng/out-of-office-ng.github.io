@@ -24,7 +24,7 @@
   .header-left, .header-actions { display: flex; align-items: center; }
   .header-left { gap: 14px; min-width: 0; }
   .brand { flex-shrink: 0; color: var(--ink); font: 700 13px/1 var(--sans); letter-spacing: .04em; text-decoration: none; }
-  .status-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-decoration: none; }
+  .status-link { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-decoration: none; }
   .status-link:hover { color: var(--ink); }
   .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #df6c56; box-shadow: 0 0 0 3px #df6c5624; }
   .header-actions { gap: 4px; }
