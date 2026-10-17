@@ -19,7 +19,7 @@ export function dialogFocus(node) {
     if (event.key !== 'Tab') return;
     const items = focusable();
     const first = items[0] || node;
-    const last = items.at(-1) || node;
+    const last = items[items.length - 1] || node; // not .at(): Safari < 15.4
     if (event.shiftKey && (document.activeElement === first || document.activeElement === node)) {
       event.preventDefault(); last.focus();
     } else if (!event.shiftKey && (document.activeElement === last || document.activeElement === node)) {
