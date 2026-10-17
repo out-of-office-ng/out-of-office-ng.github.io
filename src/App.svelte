@@ -23,6 +23,13 @@
   const openDrawer = () => isDrawerOpen = true;
   const openOooGen = () => isOooGenOpen = true;
   $: trailMatch = /^#\/trail(?:\/(0x0[1-4]))?$/.exec(currentRoute);
+  // Each view gets its own title (WCAG 2.4.2); home keeps the one in index.html.
+  const homeTitle = typeof document !== 'undefined' ? document.title : '';
+  $: if (typeof document !== 'undefined') {
+    document.title = currentRoute === '#/about' ? 'Our story — Out of Office Lagos'
+      : trailMatch ? 'Event trail — Out of Office Lagos'
+      : homeTitle;
+  }
 
   async function positionRoute(focus = true) {
     await tick();
