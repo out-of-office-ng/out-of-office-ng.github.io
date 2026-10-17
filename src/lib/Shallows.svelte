@@ -251,14 +251,16 @@
     .postmark strong { font-size: 19px; }
   }
   @media (max-width: 700px) {
-    .hero { height: 100svh; min-height: 720px; }
+    /* A column: copy from the top, the auto-reply pushed to the bottom. On short
+       phones (iPhone SE/8) the card used to cover the CTA; now the hero grows. */
+    .hero { display: flex; flex-direction: column; box-sizing: border-box; min-height: 720px; padding-bottom: 82px; }
     .water-still img { object-position: center; }
     .preview-wash { background: linear-gradient(180deg, color-mix(in srgb, var(--hero-paper) 94%, transparent) 0%, color-mix(in srgb, var(--hero-paper) 72%, transparent) 42%, color-mix(in srgb, var(--hero-paper) 20%, transparent) 68%, transparent 88%); }
-    .hero-copy { position: absolute; top: 155px; left: 20px; margin: 0; padding: 0; width: calc(100% - 40px); }
+    .hero-copy { margin: 0 20px; padding: 155px 0 24px; width: auto; }
     h1 { margin: 10px 0 18px; font-size: clamp(42px, 13.33vw, 52px); }
     .description { display: block; font-size: 14px; line-height: 1.7; margin: 0 0 18px; }
     .event-status { margin: 0 0 24px; font-size: 15px; }
-    .auto-reply { left: 20px; right: 20px; bottom: 82px; width: auto; padding: 16px; transform: rotate(1deg); }
+    .auto-reply { position: relative; inset: auto; margin: auto 20px 0; width: auto; padding: 16px; transform: rotate(1deg); }
     .auto-reply .mail-body { max-width: 28ch; font-size: 16px; }
     .auto-reply .subject { margin-bottom: 8px; padding-bottom: 8px; font-size: 13px; }
     .auto-reply .write-link { margin-top: 10px; font-size: 12px; }
@@ -268,11 +270,12 @@
     .scene-status { top: auto; right: auto; left: 20px; bottom: 82px; }
   }
   @media (max-width: 350px) {
-    .hero-copy { left: 16px; width: calc(100% - 32px); }
+    .hero-copy { margin-inline: 16px; }
     h1 { font-size: clamp(39px, 13.1vw, 44px); }
     .event-status { font-size: 14px; }
     .explore-card { padding: 18px; }
     .explore-actions button { padding: 0 14px; font-size: 14px; }
   }
+  @supports (min-height: 100svh) { @media (max-width: 700px) { .hero { min-height: max(720px, 100svh); } } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 </style>
