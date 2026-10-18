@@ -2,7 +2,9 @@
   import { onDestroy, onMount, tick } from 'svelte';
   import { releaseUnwindPhotos } from './eventPhotos.js';
 
-  const slides = releaseUnwindPhotos.map((photo, index) => ({ ...photo, label: `Photo ${String(index + 1).padStart(2, '0')}`, caption: '0x03 · Tarkwa Bay Beach · August 2026' }));
+  // Photos only, no titles on screen: the pictures speak for themselves
+  // (Charisa, 18 Oct). Screen readers get each photo's alt text.
+  const slides = releaseUnwindPhotos.map((photo, index) => ({ ...photo, label: `Photo ${String(index + 1).padStart(2, '0')}` }));
 
   let active = 0;
   let reducedMotion = false;
@@ -104,17 +106,12 @@
       {#each slides as slide, index (slide.label)}
         {@const offset = (index - active + slides.length) % slides.length}
         {@const signedOffset = offset <= slides.length / 2 ? offset : offset - slides.length}
-        <article class="showcase-card" class:active={offset === 0} aria-hidden={offset !== 0} inert={offset !== 0} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${slides.length}: ${slide.title}`} style={`--offset:${signedOffset}; --order:${slides.length - Math.abs(signedOffset)}; --drag:${offset === 0 && !reducedMotion ? dragX : 0}px; --motion:${reducedMotion ? '0ms' : '520ms'}`}>
-          <button class="photo-open" type="button" aria-label={`Open ${slide.title} photo`} on:click={openLightbox}>
+        <article class="showcase-card" class:active={offset === 0} aria-hidden={offset !== 0} inert={offset !== 0} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${slides.length}`} style={`--offset:${signedOffset}; --order:${slides.length - Math.abs(signedOffset)}; --drag:${offset === 0 && !reducedMotion ? dragX : 0}px; --motion:${reducedMotion ? '0ms' : '520ms'}`}>
+          <button class="photo-open" type="button" aria-label={`Enlarge photo: ${slide.alt}`} on:click={openLightbox}>
             <div class="photo-slot">
               <img src={slide.src} alt={slide.alt} loading={offset === 0 ? 'eager' : 'lazy'} width="1280" height="720" />
             </div>
           </button>
-          <div class="showcase-copy">
-            <p class="edition-badge">RELEASE AND UNWIND</p>
-            <h3>{slide.title}</h3>
-            <p>{slide.caption}</p>
-          </div>
         </article>
       {/each}
     </div>
@@ -128,19 +125,17 @@
       </div>
       <button class="step ui-action" type="button" aria-label="Next photo" on:click={() => goTo(active + 1)}><span aria-hidden="true">→</span></button>
     </div>
-    <p class="sr-only" role="status" aria-atomic="true">Photo {active + 1} of {slides.length}: {slides[active].title}.</p>
+    <p class="sr-only" role="status" aria-atomic="true">Photo {active + 1} of {slides.length}.</p>
   </div>
 </section>
 
 {#if lightboxOpen}
   <div class="lightbox" role="presentation" on:click={(event) => event.target === event.currentTarget && closeLightbox()}>
-    <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" tabindex="-1" on:keydown={trapLightbox}>
+    <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-label="Photo from Release and Unwind" tabindex="-1" on:keydown={trapLightbox}>
       <button class="lightbox-close" bind:this={lightboxClose} type="button" aria-label="Close photo" on:click={closeLightbox}>×</button>
       <div class="lightbox-image">
         <img src={slides[active].src} alt={slides[active].alt} />
       </div>
-      <h2 id="lightbox-title">{slides[active].title}</h2>
-      <p>{slides[active].caption}</p>
     </div>
   </div>
 {/if}
@@ -158,14 +153,10 @@
   .showcase-card { position: absolute; top: 0; left: 50%; width: min(410px, 72vw); height: 440px; padding: 0; overflow: hidden; border: 1px solid #cdc9b8; border-radius: 22px; background: #faf8f2; box-shadow: 0 24px 50px #243e3c29; transform: translateX(calc(-50% + var(--offset) * 260px + var(--drag))) rotateY(calc(var(--offset) * -30deg)) scale(calc(1 - min(abs(var(--offset)), 2) * .13)); opacity: calc(1 - min(abs(var(--offset)), 2) * .2); transition: transform var(--motion) var(--ease-out-expo), opacity var(--motion) ease; transform-origin: center 80%; z-index: var(--order); }
   .showcase-stage.dragging .showcase-card { transition: none; }
   .showcase-card:not(.active) { pointer-events: none; }
-  .photo-open { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: zoom-in; }
+  .photo-open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: zoom-in; }
   .photo-open:focus-visible { outline: 2px solid var(--pink-deep); outline-offset: -5px; }
-  .photo-slot { height: 270px; padding: 0; overflow: hidden; grid-template-rows: 100%; display: grid; place-items: center; align-content: center; gap: 8px; padding: 20px; border-bottom: 1px dashed #b4b1a0; background: repeating-linear-gradient(135deg, #e6e2d3 0 12px, #ded9c8 12px 24px); color: #586a67; text-align: center; }
-  .photo-slot img { width: 100%; height: 100%; min-height: 0; object-fit: cover; }
-  .showcase-copy { position: relative; padding: 22px 24px; }
-  .edition-badge { display: inline-flex; align-items: center; height: 28px; margin: 0 0 18px; padding: 0 11px; border-radius: 999px; background: var(--deep); color: #faf8f2; font-size: 11px; letter-spacing: .08em; }
-  .showcase-copy h3 { margin: 0 0 8px; font: 400 28px/1.1 var(--serif); letter-spacing: -.025em; }
-  .showcase-copy p:last-child { margin: 0; color: var(--deep); font-size: 15px; }
+  .photo-slot { height: 100%; overflow: hidden; background: #e6e2d3; }
+  .photo-slot img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .showcase-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; }
   .step { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--deep); border-radius: 50%; background: #faf8f2; color: var(--deep); font-size: 19px; cursor: pointer; transition: transform 150ms ease, background 150ms ease, box-shadow 150ms ease; }
   .step:focus-visible { outline: 2px solid var(--deep); outline-offset: 4px; }
@@ -182,15 +173,10 @@
   .lightbox-close { position: absolute; z-index: 1; top: 10px; right: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #243e3c; color: #faf8f2; font-size: 26px; line-height: 1; cursor: pointer; }
   .lightbox-image { display: grid; place-items: center; min-height: 360px; border-radius: 10px; background: repeating-linear-gradient(135deg, #e6e2d3 0 12px, #ded9c8 12px 24px); color: #586a67; text-align: center; }
   .lightbox-image img { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 10px; }
-  .lightbox-dialog h2 { margin: 18px 0 4px; font: 400 30px var(--serif); }
-  .lightbox-dialog p { margin: 0; color: var(--muted); }
   @media (max-width: 650px) {
     .showcase-stage { height: 410px; }
     .showcase-card { width: min(360px, 82vw); height: 402px; }
-    .photo-slot { height: 205px; }
     .showcase-card { transform: translateX(calc(-50% + var(--offset) * 170px + var(--drag))) rotateY(calc(var(--offset) * -20deg)) scale(calc(1 - min(abs(var(--offset)), 2) * .1)); }
-    .showcase-copy { padding: 18px 20px; }
-    .showcase-copy h3 { font-size: 24px; }
   }
   @media (prefers-reduced-motion: reduce) { .showcase-card { transition: none; } }
 </style>
