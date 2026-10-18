@@ -41,4 +41,21 @@
     .status-link { font-size: 9px; }
     .pass-button { padding-inline: 14px; }
   }
+  /* Phones: brand, AWAY, the icon buttons and the status button did not fit
+     and overlapped. Narrower icon hit areas (still 44px tall), no arrow. */
+  @media (max-width: 480px) {
+    .site-header { gap: 8px; }
+    .header-left { gap: 6px; }
+    .header-actions { gap: 0; }
+    .brand { max-width: 52px; }
+    .sound-button, .header-actions :global(.theme-control) { width: 34px; }
+    .pass-button { gap: 4px; padding-inline: 10px; }
+    .pass-button > span { display: none; }
+  }
+  @media (max-width: 360px) {
+    .site-header { padding-left: 10px; }
+    .header-left { gap: 4px; }
+    .sound-button, .header-actions :global(.theme-control) { width: 28px; }
+    .pass-button { padding-inline: 8px; }
+  }
 </style>
