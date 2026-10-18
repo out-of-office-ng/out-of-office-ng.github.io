@@ -53,7 +53,7 @@ try {
     assert.match(await details.innerText(), /Every vision starts somewhere/);
     assert.equal(await page.getByRole('button', { name: 'Watch Open Canvas' }).count(), 0, 'Only Open Canvas has videos');
     await page.getByRole('button', { name: 'Next edition', exact: true }).click();
-    assert.match(await details.innerText(), /Open Canvas was created/);
+    assert.match(await details.innerText(), /Open Canvas was for the artists/);
     await page.getByRole('button', { name: 'Watch Open Canvas' }).click();
     const videoDialog = page.getByRole('dialog', { name: 'Open Canvas' });
     assert.equal(await videoDialog.isVisible(), true);
