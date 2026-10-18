@@ -174,6 +174,11 @@
   .lightbox-image { display: grid; place-items: center; min-height: 360px; border-radius: 10px; background: repeating-linear-gradient(135deg, #e6e2d3 0 12px, #ded9c8 12px 24px); color: #586a67; text-align: center; }
   .lightbox-image img { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 10px; }
   @media (max-width: 650px) {
+    /* Six 44px dots plus both arrows were wider than a phone, cutting the
+       arrows off at the screen edges. Narrower dots, still 44px tall. */
+    .showcase-controls { gap: 8px; }
+    .picks { gap: 2px; }
+    .pick { width: 28px; }
     .showcase-stage { height: 410px; }
     .showcase-card { width: min(360px, 82vw); height: 402px; }
     .showcase-card { transform: translateX(calc(-50% + var(--offset) * 170px + var(--drag))) rotateY(calc(var(--offset) * -20deg)) scale(calc(1 - min(abs(var(--offset)), 2) * .1)); }

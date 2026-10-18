@@ -76,7 +76,7 @@
           <article class="edition-card" class:front={depth === 0} aria-hidden={depth !== 0} inert={depth !== 0} style={`--depth:${depth}; --rotation:${depth === 0 ? -1.5 : depth === 1 ? 4 : -5}deg; --tone:${edition.tone}; --card-w:${edition.imageKind === 'event' && edition.imageRatio < 1 ? `min(100%, calc(430px * ${edition.imageRatio} + 24px))` : '100%'}; --drag:${depth === 0 && !reducedMotion ? dragX : 0}px; z-index:${editions.length - depth}`}>
             <EditionArtwork {edition} natural />
             {#if videosByEdition[edition.code]}
-              <button class="card-play" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> {videosByEdition[edition.code].length} clips</button>
+              <button class="card-play" type="button" aria-label={`Watch ${edition.title} · ${videosByEdition[edition.code].length} clips`} on:click={openVideos}><span aria-hidden="true">▶</span> {videosByEdition[edition.code].length} clips</button>
             {/if}
             <div class="card-copy">
               <p class="edition-meta">{edition.code} <span aria-hidden="true">/</span> {edition.date}</p>
@@ -121,6 +121,9 @@
   .has-video { margin-left: 3px; font-size: 9px; color: var(--pink-deep); vertical-align: 2px; }
   .card-play { position: absolute; z-index: 3; top: 22px; right: 22px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 14px; border: 0; border-radius: 999px; background: #181818d9; color: #fff; font: 600 12px var(--sans); cursor: pointer; }
   .card-play:focus-visible { outline: 2px solid var(--pink-deep); outline-offset: 2px; }
+  /* One clips button per layout: beside the story on desktop, on the poster on
+     phones (where the story is far below the card). */
+  .card-play { display: none; }
   /* hidden for Safari < 16, which ignores `clip` and would zoom the whole page out to fit the overflow. */
   .archive { background: #e4e9e1; overflow: hidden; }
   @supports (overflow: clip) { .archive { overflow: clip; } }
@@ -155,6 +158,8 @@
   @media (max-width: 760px) {
     .archive-inner { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "carousel" "details"; grid-template-rows: none; row-gap: 24px; }
     .deck { margin-inline: 12px; }
+    .card-play { display: inline-flex; }
+    .watch-button { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { .edition-card { transition: none; } .deck:not(.dragging):hover .front { transform: rotate(-1.5deg); } }
 </style>
