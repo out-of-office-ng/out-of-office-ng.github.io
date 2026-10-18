@@ -22,6 +22,10 @@
 
   <div class="embed-wrapper" class:visible>
     <p class="player-label">THE LISTENING ROOM</p>
+    <div class="player">
+    <!-- Shows through until Spotify's player paints over it (slow data can take
+         a few seconds), instead of an empty box. -->
+    <p class="player-loading" aria-hidden="true">Loading the playlist…<br /><span>Or open it straight in Spotify, below.</span></p>
     <iframe 
       title="Out of Office Spotify Mixtape Playlist" 
       style="border-radius:12px" 
@@ -33,6 +37,7 @@
       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
       loading="lazy"
     ></iframe>
+    </div>
   </div>
     </div>
     <footer class="sleeve-footer"><p class="manifesto">Put the phone face down.</p><a class="spotify-link" href="https://open.spotify.com/playlist/5uJnnaFGzzaBcunJz6HA0h" target="_blank" rel="noopener noreferrer">Listen on Spotify <span aria-hidden="true">↗</span><span class="sr-only"> (opens a new tab)</span></a></footer>
@@ -97,7 +102,11 @@
   .vinyl { position: absolute; width: 94%; aspect-ratio: 1; right: -16%; top: 3%; border-radius: 50%; display: grid; place-items: center; background: repeating-radial-gradient(circle, #202422 0 2px, #101411 3px 4px); box-shadow: 0 8px 18px #0003; }
   .vinyl span { display: grid; place-items: center; width: 32%; aspect-ratio: 1; background: #e8a8bd; color: #243e3c; border-radius: 50%; font: 16px var(--serif); }
   .spotify-link { display: inline-flex; align-items: center; min-height: 44px; gap: 12px; color: var(--ink); font-size: 13px; text-underline-offset: 4px; }
-  iframe { display: block; border: 0; }
+  iframe { position: relative; display: block; border: 0; }
+  .player { display: grid; }
+  .player > * { grid-area: 1 / 1; }
+  .player-loading { align-self: center; margin: 0; padding: 24px; color: var(--muted); font-size: 14px; text-align: center; line-height: 1.6; }
+  .player-loading span { font-size: 12px; }
   @media (min-width: 800px) { .embed-wrapper { align-self: center; } }
   .record-sleeve { display: block; width: 78%; border: 0; padding: 0; background: transparent; cursor: pointer; opacity: 0; transform: translateY(20px) rotate(-2deg); transition: opacity 650ms ease, transform 650ms var(--ease-out-expo); }
   .record-sleeve.revealed { opacity: 1; transform: translateY(0) rotate(0); }
