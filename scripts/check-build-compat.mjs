@@ -14,6 +14,9 @@ for (const name of files.filter(f => f.endsWith('.css'))) {
   // (width<=580px) is ignored before Safari 16.4: the phone layout never applies.
   const range = css.match(/@media[^{]*\b(width|height)\s*[<>]/g) || [];
   assert.deepEqual(range, [], `${name}: media range syntax`);
+  // color-mix() is dropped before Safari 16.2: the hero lost its wash and the
+  // auto-reply card its background, so dark-mode hero text was unreadable.
+  assert.equal((css.match(/color-mix\(/g) || []).length, 0, `${name}: color-mix()`);
 }
 for (const name of files.filter(f => f.endsWith('.js'))) {
   const js = await read(name);
@@ -21,4 +24,4 @@ for (const name of files.filter(f => f.endsWith('.js'))) {
   // (three.js, so the water and its sound) fails to load.
   assert.equal((js.match(/\bstatic\s*\{/g) || []).length, 0, `${name}: class static block`);
 }
-console.log(JSON.stringify([{ check: 'built CSS/JS readable by Safari 14+ (no media range syntax, no static blocks)', outcome: 'PASS' }], null, 2));
+console.log(JSON.stringify([{ check: 'built CSS/JS readable by Safari 14+ (no media range syntax, color-mix or static blocks)', outcome: 'PASS' }], null, 2));

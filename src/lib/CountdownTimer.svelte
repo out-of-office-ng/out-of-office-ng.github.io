@@ -59,7 +59,7 @@
     gap: 0.3rem;
     font-family: var(--mono, monospace);
     color: var(--ink);
-    background: color-mix(in srgb, var(--card-surface, #fff) 80%, transparent);
+    background: rgb(255 255 255 / .8);
     padding: 0.5rem 0.8rem;
     border-radius: 8px;
     border: 1px solid var(--border-soft);

@@ -67,9 +67,6 @@
     <div class="archive-intro">
       <p class="eyebrow">THE THINGS WE KEEP</p>
       <h2 id="archive-title">Three editions.<br />A little more room.</h2>
-      <p class="intro">The first three editions: what happened, when and where, in photos from the day.</p>
-      <p class="handwritten">A little time away, kept on paper.</p>
-      <a class="text-link" href="#/trail">Explore the event trail <span aria-hidden="true">↗</span></a>
     </div>
 
     <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Past editions">
@@ -100,17 +97,19 @@
         <button class="step ui-action" type="button" aria-label="Next edition" on:keydown={onKeydown} on:click={() => goTo(active + 1)}><span aria-hidden="true">→</span></button>
       </div>
       <p class="swipe-hint">Swipe the cards, or use the arrows.</p>
-      <div id="edition-details" class="details">
-        <p class="story-meta"><strong>{current.title}</strong><br />{current.location} · {current.date}</p>
-        {#each current.story as paragraph}
-          <p>{paragraph}</p>
-        {/each}
-        {#if videosByEdition[current.code]}
-          <button class="watch-button ui-action" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> Watch {current.title} · {videosByEdition[current.code].length} clips</button>
-        {/if}
-        <a class="text-link" href={`#/trail/${current.code}`}>View this edition in the trail <span aria-hidden="true">↗</span></a>
-      </div>
       <p class="sr-only" role="status" aria-atomic="true">Edition {active + 1} of {editions.length}: {current.title}, {current.location}, {current.date}.</p>
+    </div>
+
+    <div id="edition-details" class="details">
+      <p class="story-meta"><strong>{current.title}</strong><br />{current.location} · {current.date}</p>
+      {#each current.story as paragraph}
+        <p>{paragraph}</p>
+      {/each}
+      {#if videosByEdition[current.code]}
+        <button class="watch-button ui-action" type="button" on:click={openVideos}><span aria-hidden="true">▶</span> Watch {current.title} · {videosByEdition[current.code].length} clips</button>
+      {/if}
+      <a class="text-link" href={`#/trail/${current.code}`}>View this edition in the trail <span aria-hidden="true">↗</span></a>
+      <a class="text-link" href="#/trail">Explore the event trail <span aria-hidden="true">↗</span></a>
     </div>
   </div>
 </section>
@@ -125,11 +124,12 @@
   /* hidden for Safari < 16, which ignores `clip` and would zoom the whole page out to fit the overflow. */
   .archive { background: #e4e9e1; overflow: hidden; }
   @supports (overflow: clip) { .archive { overflow: clip; } }
-  .archive-inner { max-width: 1140px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
+  /* The chosen edition's story sits beside the cards, under the heading; on
+     phones it follows the cards. */
+  .archive-inner { max-width: 1140px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "intro carousel" "details carousel"; grid-template-rows: auto 1fr; column-gap: clamp(32px, 6vw, 88px); row-gap: 28px; align-items: start; }
+  .archive-intro { grid-area: intro; }
   h2 { max-width: 520px; }
-  .intro { max-width: 380px; margin: 24px 0; color: var(--muted); line-height: 1.8; }
-  .handwritten { font: 400 17px/1.7 var(--marker); color: var(--pink-deep); margin: 30px 0; max-width: 280px; transform: rotate(-3deg); }
-  .carousel { min-width: 0; width: 100%; max-width: 470px; justify-self: center; }
+  .carousel { grid-area: carousel; min-width: 0; width: 100%; max-width: 470px; justify-self: center; }
   .deck { position: relative; display: grid; margin: 22px 18px 42px; touch-action: pan-y pinch-zoom; user-select: none; cursor: grab; }
   .deck.dragging { cursor: grabbing; }
   .edition-card { grid-area: 1 / 1; min-width: 0; width: var(--card-w); justify-self: center; align-self: end; padding: 12px; border: 1px solid #d1d2c6; border-radius: 5px; background: #faf8f2; box-shadow: 0 15px 32px -16px #243e3c45; transform: translate(var(--drag), calc(var(--depth) * 14px)) rotate(var(--rotation)) scale(calc(1 - var(--depth) * .025)); transform-origin: 50% 85%; transition: transform 550ms var(--ease-out-expo), box-shadow 250ms ease; }
@@ -148,12 +148,12 @@
   .swipe-hint { text-align: center; color: var(--muted); font-size: 12px; margin: 14px 0 6px; }
   .details .story-meta { font-size: 13px; color: var(--muted); }
   .details p:not(.story-meta) { line-height: 1.75; }
-  .details { margin-top: 16px; padding: 20px; border: 1px dashed var(--border-soft-deep); border-radius: 4px; font-size: 14px; }
+  .details { grid-area: details; max-width: 460px; font-size: 15px; }
+  .details .text-link { display: flex; width: fit-content; }
   .details p { margin: 0 0 12px; }
   @media (hover: hover) and (pointer: fine) { .deck:not(.dragging):hover .front { transform: translateY(-4px) rotate(0deg); box-shadow: 0 22px 38px -18px #243e3c55; } }
   @media (max-width: 760px) {
-    .archive-inner { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-    .handwritten { margin: 20px 0; }
+    .archive-inner { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "carousel" "details"; grid-template-rows: none; row-gap: 24px; }
     .deck { margin-inline: 12px; }
   }
   @media (prefers-reduced-motion: reduce) { .edition-card { transition: none; } .deck:not(.dragging):hover .front { transform: rotate(-1.5deg); } }

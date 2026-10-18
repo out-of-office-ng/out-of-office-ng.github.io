@@ -20,22 +20,26 @@
   mix.splice(7, 0, flyers.openCanvas);
   mix.splice(12, 0, flyers.releaseUnwind);
   mix.splice(16, 0, flyers.firstHangout2);
-  const LANES = 7, MOBILE_LANES = 3, MOBILE_COUNT = 9;
+  // Columns that never overlap sideways; in each column the prints climb at one
+  // speed, evenly spaced, and neighbouring columns are offset by half a gap
+  // (a brick pattern), so the field reads as spread out rather than piled up.
+  // Each print climbs during the first 75% of its cycle (see photo-float).
+  const LANES = 5, DURATION = 40, MOBILE_LANES = 3, MOBILE_COUNT = 9, MOBILE_DURATION = 48;
   const perLane = (lane, lanes, count) => Math.ceil((count - lane) / lanes);
-  const photos = mix.map((photo, i) => {
-    const lane = i % LANES, duration = 30 + lane * 1.3;
-    const mobileLane = i % MOBILE_LANES, mobileDuration = 36 + mobileLane * 2;
-    return {
-      ...photo,
-      label: photo.edition,
-      angle: [-7, 5, -3, 6, -5, 3, -4, 7][i % 8],
-      lane, duration,
-      delay: -((duration * Math.floor(i / LANES)) / perLane(lane, LANES, mix.length) + lane * 3.7) % duration,
-      mobileLane, mobileDuration,
-      mobileDelay: -((mobileDuration * Math.floor(i / MOBILE_LANES)) / perLane(mobileLane, MOBILE_LANES, MOBILE_COUNT) + mobileLane * 5) % mobileDuration,
-      mobileHidden: i >= MOBILE_COUNT,
-    };
-  });
+  const stagger = (i, lanes, count, duration) => {
+    const lane = i % lanes, slots = perLane(lane, lanes, count);
+    return -duration * ((Math.floor(i / lanes) + (lane % 2) / 2) / slots);
+  };
+  const photos = mix.map((photo, i) => ({
+    ...photo,
+    label: photo.edition,
+    angle: [-4, 3, -2, 4, -3, 2][i % 6],
+    lane: i % LANES, duration: DURATION,
+    delay: stagger(i, LANES, mix.length, DURATION),
+    mobileLane: i % MOBILE_LANES, mobileDuration: MOBILE_DURATION,
+    mobileDelay: stagger(i, MOBILE_LANES, MOBILE_COUNT, MOBILE_DURATION),
+    mobileHidden: i >= MOBILE_COUNT,
+  }));
   function outside(event) {
     if (!event.target.closest?.('.floating-photo')) selected = null;
     if (!event.target.closest?.('.motion-info')) infoOpen = false;
@@ -96,11 +100,13 @@
   .info-popup p { margin: 0 0 10px; }
   .apply-button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 28px; border: 0; border-radius: 28px; background: var(--ink); color: var(--bg); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
   .photo-field { position: relative; --field-height: 900px; height: var(--field-height); max-width: 1200px; margin: auto; overflow: hidden; }
-  .floating-photo { position: absolute; top: 100%; left: calc(var(--lane) * 13.4%); width: 19.6%; animation: photo-float var(--duration) linear var(--delay) infinite; }
+  .floating-photo { position: absolute; top: 100%; left: calc(1.5% + var(--lane) * 20%); width: 17%; animation: photo-float var(--duration) linear var(--delay) infinite; }
+  /* Climb in the first 75%, then wait below the field: that wait is what keeps
+     the prints in a column a full print-height apart. */
   @keyframes photo-float {
     0% { transform: translateY(0); opacity: 0; }
-    12%, 85% { opacity: 1; }
-    100% { transform: translateY(calc(-1 * var(--field-height) - 100%)); opacity: 0; }
+    8%, 67% { opacity: 1; }
+    75%, 100% { transform: translateY(calc(-1 * var(--field-height) - 100%)); opacity: 0; }
   }
   .floating-photo.held, .floating-photo:has(:focus-visible), .stopped .floating-photo { animation-play-state: paused; }
   .floating-photo.held, .floating-photo:has(:focus-visible) { z-index: 10; }
@@ -110,7 +116,7 @@
   .caption { display: block; padding: 14px 4px; font: 13px var(--marker); }
   @media (max-width: 650px) {
     .photo-field { --field-height: 620px; margin-inline: -12px; }
-    .floating-photo { width: 39%; left: calc(var(--mobile-lane) * 30%); animation-duration: var(--m-duration); animation-delay: var(--m-delay); }
+    .floating-photo { width: 36%; left: calc(var(--mobile-lane) * 32%); animation-duration: var(--m-duration); animation-delay: var(--m-delay); }
     .floating-photo.mobile-hidden { display: none; }
     .photo-print { padding: 6px 6px 0; }
     .caption { font-size: 11px; }

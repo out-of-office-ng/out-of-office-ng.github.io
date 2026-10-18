@@ -190,9 +190,10 @@ button:disabled { cursor: not-allowed; }
   --muted: var(--color-muted);
   --water-sky: var(--color-sky);
   --card-surface: var(--color-paper);
-  --border-soft: color-mix(in srgb, var(--ink) 12%, transparent);
-  --border-soft-deep: color-mix(in srgb, var(--ink) 24%, transparent);
-  --border-dashed: color-mix(in srgb, var(--ink) 40%, transparent);
+  /* --ink at 12/24/40%, as plain RGB: Safari before 16.2 has no color-mix(). */
+  --border-soft: rgb(36 62 60 / .12);
+  --border-soft-deep: rgb(36 62 60 / .24);
+  --border-dashed: rgb(36 62 60 / .4);
 }
 html, body { overflow-x: clip; }
 /* Stop iOS Safari inflating text (it does this in desktop-site mode), which
@@ -210,6 +211,9 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   --cream: #303630;
   --blue: #acd0be;
   --accent: #acd0be;
+  --border-soft: rgb(241 236 223 / .12);
+  --border-soft-deep: rgb(241 236 223 / .24);
+  --border-dashed: rgb(241 236 223 / .4);
 }
 /* Explicit surface overrides keep photographs untouched and text readable. */
 html[data-theme="dark"] .site-header,
