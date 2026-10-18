@@ -217,7 +217,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 /* Explicit surface overrides keep photographs untouched and text readable. */
 html[data-theme="dark"] .site-header,
-html[data-theme="dark"] .trail-nav { background: #202722a8; border-color: #d9e5d32e; box-shadow: 0 8px 24px #0003, inset 0 1px 0 #ffffff18; }
+html[data-theme="dark"] .trail-nav { background: #202722d9; border-color: #d9e5d32e; box-shadow: 0 8px 24px #0003, inset 0 1px 0 #ffffff18; }
 html[data-theme="dark"] .archive { background: #252e28; }
 html[data-theme="dark"] .showcase { background: #242721; }
 html[data-theme="dark"] .edition-card,
@@ -235,6 +235,13 @@ html[data-theme="dark"] .claim-btn,
 html[data-theme="dark"] .seat-badge,
 html[data-theme="dark"] .edition-badge,
 html[data-theme="dark"] .lightbox-close { background: #acd0be; color: #1c2921; }
+/* Header "Pause motion" (motionPause.js, WCAG 2.2.2). Named loops only, so
+   dialog and drawer transitions keep running. */
+html[data-motion="paused"] :is(.floating-photo, .danfo-body, .wheel) { animation-play-state: paused !important; }
+/* White text on --blue/--pink-deep fails once those turn pastel in dark mode. */
+html[data-theme="dark"] .primary-btn,
+html[data-theme="dark"] .copy-btn,
+html[data-theme="dark"] .badge { color: #1c2921; }
 html[data-theme="dark"] .next-card { --deep: #304f42; }
 html[data-theme="dark"] .city-box.yellow { color: #243e3c; }
 html[data-theme="dark"] .city-name { background: #17251d; }
@@ -246,6 +253,7 @@ html[data-theme="dark"] .edition-index a:is(:hover, [aria-current]) { background
   .site-header .pass-button { padding-inline: 10px; font-size: 10px; gap: 4px; }
   .site-header { gap: 4px; }
 }
+
 @media (prefers-reduced-motion: reduce) {
   html, body { scroll-behavior: auto; }
 }

@@ -96,11 +96,13 @@
         <div class="control-section">
           <div class="field">
             <div class="field-label">
-              <span>Passive-Aggressive Tone</span>
+              <span id="tone-label">Passive-Aggressive Tone</span>
               <span class="tone-badge">{TONE_LABELS[toneLevel]}</span>
             </div>
             <input
               type="range"
+              aria-labelledby="tone-label"
+              aria-valuetext={TONE_LABELS[toneLevel]}
               min="1"
               max="4"
               step="1"

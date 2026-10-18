@@ -1,30 +1,34 @@
 <script>
   import AsciiFire from './AsciiFire.svelte';
+  import { NEXT_EVENT } from './sales.js';
+  const COMMUNITY_URL = 'https://chat.whatsapp.com/IGeVwvbkusyFPIPA2saXKs';
   const v1ArchiveUrl = `${import.meta.env.BASE_URL}v1/`;
 </script>
 
 <div class="about-page">
   <div class="header">
     <button class="back-btn" on:click={() => window.location.hash = '#/'}>
-      &larr; Return to Lagos
+      &larr; Back to Out of Office
     </button>
   </div>
 
   <div class="content">
     <div class="text-col">
-      <h1 class="title">What We Are</h1>
+      <h1 class="title">What we are</h1>
       <p class="manifesto">
-        Out of Office is a temporary rebellion against Lagos life. 
-        It is not just a vacation; it's permission to disconnect from the madness.
+        Out of Office is a Lagos community that makes room for a day off: music, art,
+        games and good company, away from the traffic, the deadlines and the pressure to grind.
       </p>
       <p class="manifesto">
-        We are a community-driven escape from the traffic, the hustle, the economy, 
-        and the constant pressure to grind. A momentary suspension of stress, lit by a 
-        digital bonfire of ignored emails and paused notifications.
+        So far there have been three editions: The First Hangout, Open Canvas, and Release
+        and Unwind. The next one is planned for {NEXT_EVENT.when}. It's for anyone who wants
+        a little more room to create, connect and just be.
       </p>
+      <p class="manifesto">For a few hours, the emails can wait.</p>
       <p class="manifesto signature">
         Gone to touch grass. Back soon.
       </p>
+      <a class="community-link" href={COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join the community on WhatsApp <span class="sr-only">(opens in a new tab)</span><span aria-hidden="true">&rarr;</span></a>
       <a class="archive-link" href={v1ArchiveUrl}>See where it started: Out of Office v1 &rarr;</a>
     </div>
     
@@ -103,11 +107,28 @@
     color: rgba(230, 230, 220, 0.85);
   }
   .signature {
-    color: var(--pink-deep, #fc9ce0);
+    /* This page is always dark, so use the dark-theme pink in both themes;
+       the light-theme --pink-deep was 2.8:1 on #0a0b0c. */
+    color: #eeacc5;
     font-size: 1.5rem;
     margin-top: 2rem;
     transform: rotate(-2deg);
   }
+  .community-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    min-height: 44px;
+    margin-top: 1rem;
+    color: var(--chaos-yellow, #d9a441);
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .community-link:hover,
+  .community-link:focus-visible { color: #f0c46a; }
   .archive-link {
     display: inline-block;
     margin-top: 1.5rem;

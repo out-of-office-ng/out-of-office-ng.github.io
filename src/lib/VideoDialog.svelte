@@ -71,7 +71,9 @@
   .video-meta { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
   .video-close { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 28px; cursor: pointer; }
   .video-close:hover { background: var(--border-soft); }
-  video { display: block; width: 100%; max-height: calc(100dvh - 340px); aspect-ratio: 9 / 16; object-fit: contain; border-radius: 8px; background: #000; }
+  /* Leave room for the text on tall screens, but never shrink below a watchable
+     size (phones in landscape, 400% zoom); the dialog scrolls instead. */
+  video { display: block; width: 100%; max-height: max(calc(100dvh - 340px), min(60dvh, 200px)); aspect-ratio: 9 / 16; object-fit: contain; border-radius: 8px; background: #000; }
   .clip-desc { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
   .clip-desc strong { color: var(--ink); font-weight: 600; }
   .clip-picks { display: flex; gap: 10px; margin-top: 12px; }

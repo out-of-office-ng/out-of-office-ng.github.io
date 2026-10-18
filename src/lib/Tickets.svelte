@@ -38,7 +38,7 @@
         
         <div class="route-display">
           <div class="city-box yellow">
-            <h2>LOS</h2>
+            <p class="city-code">LOS</p>
             <div class="city-name">LAGOS</div>
           </div>
           <div class="flight-path">
@@ -78,7 +78,7 @@
             <div class="flight-type">NON-STOP ESCAPE</div>
           </div>
           <div class="city-box white">
-            <h2>OOO</h2>
+            <p class="city-code">OOO</p>
             <div class="city-name">[VENUE TBA]</div>
           </div>
         </div>
@@ -234,7 +234,7 @@
   .city-box.white {
     background: transparent;
   }
-  .city-box h2 {
+  .city-box .city-code {
     margin: 0;
     font-family: var(--serif, Georgia, serif);
     font-size: 2.5rem;
@@ -452,7 +452,7 @@
     .pass-details { grid-template-columns: 1fr; padding: 16px; }
     .route-display { gap: 8px; }
     .city-box { width: 82px; flex-shrink: 0; }
-    .city-box h2 { font-size: 28px; }
+    .city-box .city-code { font-size: 28px; }
     .city-name { font-size: 9px; }
     .flight-type { font-size: 8px; text-align: center; }
     .header-text { text-align: left; width: 100%; }

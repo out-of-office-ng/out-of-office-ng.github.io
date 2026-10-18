@@ -2,6 +2,7 @@
   import { SALES_MODE } from './sales.js';
   import ThemeControl from './ThemeControl.svelte';
   import { muted, toggleMute } from './ambientSound.js';
+  import { motionPaused, motionReduced, toggleMotion } from './motionPause.js';
   export let onOpenDrawer = () => {};
 </script>
 
@@ -12,6 +13,11 @@
   </div>
   <div class="header-actions">
     <ThemeControl />
+    {#if !$motionReduced}
+      <button class="sound-button motion-button" type="button" on:click={toggleMotion} aria-label="Pause motion" aria-pressed={$motionPaused} title={$motionPaused ? 'Play motion' : 'Pause motion'}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">{#if $motionPaused}<path class="fill" d="M8 5.5v13l10.5-6.5Z" />{:else}<path class="fill" d="M7 5h3.5v14H7Zm6.5 0H17v14h-3.5Z" />{/if}</svg>
+      </button>
+    {/if}
     <button class="sound-button" type="button" on:click={toggleMute} aria-label={$muted ? 'Sound is off. Turn on' : 'Sound is on. Turn off'} aria-pressed={!$muted}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z" /><path class="sound-wave" d="M16 9.2a4 4 0 0 1 0 5.6M18.5 6.8a7.5 7.5 0 0 1 0 10.4" /></svg>
     </button>
@@ -24,14 +30,14 @@
   .header-left, .header-actions { display: flex; align-items: center; }
   .header-left { gap: 14px; min-width: 0; }
   .brand { flex-shrink: 0; color: var(--ink); font: 700 13px/1 var(--sans); letter-spacing: .04em; text-decoration: none; }
-  .status-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-decoration: none; }
+  .status-link { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; color: var(--muted); font-size: 10px; letter-spacing: .12em; text-decoration: none; }
   .status-link:hover { color: var(--ink); }
   .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #df6c56; box-shadow: 0 0 0 3px #df6c5624; }
   .header-actions { gap: 4px; }
   .sound-button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
   .sound-button:hover, .sound-button:focus-visible { background: #243e3c0c; }
   .sound-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
-  .sound-button svg path:first-child { fill: currentColor; stroke: none; }
+  .sound-button svg path:first-child, .motion-button svg .fill { fill: currentColor; stroke: none; }
   .sound-button[aria-pressed="false"] .sound-wave { display: none; }
   .pass-button { display: inline-flex; justify-content: center; align-items: center; gap: 12px; min-height: 44px; padding: 10px 20px; border: 1px solid var(--deep); border-radius: 30px; background: var(--deep); color: #faf8f2; font: 500 12px var(--sans); letter-spacing: .02em; white-space: nowrap; cursor: pointer; }
   @media (max-width: 580px) {
@@ -41,7 +47,7 @@
     .status-link { font-size: 9px; }
     .pass-button { padding-inline: 14px; }
   }
-  /* Phones: brand, AWAY, the icon buttons and the status button did not fit
+  /* Phones: brand, AWAY, three icon buttons and the status button did not fit
      and overlapped. Narrower icon hit areas (still 44px tall), no arrow. */
   @media (max-width: 480px) {
     .site-header { gap: 8px; }

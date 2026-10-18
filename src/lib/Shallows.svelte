@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, tick } from 'svelte';
   import { muted, toggleMute } from './ambientSound.js';
+  import { motionPaused } from './motionPause.js';
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
 
   const siteBase = import.meta.env.BASE_URL;
@@ -59,6 +60,7 @@
       if (scene) return;
       scene = createShallows(stage, {
         sound: !isMuted,
+        initialPaused: $motionPaused,
         initialMode: viewMode,
         initialQuality: preferredQuality,
         onStatus: handleStatus,
@@ -79,6 +81,7 @@
     try { localStorage.setItem('ooo-water-quality', next); } catch {}
   }
 
+  $: scene?.setPaused?.($motionPaused);
 
   let nearObserver;
   onMount(() => {
