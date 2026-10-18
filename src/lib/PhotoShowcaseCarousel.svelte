@@ -1,6 +1,7 @@
 <script>
   import { onDestroy, onMount, tick } from 'svelte';
   import { releaseUnwindPhotos } from './eventPhotos.js';
+  import { motionPaused } from './motionPause.js';
 
   // Photos only, no titles on screen: the pictures speak for themselves
   // (Charisa, 18 Oct). Screen readers get each photo's alt text.
@@ -14,7 +15,38 @@
   let lightboxOpen = false;
   let lightboxClose;
   let opener;
-  onDestroy(() => { document.body.style.overflow = ''; });
+  onDestroy(() => { document.body.style.overflow = ''; clearTimeout(timer); });
+
+  // Slides itself every few seconds (Charisa, 18 Oct). It holds still while
+  // someone is using it (mouse over it, focus in it, mid-swipe, photo open),
+  // while it is off screen, and whenever the header's Pause motion switch is
+  // on, which also covers reduced-motion visitors (WCAG 2.2.2).
+  const AUTOPLAY_MS = 3000;
+  let carousel;
+  let timer;
+  let hovering = false;
+  let focusInside = false;
+  let inView = false;
+  let live = 'polite';
+  $: held = $motionPaused || lightboxOpen || hovering || focusInside || dragging || !inView;
+  $: restart(active, held);
+
+  function restart(_, hold) {
+    clearTimeout(timer);
+    if (hold) return;
+    timer = setTimeout(() => {
+      if (document.hidden) return restart(active, held);
+      // Don't announce photos the visitor didn't ask for.
+      live = 'off';
+      active = (active + 1) % slides.length;
+    }, AUTOPLAY_MS);
+  }
+
+  onMount(() => {
+    const observer = new IntersectionObserver(([entry]) => inView = entry.isIntersecting, { threshold: .4 });
+    observer.observe(carousel);
+    return () => observer.disconnect();
+  });
 
   onMount(() => {
     const preference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -25,6 +57,7 @@
   });
 
   function goTo(index) {
+    live = 'polite';
     active = (index + slides.length) % slides.length;
     dragX = 0;
   }
@@ -101,7 +134,7 @@
     <p class="showcase-intro">Moments from Release and Unwind at Tarkwa Bay.</p>
   </div>
 
-  <div class="showcase-carousel" role="region" aria-roledescription="carousel" aria-label="Photos from Release and Unwind">
+  <div class="showcase-carousel" bind:this={carousel} role="region" aria-roledescription="carousel" aria-label="Photos from Release and Unwind" on:pointerenter={(event) => { if (event.pointerType === 'mouse') hovering = true; }} on:pointerleave={() => hovering = false} on:focusin={() => focusInside = true} on:focusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) focusInside = false; }}>
     <div class="showcase-stage" role="group" aria-label="Swipe to change photo. Use the arrow keys when focused." tabindex="-1" class:dragging on:pointerdown={pointerDown} on:pointermove={pointerMove} on:pointerup={pointerUp} on:pointercancel={cancelDrag} on:lostpointercapture={cancelDrag}>
       {#each slides as slide, index (slide.label)}
         {@const offset = (index - active + slides.length) % slides.length}
@@ -125,7 +158,7 @@
       </div>
       <button class="step ui-action" type="button" aria-label="Next photo" on:click={() => goTo(active + 1)}><span aria-hidden="true">→</span></button>
     </div>
-    <p class="sr-only" role="status" aria-atomic="true">Photo {active + 1} of {slides.length}.</p>
+    <p class="sr-only" aria-live={live} aria-atomic="true">Photo {active + 1} of {slides.length}.</p>
   </div>
 </section>
 
