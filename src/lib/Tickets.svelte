@@ -23,9 +23,8 @@
 
 <section id="passes" class="tickets-section">
   <div class="header-text" class:visible>
-    <p class="eyebrow">OOO 0x04 · PASS STATUS</p>
-    <h2 class="heading">Passes aren't on sale yet.</h2>
-    <p class="subheading">This is a preview. Come back here for the confirmed date, venue and pass details.</p>
+    <p class="eyebrow">OOO 0x04 · PASS PREVIEW</p>
+    <h2 class="sr-only">0x04 pass preview</h2>
   </div>
 
   <div class="pass-container" class:visible>
@@ -128,8 +127,8 @@
         {:else}
           <div class="stub-header">PREVIEW · NOT AN ISSUED PASS</div>
           <div class="seat-badge">0x04 · NOVEMBER</div>
-          <p class="closed-copy">The date and venue are still to be announced. Passes are not on sale yet.</p>
-          <button class="claim-btn ui-action" on:click={openPass}>See 0x04 status &rarr;</button>
+          <p class="closed-copy">Not on sale yet.</p>
+          <button class="claim-btn ui-action" on:click={openPass}>0x04 status &rarr;</button>
         {/if}
       </div>
     </div>
@@ -156,18 +155,6 @@
     font-size: 1rem;
     margin: 0 0 1rem;
     letter-spacing: 0.05em;
-  }
-  .heading {
-    font-family: var(--serif, Georgia, serif);
-    font-size: clamp(3rem, 6vw, 4.5rem);
-    color: var(--deep, #1a332f);
-    margin: 0 0 1rem;
-    line-height: 1.1;
-  }
-  .subheading {
-    color: var(--muted, #6b6b6b);
-    font-size: 1.1rem;
-    margin: 0;
   }
   
   .pass-container {
@@ -456,7 +443,6 @@
     .city-name { font-size: 9px; }
     .flight-type { font-size: 8px; text-align: center; }
     .header-text { text-align: left; width: 100%; }
-    .heading { font-size: 40px; }
     .pass-card.ripping .pass-right { transform: translateY(8px) rotate(.35deg); }
   }
   @media (prefers-reduced-motion: reduce) {

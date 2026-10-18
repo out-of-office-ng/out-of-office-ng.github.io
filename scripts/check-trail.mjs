@@ -44,7 +44,7 @@ for (const width of [320, 390, 768, 1440]) {
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
     await page.getByRole('navigation', { name: 'Event trail navigation' }).getByRole('link', { name: 'Next escape' }).click();
     await page.waitForFunction(() => scrollY > 200 && document.getElementById('edition-0x04').getBoundingClientRect().top < innerHeight / 2);
-    const trigger = page.getByRole('button', { name: 'See the pass update' });
+    const trigger = page.getByRole('main').getByRole('button', { name: '0x04 status' });
     await trigger.click();
     const dialog = page.getByRole('dialog', { name: '0x04 status' });
     await dialog.waitFor();

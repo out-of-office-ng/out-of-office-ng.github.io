@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import { editions } from './editions.js';
   import { NEXT_EVENT, SALES_MODE } from './sales.js';
   import EditionArtwork from './EditionArtwork.svelte';
@@ -12,6 +13,18 @@
 
   export let onOpenDrawer = () => {};
   export let activeEdition = null;
+
+  // "You are here" follows the edition in the middle of the screen, not only
+  // the one named in the address.
+  let inView = null;
+  $: current = inView || activeEdition;
+  onMount(() => {
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) inView = entry.target.id.replace('edition-', '');
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    for (const section of document.querySelectorAll('[id^="edition-0x"]')) observer.observe(section);
+    return () => observer.disconnect();
+  });
 
   // A repeated hash does not dispatch hashchange. Keep the current edition's
   // jump link useful after someone has scrolled elsewhere. --codex
@@ -44,11 +57,11 @@
         <nav aria-label="Jump to an edition">
           <span class="index-label">THE TRAIL</span>
           {#each editions as edition}
-            <a href={`#/trail/${edition.code}`} on:click={(event) => repeatJump(event, edition.code)} aria-current={activeEdition === edition.code ? 'location' : undefined} aria-label={`${edition.code}: ${edition.title}`}>
+            <a href={`#/trail/${edition.code}`} on:click={(event) => repeatJump(event, edition.code)} aria-current={current === edition.code ? 'location' : undefined} aria-label={`${edition.code}: ${edition.title}`}>
               <span class="index-code">{edition.code}</span><span class="index-name">{edition.word.replace('.', '')}</span>
             </a>
           {/each}
-          <a href="#/trail/0x04" on:click={(event) => repeatJump(event, '0x04')} class="index-next" aria-current={activeEdition === '0x04' ? 'location' : undefined} aria-label="0x04: The next escape"><span class="index-code">0x04</span><span class="index-name">Up next</span></a>
+          <a href="#/trail/0x04" on:click={(event) => repeatJump(event, '0x04')} class="index-next" aria-current={current === '0x04' ? 'location' : undefined} aria-label="0x04: The next escape"><span class="index-code">0x04</span><span class="index-name">Up next</span></a>
         </nav>
       </aside>
 
@@ -84,7 +97,7 @@
                 <p class="next-date">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}</p>
                 <p class="next-detail">{NEXT_EVENT.detail}</p>
                 <p class="sales-note">{SALES_MODE === 'open' ? 'Pass details are available below.' : 'Passes are not on sale yet.'}</p>
-                <button class="pass-button ui-action" type="button" on:click={onOpenDrawer}>{SALES_MODE === 'open' ? 'See pass details' : 'See the pass update'} <span aria-hidden="true">↗</span></button>
+                <button class="pass-button ui-action" type="button" on:click={onOpenDrawer}>{SALES_MODE === 'open' ? 'See pass details' : '0x04 status'} <span aria-hidden="true">↗</span></button>
               </div>
             </article>
           </ScrollReveal>
@@ -178,7 +191,8 @@
     .edition-index nav { flex-direction: row; justify-content: space-between; gap: 4px; }
     .index-label { display: none; }
     .edition-index a { min-height: 44px; padding: 8px 12px; }
-    .edition-index .index-next { margin: 0; padding: 8px 12px; border: 1px dashed var(--deep); border-radius: 4px; }
+    /* Not boxed: a dashed box read as "you are here" while viewing 0x01. */
+    .edition-index .index-next { margin: 0; padding: 8px 12px; border-top: 0; border-radius: 4px; }
     .trail { padding-left: 0; gap: 32px; }
     .trail::before, .trail > li::before { display: none; }
     .trail-card { padding: 10px; scroll-margin-top: 152px; }

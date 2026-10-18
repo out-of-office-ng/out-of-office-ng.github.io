@@ -59,10 +59,8 @@
   <header>
     <p class="eyebrow">FROM OUR EDITIONS</p>
     <h2 id="memories-title">We're creating more than events.</h2>
-    <p>Through thoughtfully curated hangouts, creative experiences, outdoor retreats, and community gatherings, we create spaces where everyone has room to participate, express themselves, feel included, and make meaningful connections.</p>
-    <p>We're creating room to live, feel, connect, and experience life differently.</p>
-    <a class="apply-button ui-action" href="#passes">See 0x04 status</a>
-    <p class="hint">November 2026 · exact date and venue to be announced.</p>
+    <p>Hangouts, creative days, retreats and gatherings where everyone has room to take part, feel included, and make real connections.</p>
+    <a class="apply-button ui-action" href="https://chat.whatsapp.com/IGeVwvbkusyFPIPA2saXKs" target="_blank" rel="noopener noreferrer">Join the community <span class="sr-only">(WhatsApp, opens in a new tab)</span><span aria-hidden="true">&nbsp;↗</span></a>
     <div class="motion-info" role="group" aria-label="Photo motion controls" on:pointerenter={(event) => { if (event.pointerType === 'mouse') infoOpen = true; }} on:pointerleave={() => infoOpen = false} on:focusin={() => infoOpen = true} on:focusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) infoOpen = false; }}>
       <button class="info-button" type="button" aria-label="Photo motion help" aria-expanded={infoOpen} aria-controls="motion-help" on:click={() => infoOpen = true}>i</button>
       <div class="info-popup" id="motion-help" hidden={!infoOpen}>

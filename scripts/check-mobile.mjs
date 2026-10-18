@@ -199,13 +199,17 @@ async function run(engine, launcher, launchOptions) {
       page.on('request', request => requests.push(request.url()));
       await page.goto(base, { waitUntil: 'domcontentloaded' });
 
-      // Task A: community entry point.
-      const community = page.getByRole('link', { name: /Join the community/ });
-      assert.equal(await community.count(), 1, 'One community link');
-      assert.equal(await community.getAttribute('href'), COMMUNITY, 'Community link goes to the WhatsApp community');
+      // Task A: community entry points (mid-page button and footer), all to the
+      // same WhatsApp community; the first one a visitor reaches is tested below.
+      const links = page.getByRole('link', { name: /Join the community/ });
+      assert.equal(await links.count(), 2, 'Community button mid-page and in the footer');
+      for (const link of await links.all()) {
+        assert.equal(await link.getAttribute('href'), COMMUNITY, 'Community link goes to the WhatsApp community');
+        assert.match(await link.getAttribute('rel'), /noopener/);
+        assert.match(await link.textContent(), /WhatsApp/, 'Screen readers hear it is WhatsApp');
+      }
+      const community = links.first();
       assert.match(await community.innerText(), /Join the community/);
-      assert.match(await community.getAttribute('rel'), /noopener/);
-      assert.match(await community.textContent(), /WhatsApp/, 'Screen readers hear it is WhatsApp');
       const instagram = page.getByRole('link', { name: /^Instagram/ });
       assert.equal(await instagram.getAttribute('href'), INSTAGRAM, 'Instagram link is separate');
       await community.scrollIntoViewIfNeeded();

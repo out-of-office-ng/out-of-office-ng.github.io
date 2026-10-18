@@ -18,8 +18,7 @@
       <p class="eyebrow">WHAT WE KNOW ABOUT 0x04</p>
       <h2 id="next-event-title">November is the plan.<br />The details are coming.</h2>
       <p class="event-date">{NEXT_EVENT.code} <span aria-hidden="true">·</span> {NEXT_EVENT.when}</p>
-      <p class="intro">The exact date, venue, programme and pass details have not been announced. Check this page for confirmed updates.</p>
-      <p class="status-note"><span aria-hidden="true"></span> Passes are not on sale</p>
+      <p class="intro">Date, venue, programme and passes will be announced here.</p>
     </div>
     <div class="faq">
       <h3>Before you switch off.</h3>
@@ -48,8 +47,6 @@
   .event-date { margin: 28px 0 16px; font-size: 17px; font-weight: 500; }
   .event-date span { margin: 0 6px; }
   .intro { max-width: 380px; line-height: 1.8; color: var(--muted); }
-  .status-note { margin-top: 28px; display: flex; align-items: center; gap: 10px; font-size: 12px; }
-  .status-note span { width: 7px; height: 7px; border-radius: 50%; background: var(--deep); }
   h3 { margin: 0 0 24px; font: 400 25px/1.3 var(--serif); }
   h4 { margin: 0; }
   .faq-row { border-top: 1px solid var(--border-soft-deep); }
