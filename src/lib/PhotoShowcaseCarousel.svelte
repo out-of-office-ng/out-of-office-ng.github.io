@@ -74,6 +74,7 @@
   }
 
   async function openLightbox(event) {
+    if (swiped && event.detail) return; // the finger was swiping, not tapping (keyboard clicks have detail 0)
     opener = event.currentTarget;
     lightboxOpen = true;
     document.body.style.overflow = 'hidden';
@@ -93,10 +94,13 @@
     lightboxClose?.focus();
   }
 
+  // The photo itself is a button (tap to enlarge) and fills the card, so
+  // swipes have to be allowed to start on it; only a tap opens it.
+  let swiped = false;
   function pointerDown(event) {
-    if (!event.isPrimary || event.button !== 0 || event.target.closest('button')) return;
+    if (!event.isPrimary || event.button !== 0 || event.target.closest('button:not(.photo-open)')) return;
+    swiped = false;
     pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
-    event.currentTarget.setPointerCapture(event.pointerId);
   }
 
   function pointerMove(event) {
@@ -107,13 +111,18 @@
       cancelDrag();
       return;
     }
-    if (Math.abs(x) > 8) dragging = true;
+    // Capture only once it is a swipe, so a plain tap still reaches the photo.
+    if (!dragging && Math.abs(x) > 8) {
+      dragging = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
     if (dragging) dragX = Math.max(-120, Math.min(120, x));
   }
 
   function pointerUp(event) {
     if (!pointer || event.pointerId !== pointer.id) return;
     if (dragging && Math.abs(dragX) > 48) goTo(active + (dragX < 0 ? 1 : -1));
+    swiped = dragging;
     cancelDrag();
   }
 
@@ -135,14 +144,14 @@
   </div>
 
   <div class="showcase-carousel" bind:this={carousel} role="region" aria-roledescription="carousel" aria-label="Photos from Release and Unwind" on:pointerenter={(event) => { if (event.pointerType === 'mouse') hovering = true; }} on:pointerleave={() => hovering = false} on:focusin={() => focusInside = true} on:focusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) focusInside = false; }}>
-    <div class="showcase-stage" role="group" aria-label="Swipe to change photo. Use the arrow keys when focused." tabindex="-1" class:dragging on:pointerdown={pointerDown} on:pointermove={pointerMove} on:pointerup={pointerUp} on:pointercancel={cancelDrag} on:lostpointercapture={cancelDrag}>
+    <div class="showcase-stage" role="group" aria-label="Swipe to change photo. Use the arrow keys when focused." tabindex="-1" class:dragging on:pointerdown={pointerDown} on:pointermove={pointerMove} on:pointerup={pointerUp} on:pointercancel={cancelDrag} on:dragstart|preventDefault on:lostpointercapture={(event) => { if (event.target === event.currentTarget) cancelDrag(); }}>
       {#each slides as slide, index (slide.label)}
         {@const offset = (index - active + slides.length) % slides.length}
         {@const signedOffset = offset <= slides.length / 2 ? offset : offset - slides.length}
         <article class="showcase-card" class:active={offset === 0} aria-hidden={offset !== 0} inert={offset !== 0} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${slides.length}`} style={`--offset:${signedOffset}; --order:${slides.length - Math.abs(signedOffset)}; --drag:${offset === 0 && !reducedMotion ? dragX : 0}px; --motion:${reducedMotion ? '0ms' : '520ms'}`}>
           <button class="photo-open" type="button" aria-label={`Enlarge photo: ${slide.alt}`} on:click={openLightbox}>
             <div class="photo-slot">
-              <img src={slide.src} alt={slide.alt} loading={offset === 0 ? 'eager' : 'lazy'} width="1280" height="720" />
+              <img src={slide.src} alt={slide.alt} loading={offset === 0 ? 'eager' : 'lazy'} width="1280" height="720" draggable="false" />
             </div>
           </button>
         </article>
@@ -189,7 +198,7 @@
   .photo-open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: zoom-in; }
   .photo-open:focus-visible { outline: 2px solid var(--pink-deep); outline-offset: -5px; }
   .photo-slot { height: 100%; overflow: hidden; background: #e6e2d3; }
-  .photo-slot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .photo-slot img { display: block; width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; -webkit-touch-callout: none; }
   .showcase-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; }
   .step { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--deep); border-radius: 50%; background: #faf8f2; color: var(--deep); font-size: 19px; cursor: pointer; transition: transform 150ms ease, background 150ms ease, box-shadow 150ms ease; }
   .step:focus-visible { outline: 2px solid var(--deep); outline-offset: 4px; }
