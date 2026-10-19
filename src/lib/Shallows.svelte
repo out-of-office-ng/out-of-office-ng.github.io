@@ -150,6 +150,18 @@
 
     <button type="button" class="scroll-cue" aria-label="Scroll to the rest of the page" on:click={onScrollToContent}>↓</button>
     {#if !stillWater}
+    {#if status === 'ready'}
+      <!-- Hand-drawn nudge toward the button; decoration only. -->
+      <svg class="wander-arrow wide" viewBox="0 0 90 80" aria-hidden="true" focusable="false">
+        <path class="stroke" pathLength="1" d="M14 4c-6 18-2 36 14 42 14 5 26-4 22-14-4-9-17-6-17 5 0 14 20 25 47 27" />
+        <path class="head" pathLength="1" d="M68 52l13 12-17 6" />
+      </svg>
+      <!-- Phones: the auto-reply card sits right above the button, so this one comes in from the left. -->
+      <svg class="wander-arrow narrow" viewBox="0 0 110 50" aria-hidden="true" focusable="false">
+        <path class="stroke" pathLength="1" d="M4 34c16-14 32-17 38-8 5 8-5 15-11 8-6-8 8-19 27-17 17 2 30 8 45 14" />
+        <path class="head" pathLength="1" d="M92 19l12 12-15 6" />
+      </svg>
+    {/if}
     <button type="button" class="wander-button ui-action" bind:this={wanderButton} disabled={stillWater || status !== 'ready'} on:click={() => showView('explore')}>
       Wander the water
     </button>
@@ -237,6 +249,14 @@
   .wander-button { position: absolute; z-index: 3; right: clamp(16px, 4.45vw, 64px); bottom: max(40px, env(safe-area-inset-bottom)); height: 46px; padding: 0 16px; border: 2px solid var(--hero-ink); border-radius: 99px; background: rgb(250 248 242 / .94); color: var(--hero-ink); font-size: 13px; font-weight: 500; white-space: nowrap; }
   .wander-button:hover { background: var(--hero-card); }
   .wander-button:disabled { opacity: .5; cursor: not-allowed; }
+  /* Sits up and left of the button and curls into it. */
+  .wander-arrow.narrow { display: none; }
+  .wander-arrow { filter: drop-shadow(0 0 1.5px rgb(250 248 242 / .95)) drop-shadow(0 0 3px rgb(250 248 242 / .7)); }
+  .wander-arrow { position: absolute; z-index: 3; right: calc(clamp(16px, 4.45vw, 64px) + 128px); bottom: calc(max(40px, env(safe-area-inset-bottom)) + 18px); width: 84px; height: 75px; overflow: visible; pointer-events: none; color: var(--hero-ink); }
+  .wander-arrow path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+  :global(html[data-motion="running"]) .wander-arrow .stroke { animation: wander-draw 1.1s .6s cubic-bezier(.6, 0, .3, 1) both; }
+  :global(html[data-motion="running"]) .wander-arrow .head { animation: wander-draw .35s 1.6s ease-out both; }
+  @keyframes wander-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   .scroll-cue { position: absolute; z-index: 2; bottom: 30px; left: 50%; width: 44px; height: 44px; transform: translateX(-50%); border: 0; background: transparent; color: var(--hero-ink); font-size: 26px; }
   .explore-card { position: absolute; z-index: 2; bottom: max(80px, env(safe-area-inset-bottom)); left: clamp(16px, 4.45vw, 64px); width: min(380px, calc(100% - 32px)); padding: 22px; border: 1px solid var(--hero-line); border-radius: 14px; background: rgb(250 248 242 / .94); box-shadow: 0 12px 32px var(--hero-card-shadow); }
   .explore-hint { margin: 0 0 16px; font-size: 16px; line-height: 1.4; }
@@ -270,6 +290,8 @@
     .auto-reply .postmark { display: none; }
     .scroll-cue { display: none; }
     .wander-button { right: 16px; bottom: max(28px, env(safe-area-inset-bottom)); }
+    .wander-arrow.wide { display: none; }
+    .wander-arrow.narrow { display: block; right: 152px; bottom: calc(max(28px, env(safe-area-inset-bottom)) + 6px); width: 92px; height: 42px; }
     .scene-status { top: auto; right: auto; left: 20px; bottom: 82px; }
   }
   @media (max-width: 350px) {
